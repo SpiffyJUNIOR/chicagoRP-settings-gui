@@ -79,5 +79,46 @@ net.Receive("chicagoRP_settings", function()
     exitButtonLabel:SetPos(5, 250)
     exitButtonLabel:SetText("GAME")
     exitButtonLabel:SetFont("MichromaRegular")
+
+    local categorySheet = vgui.Create("DPropertySheet", motherFrame)
+    sheet:Dock(LEFT)
+
+    local categoryButton1 = vgui.Create("DPanel", categorySheet)
+    categorySheet:AddSheet("VIDEO", categoryButton1)
+
+    local categoryButton2 = vgui.Create( "DPanel", categorySheet )
+    categorySheet:AddSheet("GAME", categoryButton2)
+
+    local settingButton = vgui.Create( "DComboBox", frame )
+    settingButton:SetPos(5, 30)
+    settingButton:SetSize(100, 20)
+    settingButton:SetValue("options")
+    settingButton:AddChoice("Low")
+    settingButton:AddChoice("Medium")
+    settingButton:AddChoice("High")
+    settingButton:AddChoice("Very High")
+    settingButton.OnSelect = function( self, index, value )
+        print( value .. " was selected at index " .. index )
+    end
+
+    local settingButtonLabel = vgui.Create("DLabel", settingButton)
+    DLabel:SetPos(5, 30)
+    DLabel:SetText("options")
+    DLabel:SetFont("MichromaRegular")
     ---
 end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
