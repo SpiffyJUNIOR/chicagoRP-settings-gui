@@ -7,6 +7,15 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     end
 })
 
+surface.CreateFont("MichromaRegular", {
+    font = "Michroma",
+    extended = false,
+    size = 15,
+    weight = 500,
+    antialias = true,
+    shadow = false
+})
+
 local blurMat = Material("pp/blurscreen")
 local Dynamic = 0
 
@@ -53,5 +62,22 @@ net.Receive("chicagoRP_settings", function()
             self:Close()
         end
     end
+
+    function motherFrame:OnClose()
+        self:AlphaTo(100, 1, 0)
+    end
+
+    local exitButton = vgui.Create("DButton", motherFrame)
+    exitButton:SetPos(5, 245)
+    exitButton:SetSize(190, 50)
+
+    function exitButton:DoClick()
+        motherFrame:Close()
+    end
+
+    local exitButtonLabel = vgui.Create("DLabel", exitButton)
+    exitButtonLabel:SetPos(5, 250)
+    exitButtonLabel:SetText("GAME")
+    exitButtonLabel:SetFont("MichromaRegular")
     ---
 end)
