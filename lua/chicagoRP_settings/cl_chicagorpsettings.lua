@@ -1,17 +1,39 @@
 list.Set("DesktopWindows", "chicagoRP Settings", {
-    local listplayer = LocalPlayer()
     title = "Context Menu Icon",
     icon = "icon64/icon.png",
     init = function(icon, window)
-        listplayer:EZ_Open_Inventory(listplayer)
+        OpenChicagoRPSettings()
     end
+})
+
+local function OpenChicagoRPSettings()
+    net.Start("chicagoRP_settings")
+    net.Send(LocalPlayer())
+end
+
+surface.CreateFont("MichromaSmall", {
+    font = "Michroma",
+    extended = false,
+    size = 20,
+    weight = 551,
+    antialias = true,
+    shadow = false
 })
 
 surface.CreateFont("MichromaRegular", {
     font = "Michroma",
     extended = false,
-    size = 15,
-    weight = 500,
+    size = 24,
+    weight = 550,
+    antialias = true,
+    shadow = false
+})
+
+surface.CreateFont("MichromaHelpText", {
+    font = "Michroma",
+    extended = false,
+    size = 18,
+    weight = 550,
     antialias = true,
     shadow = false
 })
@@ -44,68 +66,95 @@ net.Receive("chicagoRP_settings", function()
     local motherFrame = vgui.Create("DFrame")
     local screenwidth = ScrW()
     local screenheight = ScrH()
+    local whitetext = (Color(255, 255, 255, 255))
+    local redtext = (Color(130, 25, 39, 255))
     motherFrame:SetSize(screenwidth, screenheight)
     motherFrame:SetVisible(true)
     motherFrame:SetDraggable(false)
     motherFrame:ShowCloseButton(false)
+    motherFrame:SetTitle("")
+    motherFrame:ParentToHUD()
 
     function motherFrame:Paint(w, h)
         BlurBackground(self)
-        draw.RoundedBox(8, 0, 0, w, h, Color(0, 0, 0, 255))
+        draw.RoundedBox(8, 0, 0, w, h, Color(0, 0, 0, 10))
     end
 
     motherFrame:MakePopup()
     motherFrame:Center()
 
     function motherFrame:OnKeyCodePressed(key)
-        if key == KEY_ESCAPE then
+        if key == KEY_ESCAPE or key == KEY_Q then
             self:Close()
         end
     end
 
-    function motherFrame:OnClose()
-        self:AlphaTo(100, 1, 0)
-    end
-
+    ---
     local exitButton = vgui.Create("DButton", motherFrame)
-    exitButton:SetPos(5, 245)
-    exitButton:SetSize(190, 50)
+    exitButton:SetPos(100, 94)
+    exitButton:SetSize(80, 20)
+    -- exitButton:SetSize(200, 200)
+    exitButton:SetFont("MichromaSmall")
+    exitButton:SetText("< GAME")
+    exitButton:SetTextColor(redtext)
 
     function exitButton:DoClick()
         motherFrame:Close()
     end
 
-    local exitButtonLabel = vgui.Create("DLabel", exitButton)
-    exitButtonLabel:SetPos(5, 250)
-    exitButtonLabel:SetText("GAME")
-    exitButtonLabel:SetFont("MichromaRegular")
-
-    local categorySheet = vgui.Create("DPropertySheet", motherFrame)
-    sheet:Dock(LEFT)
-
-    local categoryButton1 = vgui.Create("DPanel", categorySheet)
-    categorySheet:AddSheet("VIDEO", categoryButton1)
-
-    local categoryButton2 = vgui.Create( "DPanel", categorySheet )
-    categorySheet:AddSheet("GAME", categoryButton2)
-
-    local settingButton = vgui.Create( "DComboBox", frame )
-    settingButton:SetPos(5, 30)
-    settingButton:SetSize(100, 20)
-    settingButton:SetValue("options")
-    settingButton:AddChoice("Low")
-    settingButton:AddChoice("Medium")
-    settingButton:AddChoice("High")
-    settingButton:AddChoice("Very High")
-    settingButton.OnSelect = function( self, index, value )
-        print( value .. " was selected at index " .. index )
+    function exitButton:Paint(w, h)
+        return nil
     end
-
-    local settingButtonLabel = vgui.Create("DLabel", settingButton)
-    DLabel:SetPos(5, 30)
-    DLabel:SetText("options")
-    DLabel:SetFont("MichromaRegular")
     ---
+
+    local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
+    settingsTitleLabel:SetPos(114, 96)
+    settingsTitleLabel:SetSize(150, 50)
+    settingsTitleLabel:SetFont("MichromaRegular")
+    settingsTitleLabel:SetText("SETTINGS")
+    settingsTitleLabel:SetTextColor(whitetext)
+
+    function settingsTitleLabel:Paint(w, h)
+        return nil
+    end
+    ---
+
+    local settingsHelpText = vgui.Create("DLabel", motherFrame)
+    settingsHelpText:SetPos(114, 915)
+    settingsHelpText:SetSize(1000, 30)
+    settingsHelpText:SetFont("MichromaSmall")
+    settingsHelpText:SetText("This shouldn't appear when nothing is highlighted.")
+    settingsHelpText:SetTextColor(whitetext)
+
+    function settingsHelpText:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
+    ---
+
+    local controlHelpText = vgui.Create("DLabel", motherFrame)
+    controlHelpText:SetPos(114, 970)
+    controlHelpText:SetSize(170, 30)
+    controlHelpText:SetFont("MichromaHelpText")
+    controlHelpText:SetText("[ENTER]   SELECT")
+    controlHelpText:SetTextColor(redtext)
+
+    function controlHelpText:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
+    ---
+
+    local controlHelpText2 = vgui.Create("DLabel", motherFrame)
+    controlHelpText2:SetPos(300, 970)
+    controlHelpText2:SetSize(170, 30)
+    controlHelpText2:SetFont("MichromaHelpText")
+    controlHelpText2:SetText("[ESC]   BACK")
+    controlHelpText2:SetTextColor(redtext)
+
+    function controlHelpText2:Paint(w, h)
+        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+    end
 end)
 
 

@@ -6,18 +6,15 @@ hook.Add("PlayerSay", "chicagoRPsettings_PLAYERSAY", function(ply, txt)
     local lowerTxt = string.lower(txt)
 
     if (lowerTxt == "*settings*") then
-        ply:EZ_Open_Inventory(ply)
+        net.Start("chicagoRP_settings")
+        net.Send(ply)
 
         return ""
     end
 end)
 
-function ply:EZ_Open_Inventory(ply)
-    net.Start("chicagoRP_settings")
-    net.Send(ply)
-end
-
 concommand.Add("chicagoRP_settings", function(ply)
     if not (IsValid(ply) and ply:Alive()) then return end
-    JMod.EZ_Open_Inventory(ply)
+    net.Start("chicagoRP_settings")
+    net.Send(ply)
 end)
