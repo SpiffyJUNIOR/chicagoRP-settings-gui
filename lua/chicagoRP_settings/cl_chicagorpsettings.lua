@@ -2,7 +2,7 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     title = "Context Menu Icon",
     icon = "icon64/icon.png",
     init = function(icon, window)
-        RunConsoleCommand("chicagoRP_settings")
+        LocalPlayer():ConCommand("chicagoRP_settings")
     end
 })
 
