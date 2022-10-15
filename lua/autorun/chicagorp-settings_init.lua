@@ -1,5 +1,4 @@
 AddCSLuaFile()
-chicagoRPsettings = chicagoRPsettings or {}
 
 for i, f in pairs(file.Find("chicagorp_settings/*.lua", "LUA")) do
     if string.Left(f, 3) == "sv_" then

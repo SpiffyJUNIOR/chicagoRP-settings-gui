@@ -2,14 +2,9 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     title = "Context Menu Icon",
     icon = "icon64/icon.png",
     init = function(icon, window)
-        OpenChicagoRPSettings()
+        RunConsoleCommand("chicagoRP_settings")
     end
 })
-
-local function OpenChicagoRPSettings()
-    net.Start("chicagoRP_settings")
-    net.Send(LocalPlayer())
-end
 
 surface.CreateFont("MichromaSmall", {
     font = "Michroma",
@@ -153,7 +148,7 @@ net.Receive("chicagoRP_settings", function()
     controlHelpText2:SetTextColor(redtext)
 
     function controlHelpText2:Paint(w, h)
-        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
     end
 end)
 
