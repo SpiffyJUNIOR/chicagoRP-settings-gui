@@ -6,7 +6,7 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     end
 })
 
-surface.CreateFont("MichromaSmall", {
+surface.CreateFont("MichromaSmall", { -- wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
     font = "Michroma",
     extended = false,
     size = 20,
@@ -138,8 +138,12 @@ net.Receive("chicagoRP_settings", function()
     settingsHelpText:SetPos(114, 915)
     settingsHelpText:SetSize(1000, 30)
     settingsHelpText:SetFont("MichromaSmall")
-    settingsHelpText:SetText("This shouldn't appear when nothing is highlighted.")
+    settingsHelpText:SetText("This should not appear when nothing is highlighted.")
     settingsHelpText:SetTextColor(whitetext)
+
+    if !VideoCategory:IsChildHovered() then
+        settingsHelpText:SetText("This should not appear when nothing is highlighted.")
+    end
 
     function settingsHelpText:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
@@ -169,6 +173,26 @@ net.Receive("chicagoRP_settings", function()
 
     function controlHelpText2:Paint(w, h)
         return nil
+    end
+    ---
+
+    local VideoCategory = vgui.Create("DCategoryList", motherFrame)
+    VideoCategory:SetPos(114, 400)
+
+    -- The contents can be any panel, even a DPanelList
+    local VideoCategoryButton = VideoCategory:Add("Test category with panel contents")
+    VideoCategoryButton:SetTall(100)
+
+    local NewImpactEffects = vgui.Create("DCheckBox")
+    NewImpactEffects:SetText("Fancy Impact Effects")
+    NewImpactEffects:SetPos(314, 300)
+    NewImpactEffects:SetValue(true)
+    VideoCategoryButton:SetContents(NewImpactEffects)
+
+    VideoCategory:InvalidateLayout(true)
+
+    if NewImpactEffects:IsHovered() and IsValid(settingsHelpText) then
+        settingsHelpText:SetText("Enables or disables fancy impact effects.")
     end
 end)
 
