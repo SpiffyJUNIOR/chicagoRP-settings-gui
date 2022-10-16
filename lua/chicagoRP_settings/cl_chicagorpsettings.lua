@@ -56,19 +56,35 @@ local function BlurBackground(panel)
     Dynamic = math.Clamp(Dynamic + (1 / FrameRate) * 7, 0, 1)
 end
 
+local HideHUD = false
+
+local HideElements = {
+    ["CHudHealth"] = true,
+    ["CHudBattery"] = true
+}
+
+hook.Add("HUDPaint", "chicagoRP_HideHUD", function()
+    if HideHUD then
+        return false
+    end
+
+    -- Don't return anything here, it may break other addons that rely on this hook.
+end)
+
 net.Receive("chicagoRP_settings", function()
     local ply = LocalPlayer()
-    local motherFrame = vgui.Create("DFrame")
     local screenwidth = ScrW()
     local screenheight = ScrH()
     local whitetext = (Color(255, 255, 255, 255))
     local redtext = (Color(130, 25, 39, 255))
+    local motherFrame = vgui.Create("DFrame")
     motherFrame:SetSize(screenwidth, screenheight)
     motherFrame:SetVisible(true)
     motherFrame:SetDraggable(false)
     motherFrame:ShowCloseButton(false)
     motherFrame:SetTitle("")
     motherFrame:ParentToHUD()
+    HideHUD = true
 
     function motherFrame:Paint(w, h)
         BlurBackground(self)
@@ -84,7 +100,11 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
+    function motherFrame:OnClose()
+        HideHUD = false
+    end
     ---
+
     local exitButton = vgui.Create("DButton", motherFrame)
     exitButton:SetPos(100, 94)
     exitButton:SetSize(80, 20)
