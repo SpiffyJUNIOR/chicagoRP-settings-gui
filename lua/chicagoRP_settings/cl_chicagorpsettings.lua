@@ -58,17 +58,10 @@ end
 
 local HideHUD = false
 
-local HideElements = {
-    ["CHudHealth"] = true,
-    ["CHudBattery"] = true
-}
-
 hook.Add("HUDPaint", "chicagoRP_HideHUD", function()
     if HideHUD then
         return false
     end
-
-    -- Don't return anything here, it may break other addons that rely on this hook.
 end)
 
 net.Receive("chicagoRP_settings", function()
@@ -141,10 +134,6 @@ net.Receive("chicagoRP_settings", function()
     settingsHelpText:SetText("This should not appear when nothing is highlighted.")
     settingsHelpText:SetTextColor(whitetext)
 
-    if !VideoCategory:IsChildHovered() then
-        settingsHelpText:SetText("This should not appear when nothing is highlighted.")
-    end
-
     function settingsHelpText:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
@@ -176,20 +165,28 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local VideoCategory = vgui.Create("DCategoryList", motherFrame)
+    local VideoCategory = vgui.Create("DCollapsibleCategory", motherFrame)
+    VideoCategory:SetLabel("VIDEO")
     VideoCategory:SetPos(114, 400)
+    VideoCategory:SetSize(114, 400)
+    VideoCategory:SetExpanded(false)
 
     -- The contents can be any panel, even a DPanelList
-    local VideoCategoryButton = VideoCategory:Add("Test category with panel contents")
-    VideoCategoryButton:SetTall(100)
+    local VideoCategoryList = vgui.Create("DPanelList", motherFrame)
+    VideoCategoryList:SetSpacing(2)                           -- Set the spacing between items
+    VideoCategoryList:EnableHorizontal(true)                 -- Only vertical items
+    VideoCategoryList:EnableVerticalScrollbar(true)           -- Enable the scrollbar if (the contents are too wide)
+    VideoCategory:SetContents(VideoCategoryList)               -- Add DPanelList to our Collapsible Category
 
-    local NewImpactEffects = vgui.Create("DCheckBox")
-    NewImpactEffects:SetText("Fancy Impact Effects")
-    NewImpactEffects:SetPos(314, 300)
-    NewImpactEffects:SetValue(true)
-    VideoCategoryButton:SetContents(NewImpactEffects)
+    local NewImpactEffects = vgui.Create("DCheckBoxLabel")  -- This section creates a checkbox and
+    NewImpactEffects:SetText("Amen, Brother")                    -- sets up its settings
+    NewImpactEffects:SetConVar("cl_new_impact_effects")
+    NewImpactEffects:SetValue(1)
+    VideoCategoryList:AddItem(NewImpactEffects)                 -- Add the checkbox to the category
 
-    VideoCategory:InvalidateLayout(true)
+    if !VideoCategory:IsChildHovered() then
+        settingsHelpText:SetText("This should not appear when nothing is highlighted.")
+    end
 
     if NewImpactEffects:IsHovered() and IsValid(settingsHelpText) then
         settingsHelpText:SetText("Enables or disables fancy impact effects.")
