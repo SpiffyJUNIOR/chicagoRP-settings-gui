@@ -121,6 +121,10 @@ net.Receive("chicagoRP_settings", function()
     settingsHelpText:SetText("This should not appear when nothing is highlighted.")
     settingsHelpText:SetTextColor(whitetext)
 
+    if !VideoCategory:IsChildHovered() then
+        settingsHelpText:SetText("This should not appear when nothing is highlighted.")
+    end
+
     function settingsHelpText:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
@@ -166,6 +170,10 @@ net.Receive("chicagoRP_settings", function()
     VideoCategoryButton:SetContents(NewImpactEffects)
 
     VideoCategory:InvalidateLayout(true)
+
+    if NewImpactEffects:IsHovered() and IsValid(settingsHelpText) then
+        settingsHelpText:SetText("Enables or disables fancy impact effects.")
+    end
 end)
 
 
