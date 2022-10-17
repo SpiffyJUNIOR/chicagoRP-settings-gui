@@ -165,30 +165,49 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local VideoCategory = vgui.Create("DCollapsibleCategory", motherFrame)
-    VideoCategory:SetLabel("VIDEO")
-    VideoCategory:SetPos(114, 400)
-    VideoCategory:SetSize(114, 400)
-    VideoCategory:SetExpanded(false)
+    -- local VideoCategory = vgui.Create("DCollapsibleCategory", motherFrame)
+    -- VideoCategory:SetLabel("VIDEO")
+    -- VideoCategory:SetPos(114, 400)
+    -- VideoCategory:SetSize(114, 400)
+    -- VideoCategory:SetExpanded(false)
 
-    -- The contents can be any panel, even a DPanelList
-    local VideoCategoryList = vgui.Create("DPanelList", motherFrame)
-    VideoCategoryList:SetSpacing(2)                           -- Set the spacing between items
-    VideoCategoryList:EnableHorizontal(true)                 -- Only vertical items
-    VideoCategoryList:EnableVerticalScrollbar(true)           -- Enable the scrollbar if (the contents are too wide)
-    VideoCategory:SetContents(VideoCategoryList)               -- Add DPanelList to our Collapsible Category
+    -- -- The contents can be any panel, even a DPanelList
+    -- local VideoCategoryList = vgui.Create("DPanelList", motherFrame)
+    -- VideoCategoryList:SetSpacing(2)                           -- Set the spacing between items
+    -- VideoCategoryList:EnableHorizontal(true)                 -- Only vertical items
+    -- VideoCategoryList:EnableVerticalScrollbar(true)           -- Enable the scrollbar if (the contents are too wide)
+    -- VideoCategory:SetContents(VideoCategoryList)               -- Add DPanelList to our Collapsible Category
 
-    local NewImpactEffects = vgui.Create("DCheckBoxLabel")  -- This section creates a checkbox and
-    NewImpactEffects:SetText("Amen, Brother")                    -- sets up its settings
-    NewImpactEffects:SetConVar("cl_new_impact_effects")
-    NewImpactEffects:SetValue(1)
-    VideoCategoryList:AddItem(NewImpactEffects)                 -- Add the checkbox to the category
+    -- local NewImpactEffects = vgui.Create("DCheckBoxLabel")  -- This section creates a checkbox and
+    -- NewImpactEffects:SetText("Amen, Brother")                    -- sets up its settings
+    -- NewImpactEffects:SetConVar("cl_new_impact_effects")
+    -- NewImpactEffects:SetValue(1)
+    -- VideoCategoryList:AddItem(NewImpactEffects)                 -- Add the checkbox to the category
 
-    if !VideoCategory:IsChildHovered() then
+    local videoCategorySheet = vgui.Create("DPropertySheet", motherFrame)
+    videoCategorySheet:Dock(FILL)
+
+    local videoSettingsPanel = vgui.Create("DPanel", videoCategorySheet)
+
+    function videoSettingsPanel:Paint(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, Color(0, 128, 255, self:GetAlpha()))
+    end
+
+    videoCategorySheet:AddSheet("FROM SIRUS...", videoSettingsPanel)
+
+    local gameSettingsPanel = vgui.Create("...TO MARS", videoCategorySheet)
+
+    function gameSettingsPanel:Paint(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, Color(255, 128, 0, self:GetAlpha()))
+    end
+
+    videoCategorySheet:AddSheet("test 2", gameSettingsPanel)
+
+    if !videoCategorySheet:IsChildHovered() then
         settingsHelpText:SetText("This should not appear when nothing is highlighted.")
     end
 
-    if NewImpactEffects:IsHovered() and IsValid(settingsHelpText) then
+    if videoCategorySheet:IsChildHovered() and IsValid(settingsHelpText) then
         settingsHelpText:SetText("Enables or disables fancy impact effects.")
     end
 end)
