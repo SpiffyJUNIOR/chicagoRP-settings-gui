@@ -38,7 +38,7 @@ local Dynamic = 0
 
 local function BlurBackground(panel)
     if (!IsValid(panel) and !panel:IsVisible()) then return end
-    local layers, density, alpha = 1, 1, 255
+    local layers, density, alpha = 1, 1, 80
     local x, y = panel:LocalToScreen(0, 0)
     surface.SetDrawColor(255, 255, 255, alpha)
     surface.SetMaterial(blurMat)
@@ -78,6 +78,10 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:SetTitle("")
     motherFrame:ParentToHUD()
     HideHUD = true
+
+    if ConVarExists("arccw_crosshair") then
+        ArcCW.InvHUD:Remove()
+    end
 
     function motherFrame:Paint(w, h)
         BlurBackground(self)
