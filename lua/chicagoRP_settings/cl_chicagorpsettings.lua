@@ -64,6 +64,21 @@ hook.Add("HUDPaint", "chicagoRP_HideHUD", function()
     end
 end)
 
+local videoSettingsOptions = {
+    [1] = {
+        convar = "cl_new_impact_effects",
+        max = 1,
+        min = 0,
+        printname = "Fancy Impact Effects"
+    },
+    [2] = {
+        convar = "kill",
+        max = 0,
+        min = 0,
+        printname = "GET GOOD GET LMAOBOX"
+    }
+}
+
 net.Receive("chicagoRP_settings", function()
     local ply = LocalPlayer()
     local screenwidth = ScrW()
@@ -79,7 +94,7 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:ParentToHUD()
     HideHUD = true
 
-    if ConVarExists("arccw_crosshair") then
+    if IsValid(ArcCW.InvHUD) then
         ArcCW.InvHUD:Remove()
     end
 
@@ -169,25 +184,41 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local CatList = vgui.Create( "DCategoryList", motherFrame)
-    CatList:SetPos(400, 400)
-    CatList:SetSize(400, 400)
+    local videoSettingsButton = vgui.Create("DButton", motherFrame)
+    videoSettingsButton:SetPos(110, 200)
+    videoSettingsButton:SetSize(394, 56)
+    videoSettingsButton:SetFont("MichromaRegular")
+    videoSettingsButton:SetText("")
+    videoSettingsButton:SetTextColor(whitetext)
 
-    local Cat = CatList:Add("Test category with text contents")
-    Cat:Add("From Mars...")
-    local button = Cat:Add( "...To Sirus" )
-    button.DoClick = function() -- how the fuck (figure out how to do category shit properly, then try and make button table)
-        print( "...To Sirus was clicked." )
-        local NewImpactEffects = vgui.Create( "DButton", motherFrame)
-        NewImpactEffects:SetPos(400, 400)
-        NewImpactEffects:SetSize(100, 50)
+    function videoSettingsButton:Paint(w, h)
+        if self:IsHovered() then
+            surface.SetDrawColor(34, 34, 34, 100)
+            surface.DrawRect(0, 0, w, h)
+        end
+        surface.SetTextColor(whitetext)
+        surface.SetTextPos(w - 383, h - 42)
+        surface.SetFont("MichromaRegular")
+        surface.DrawText("VIDEO")
+        self:InsertFade(6, 2)
+    end
+
+    function videoSettingsButton:DoClick()
+        -- PrintTable(videoSettingsOptions)
+        for k, v in ipairs(videoSettingsOptions) do
+            print(v.convar)
+            print(v.printname)
+            local button = vgui.Create("DButton", motherFrame)
+            button:SetText(v.printname)
+            button:SetPos(300, 300)
+            button.DoClick = function()
+                current:Hide()
+                v:Show()
+                local current = v
+            end
+        end
     end
 end)
-
-
-
-
-
 
 
 
