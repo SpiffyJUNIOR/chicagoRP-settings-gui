@@ -6,7 +6,8 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     end
 })
 
-surface.CreateFont("MichromaSmall", { -- wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
+// wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
+surface.CreateFont("MichromaSmall", {
     font = "Michroma",
     extended = false,
     size = 20,
@@ -225,7 +226,7 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawRect(0, 0, w, h)
             if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                 surface.SetDrawColor(255, 86, 65)
-                surface.DrawOutlinedRect(0, 0, w, h, 1)
+                surface.DrawOutlinedRect(0, 0, w, h, 1) -- 4 x drawtexturedrectuv for gradient
                 settingsHelpText:SetText("Love?")
             end
             surface.SetTextColor(whitetext)
@@ -234,6 +235,15 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawText("Button #" .. i)
         end
     end
+    -- function surface.DrawOutlinedRect(x, y, w, h) -- drawoutlinedrect example
+    --     local old = render2d.bound_texture
+    --     render2d.SetTexture()
+    --     render2d.DrawRect(x, y, 1, h)
+    --     render2d.DrawRect(x, y, w, 1)
+    --     render2d.DrawRect(w + x - 1, y, 1, h)
+    --     render2d.DrawRect(x, h + y - 1, w, 1)
+    --     render2d.bound_texture = old
+    -- end
     ---
 
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
