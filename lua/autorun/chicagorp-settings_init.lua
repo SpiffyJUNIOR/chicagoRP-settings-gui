@@ -15,4 +15,5 @@ for i, f in pairs(file.Find("chicagorp_settings/*.lua", "LUA")) do
     else
         print("chicagoRP Settings detected unaccounted for lua file '" .. f .. "' - check prefixes!")
     end
+    print("chicagoRP Settings successfully loaded!")
 end

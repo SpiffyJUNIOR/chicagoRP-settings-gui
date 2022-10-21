@@ -6,8 +6,10 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     end
 })
 
+print("new changes loaded!")
+
 // wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
-surface.CreateFont("MichromaSmall", {
+surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being created every frame
     font = "Michroma",
     extended = false,
     size = 20,
@@ -16,7 +18,7 @@ surface.CreateFont("MichromaSmall", {
     shadow = false
 })
 
-surface.CreateFont("MichromaRegular", {
+surface.CreateFont("MichromaRegular", { -- check to make sure these aren't being created every frame
     font = "Michroma",
     extended = false,
     size = 24,
@@ -25,7 +27,7 @@ surface.CreateFont("MichromaRegular", {
     shadow = false
 })
 
-surface.CreateFont("MichromaHelpText", {
+surface.CreateFont("MichromaHelpText", { -- check to make sure these aren't being created every frame
     font = "Michroma",
     extended = false,
     size = 18,
@@ -59,11 +61,13 @@ end
 
 local HideHUD = false
 
-hook.Add("HUDPaint", "chicagoRP_HideHUD", function()
+hook.Add("HUDPaint", "chicagoRP_HideHUD", function() -- we also need to hide hints and easychat
     if HideHUD then
         return false
     end
 end)
+
+local gradient_mat = Material("vgui/gradient-u")
 
 local videoSettingsOptions = {
     [1] = {
@@ -80,6 +84,8 @@ local videoSettingsOptions = {
     }
 }
 
+local OpenDropdown = nil
+
 net.Receive("chicagoRP_settings", function()
     local ply = LocalPlayer()
     local screenwidth = ScrW()
@@ -95,8 +101,8 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:ParentToHUD()
     HideHUD = true
 
-    if IsValid(ArcCW.InvHUD) then
-        ArcCW.InvHUD:Remove()
+    if IsValid(ArcCW.InvHUD) then -- also add tfa, cw2, and fas2 compatibility please
+        ArcCW.InvHUD:Hide()
     end
 
     function motherFrame:Paint(w, h)
@@ -115,6 +121,9 @@ net.Receive("chicagoRP_settings", function()
 
     function motherFrame:OnClose()
         HideHUD = false
+        if IsValid(ArcCW.InvHUD) then
+            ArcCW.InvHUD:Show()
+        end
     end
     ---
 
@@ -191,15 +200,15 @@ net.Receive("chicagoRP_settings", function()
     local settingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
     settingsScrollPanel:SetPos(525, 235)
     settingsScrollPanel:SetSize(820, 635)
-    settingsScrollPanel:SetPadding(15)
 
     function settingsScrollPanel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
 
-    local settingsScrollBar = settingsScrollPanel:GetVBar() -- mr joe biden please legalize nuclear bombs
+    local settingsScrollBar = settingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     settingsScrollBar:SetHideButtons(true)
+    settingsScrollBar:SetPos(525, 235)
     function settingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
     end
@@ -226,7 +235,12 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawRect(0, 0, w, h)
             if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                 surface.SetDrawColor(255, 86, 65)
-                surface.DrawOutlinedRect(0, 0, w, h, 1) -- 4 x drawtexturedrectuv for gradient
+                -- surface.DrawOutlinedRect(0, 0, w, h, 1) -- 4 x drawtexturedrectuv for gradient
+                surface.SetMaterial(gradient_mat)
+                surface.DrawTexturedRectUV(0, 0, w, 4, 0, 0, 1, 0)
+                -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
+                -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
+                -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
                 settingsHelpText:SetText("Love?")
             end
             surface.SetTextColor(whitetext)
@@ -234,17 +248,23 @@ net.Receive("chicagoRP_settings", function()
             surface.SetFont("MichromaRegular")
             surface.DrawText("Button #" .. i)
         end
+        function settingsScrollPanelTestButton:DoClick()
+            if IsValid(OpenDropdown) then
+                OpenDropdown:Remove()
+            end
+
+            local Dropdown = vgui.Create("DPanel", motherFrame)
+            Dropdown:SetSize(settingsScrollPanelTestButton:GetWide(), 3 * 40)
+            Dropdown:SetPos(650, 235)
+
+            function Dropdown:Paint(w, h)
+                surface.SetDrawColor(70, 70, 70, 220)
+                surface.DrawRect(0, 0, w, h)
+            end
+
+            OpenDropdown = Dropdown
+        end
     end
-    -- function surface.DrawOutlinedRect(x, y, w, h) -- drawoutlinedrect example
-    --     local old = render2d.bound_texture
-    --     render2d.SetTexture()
-    --     render2d.DrawRect(x, y, 1, h)
-    --     render2d.DrawRect(x, y, w, 1)
-    --     render2d.DrawRect(w + x - 1, y, 1, h)
-    --     render2d.DrawRect(x, h + y - 1, w, 1)
-    --     render2d.bound_texture = old
-    -- end
-    ---
 
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
     videoSettingsButton:SetPos(103, 230)
@@ -271,7 +291,6 @@ net.Receive("chicagoRP_settings", function()
             print(v.printname)
             local button = settingsScrollPanel:Add("DButton")
             button:SetText(v.printname)
-            -- button:SetPos(300, 300)
             button.DoClick = function()
                 current:Hide()
                 v:Show()
