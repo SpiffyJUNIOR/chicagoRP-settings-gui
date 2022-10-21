@@ -238,6 +238,7 @@ net.Receive("chicagoRP_settings", function()
                 -- surface.DrawOutlinedRect(0, 0, w, h, 1) -- 4 x drawtexturedrectuv for gradient
                 surface.SetMaterial(gradient_mat)
                 surface.DrawTexturedRectUV(0, 0, w, 4, 0, 0, 1, 0)
+                surface.DrawTexturedRectUV(0, 0, w, 4, 0, 1, 0, 1) -- get x/y coords from rectangle somehow
                 -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
                 -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
                 -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
