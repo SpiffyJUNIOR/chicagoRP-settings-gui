@@ -1,15 +1,15 @@
 list.Set("DesktopWindows", "chicagoRP Settings", {
     title = "Context Menu Icon",
-    icon = "icon64/icon.png",
+    icon = "icon64/chicagoRP_settings.png",
     init = function(icon, window)
         LocalPlayer():ConCommand("chicagoRP_settings")
     end
 })
 
-print("new changes loaded!")
+print("chicagoRP client LUA loaded!")
 
-// wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
-surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being created every frame
+-- wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
+surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being created constantly
     font = "Michroma",
     extended = false,
     size = 20,
@@ -18,7 +18,7 @@ surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being c
     shadow = false
 })
 
-surface.CreateFont("MichromaRegular", { -- check to make sure these aren't being created every frame
+surface.CreateFont("MichromaRegular", { -- check to make sure these aren't being created constantly
     font = "Michroma",
     extended = false,
     size = 24,
@@ -27,7 +27,7 @@ surface.CreateFont("MichromaRegular", { -- check to make sure these aren't being
     shadow = false
 })
 
-surface.CreateFont("MichromaHelpText", { -- check to make sure these aren't being created every frame
+surface.CreateFont("MichromaHelpText", { -- check to make sure these aren't being created constantly
     font = "Michroma",
     extended = false,
     size = 18,
@@ -85,13 +85,13 @@ local videoSettingsOptions = {
 }
 
 local OpenDropdown = nil
+local primarytext = (Color(255, 255, 255, 255))
+local secondarytext = (Color(130, 25, 39, 255))
 
 net.Receive("chicagoRP_settings", function()
     local ply = LocalPlayer()
     local screenwidth = ScrW()
     local screenheight = ScrH()
-    local whitetext = (Color(255, 255, 255, 255))
-    local redtext = (Color(130, 25, 39, 255))
     local motherFrame = vgui.Create("DFrame")
     motherFrame:SetSize(screenwidth, screenheight)
     motherFrame:SetVisible(true)
@@ -133,7 +133,7 @@ net.Receive("chicagoRP_settings", function()
     -- exitButton:SetSize(200, 200)
     exitButton:SetFont("MichromaSmall")
     exitButton:SetText("< GAME")
-    exitButton:SetTextColor(redtext)
+    exitButton:SetTextColor(secondarytext)
 
     function exitButton:DoClick()
         motherFrame:Close()
@@ -150,7 +150,7 @@ net.Receive("chicagoRP_settings", function()
     settingsTitleLabel:SetSize(130, 20)
     settingsTitleLabel:SetFont("MichromaRegular")
     settingsTitleLabel:SetText("SETTINGS")
-    settingsTitleLabel:SetTextColor(whitetext)
+    settingsTitleLabel:SetTextColor(primarytext)
 
     function settingsTitleLabel:Paint(w, h)
         draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
@@ -163,7 +163,7 @@ net.Receive("chicagoRP_settings", function()
     settingsHelpText:SetSize(1000, 30)
     settingsHelpText:SetFont("MichromaSmall")
     settingsHelpText:SetText("This should not appear when nothing is highlighted.")
-    settingsHelpText:SetTextColor(whitetext)
+    settingsHelpText:SetTextColor(primarytext)
 
     function settingsHelpText:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
@@ -176,7 +176,7 @@ net.Receive("chicagoRP_settings", function()
     controlHelpText:SetSize(160, 30)
     controlHelpText:SetFont("MichromaHelpText")
     controlHelpText:SetText("[ENTER]   SELECT")
-    controlHelpText:SetTextColor(redtext)
+    controlHelpText:SetTextColor(secondarytext)
 
     function controlHelpText:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
@@ -189,7 +189,7 @@ net.Receive("chicagoRP_settings", function()
     controlHelpText2:SetSize(115, 30)
     controlHelpText2:SetFont("MichromaHelpText")
     controlHelpText2:SetText("[ESC]   BACK")
-    controlHelpText2:SetTextColor(redtext)
+    controlHelpText2:SetTextColor(secondarytext)
 
     function controlHelpText2:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
@@ -209,7 +209,7 @@ net.Receive("chicagoRP_settings", function()
     local settingsScrollBar = settingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     settingsScrollBar:SetHideButtons(true)
     settingsScrollBar:SetPos(525, 235)
-    function settingsScrollBar:Paint(w, h)
+    function settingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
         draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
     end
     function settingsScrollBar.btnUp:Paint(w, h)
@@ -244,7 +244,7 @@ net.Receive("chicagoRP_settings", function()
                 -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
                 settingsHelpText:SetText("Love?")
             end
-            surface.SetTextColor(whitetext)
+            surface.SetTextColor(primarytext)
             surface.SetTextPos(14, 14)
             surface.SetFont("MichromaRegular")
             surface.DrawText("Button #" .. i)
@@ -272,14 +272,14 @@ net.Receive("chicagoRP_settings", function()
     videoSettingsButton:SetSize(394, 56)
     videoSettingsButton:SetFont("MichromaRegular")
     videoSettingsButton:SetText("")
-    videoSettingsButton:SetTextColor(whitetext)
+    videoSettingsButton:SetTextColor(primarytext)
 
     function videoSettingsButton:Paint(w, h)
         if self:IsHovered() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
         end
-        surface.SetTextColor(whitetext)
+        surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
         surface.SetFont("MichromaRegular")
         surface.DrawText("VIDEO")
@@ -293,9 +293,9 @@ net.Receive("chicagoRP_settings", function()
             local button = settingsScrollPanel:Add("DButton")
             button:SetText(v.printname)
             button.DoClick = function()
+                local current = v
                 current:Hide()
                 v:Show()
-                local current = v
             end
         end
     end
