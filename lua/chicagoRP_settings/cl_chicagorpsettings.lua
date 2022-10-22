@@ -1,5 +1,5 @@
 list.Set("DesktopWindows", "chicagoRP Settings", {
-    title = "Context Menu Icon",
+    title = "chicagoRP Settings",
     icon = "icon64/chicagoRP_settings.png",
     init = function(icon, window)
         LocalPlayer():ConCommand("chicagoRP_settings")
@@ -57,6 +57,15 @@ local function BlurBackground(panel)
     surface.SetDrawColor(0, 0, 0, Dark * Dynamic)
     surface.DrawRect(0, 0, panel:GetWide(), panel:GetTall())
     Dynamic = math.Clamp(Dynamic + (1 / FrameRate) * 7, 0, 1)
+end
+
+local function DrawOutlinedTexturedRect(panel, w, h, material, thickness) -- figure out how to make gradient mat
+    if (!IsValid(panel) and !panel:IsVisible()) then return end
+    surface.SetMaterial(material)
+    surface.DrawTexturedRectUV(0, 0, w, thickness, 0, 0, 1, 0) -- top
+    surface.DrawTexturedRectUV(0, h - thickness, w, thickness, 0, 1, 1, 1) -- bottom
+    surface.DrawTexturedRectUV(0, 0, thickness, h, 0, 0, 0, 1) -- left
+    surface.DrawTexturedRectUV(w - thickness, 0, thickness, h, 0, 0, 0, 1) -- right
 end
 
 local HideHUD = false
@@ -140,8 +149,8 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function exitButton:Paint(w, h)
-        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        -- return nil
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
     end
     ---
 
@@ -153,8 +162,8 @@ net.Receive("chicagoRP_settings", function()
     settingsTitleLabel:SetTextColor(primarytext)
 
     function settingsTitleLabel:Paint(w, h)
-        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        -- return nil
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
     end
     ---
 
@@ -235,13 +244,7 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawRect(0, 0, w, h)
             if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                 surface.SetDrawColor(255, 86, 65)
-                -- surface.DrawOutlinedRect(0, 0, w, h, 1) -- 4 x drawtexturedrectuv for gradient
-                surface.SetMaterial(gradient_mat)
-                -- surface.DrawTexturedRectUV(0, 0, w, 4, 0, 0, 1, 0)
-                surface.DrawTexturedRectUV(0, h, w, 4, 0, 0, 1, 0) -- get x/y coords from rectangle somehow
-                -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
-                -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
-                -- surface.DrawTexturedRectUV(number x, number y, number width, number height, number startU, number startV, number endU, number endV)
+                DrawOutlinedTexturedRect(self, w, h, gradient_mat, 4)
                 settingsHelpText:SetText("Love?")
             end
             surface.SetTextColor(primarytext)
@@ -250,13 +253,15 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawText("Button #" .. i)
         end
         function settingsScrollPanelTestButton:DoClick()
-            if IsValid(OpenDropdown) then
-                OpenDropdown:Remove()
+            if IsValid(Dropdown) then
+                Dropdown:Remove()
             end
 
             local Dropdown = vgui.Create("DPanel", motherFrame)
             Dropdown:SetSize(settingsScrollPanelTestButton:GetWide(), 3 * 40)
-            Dropdown:SetPos(650, 235)
+            Dropdown:SetPos(650, settingsScrollPanelTestButton:LocalToScreen())
+            print(settingsScrollPanelTestButton:GetPos())
+            print(settingsScrollPanelTestButton:LocalToScreen())
 
             function Dropdown:Paint(w, h)
                 surface.SetDrawColor(70, 70, 70, 220)
