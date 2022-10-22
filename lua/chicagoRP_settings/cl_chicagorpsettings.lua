@@ -59,8 +59,9 @@ local function BlurBackground(panel)
     Dynamic = math.Clamp(Dynamic + (1 / FrameRate) * 7, 0, 1)
 end
 
-local function DrawOutlinedTexturedRect(panel, w, h, material, thickness) -- figure out how to make gradient mat
+local function DrawOutlinedTexturedRect(panel, material, thickness) -- figure out how to make gradient mat
     if (!IsValid(panel) and !panel:IsVisible()) then return end
+    local w, h = panel:GetSize()
     surface.SetMaterial(material)
     surface.DrawTexturedRectUV(0, 0, w, thickness, 0, 0, 1, 0) -- top
     surface.DrawTexturedRectUV(0, h - thickness, w, thickness, 0, 1, 1, 1) -- bottom
@@ -244,7 +245,7 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawRect(0, 0, w, h)
             if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                 surface.SetDrawColor(255, 86, 65)
-                DrawOutlinedTexturedRect(self, w, h, gradient_mat, 4)
+                DrawOutlinedTexturedRect(self, gradient_mat, 4)
                 settingsHelpText:SetText("Love?")
             end
             surface.SetTextColor(primarytext)
@@ -258,13 +259,13 @@ net.Receive("chicagoRP_settings", function()
             end
 
             local Dropdown = vgui.Create("DPanel", motherFrame)
-            Dropdown:SetSize(settingsScrollPanelTestButton:GetWide(), 3 * 40)
-            Dropdown:SetPos(650, settingsScrollPanelTestButton:LocalToScreen())
-            print(settingsScrollPanelTestButton:GetPos())
-            print(settingsScrollPanelTestButton:LocalToScreen())
+            local _,ScreenY = settingsScrollPanelTestButton:LocalToScreen()
+            Dropdown:SetSize(360, 3 * 40)
+            Dropdown:SetPos(650, ScreenY)
+            print(ScreenY)
 
             function Dropdown:Paint(w, h)
-                surface.SetDrawColor(70, 70, 70, 220)
+                surface.SetDrawColor(200, 0, 0, 10)
                 surface.DrawRect(0, 0, w, h)
             end
 
