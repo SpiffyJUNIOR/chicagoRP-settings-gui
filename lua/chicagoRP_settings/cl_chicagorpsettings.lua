@@ -71,13 +71,14 @@ end
 
 local HideHUD = false
 
-hook.Add("HUDPaint", "chicagoRP_HideHUD", function() -- we also need to hide hints and easychat
+hook.Add("HUDPaint", "chicagoRP_HideHUD", function() -- we also need to hide hints and prop protection display
     if HideHUD then
         return false
     end
 end)
 
 local gradient_mat = Material("vgui/gradient-u")
+-- gradient-d, gradient-r, gradient-u, gradient_down, gradient_up
 
 local videoSettingsOptions = {
     [1] = {
@@ -222,14 +223,6 @@ net.Receive("chicagoRP_settings", function()
     function settingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
         draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
     end
-    function settingsScrollBar.btnUp:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        return nil
-    end
-    function settingsScrollBar.btnDown:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        return nil
-    end
     function settingsScrollBar.btnGrip:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74))
     end
@@ -239,7 +232,7 @@ net.Receive("chicagoRP_settings", function()
         settingsScrollPanelTestButton:SetText("")
         settingsScrollPanelTestButton:Dock(TOP)
         settingsScrollPanelTestButton:DockMargin(0, 0, 0, 5)
-        settingsScrollPanelTestButton:SetSize(800, 50)
+        settingsScrollPanelTestButton:SetSize(800, 44)
         function settingsScrollPanelTestButton:Paint(w, h)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
@@ -249,27 +242,58 @@ net.Receive("chicagoRP_settings", function()
                 settingsHelpText:SetText("Love?")
             end
             surface.SetTextColor(primarytext)
-            surface.SetTextPos(14, 14)
+            surface.SetTextPos(14, 12)
             surface.SetFont("MichromaRegular")
             surface.DrawText("Button #" .. i)
         end
         function settingsScrollPanelTestButton:DoClick()
-            if IsValid(Dropdown) then
-                Dropdown:Remove()
+            if IsValid(OpenDropdown) then
+                OpenDropdown:Remove()
             end
 
-            local Dropdown = vgui.Create("DPanel", motherFrame)
+            local Dropdown = vgui.Create("DScrollPanel", motherFrame)
             local _,ScreenY = settingsScrollPanelTestButton:LocalToScreen()
-            Dropdown:SetSize(360, 3 * 40)
-            Dropdown:SetPos(650, ScreenY)
+            local DropdownBar = Dropdown:GetVBar()
+            Dropdown:SetSize(500, 210) -- button size (465, 50)
+            Dropdown:SetPos(1348, ScreenY)
+            DropdownBar:SetHideButtons(true)
             print(ScreenY)
 
             function Dropdown:Paint(w, h)
-                surface.SetDrawColor(200, 0, 0, 10)
-                surface.DrawRect(0, 0, w, h)
+                -- surface.SetDrawColor(200, 0, 0, 10)
+                -- surface.DrawRect(0, 0, w, h)
+                return nil
+            end
+
+            function DropdownBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+                draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
+            end
+            function DropdownBar.btnGrip:Paint(w, h)
+                draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74))
             end
 
             OpenDropdown = Dropdown
+
+            for i = 0, 6 do
+                local DropdownTestButton = Dropdown:Add("DButton")
+                DropdownTestButton:SetText("")
+                DropdownTestButton:Dock(TOP)
+                DropdownTestButton:DockMargin(0, 0, 0, 5)
+                DropdownTestButton:SetSize(400, 44)
+                function DropdownTestButton:Paint(w, h)
+                    surface.SetDrawColor(40, 40, 40, 100)
+                    surface.DrawRect(0, 0, w, h)
+                    if DropdownTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
+                        surface.SetDrawColor(255, 86, 65)
+                        DrawOutlinedTexturedRect(self, gradient_mat, 4)
+                        settingsHelpText:SetText("Love.")
+                    end
+                    surface.SetTextColor(primarytext)
+                    surface.SetTextPos(14, 12)
+                    surface.SetFont("MichromaRegular")
+                    surface.DrawText("Button #" .. i)
+                end
+            end
         end
     end
 
