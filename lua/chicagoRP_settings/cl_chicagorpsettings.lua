@@ -95,11 +95,13 @@ local videoSettingsOptions = {
     }
 }
 
+local OpenMotherFrame = nil
 local OpenDropdown = nil
 local primarytext = (Color(255, 255, 255, 255))
 local secondarytext = (Color(130, 25, 39, 255))
 
 net.Receive("chicagoRP_settings", function()
+    if IsValid(OpenMotherFrame) then return end
     local ply = LocalPlayer()
     local screenwidth = ScrW()
     local screenheight = ScrH()
@@ -329,6 +331,8 @@ net.Receive("chicagoRP_settings", function()
             end
         end
     end
+
+    OpenMotherFrame = motherFrame
 end)
 
 
