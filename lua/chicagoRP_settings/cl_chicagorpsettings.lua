@@ -80,18 +80,66 @@ end)
 local gradient_mat = Material("vgui/gradient-u")
 -- gradient-d, gradient-r, gradient-u, gradient_down, gradient_up
 
-local videoSettingsOptions = {
+local videoSettingsOptions = { -- simfphys camera, arccw, first person shadow, enhanced water, shmovement, vfire, simfphys, stormfox, atmos, 
     [1] = {
         convar = "cl_new_impact_effects",
         max = 1,
         min = 0,
-        printname = "Fancy Impact Effects (1)"
+        printname = "Fancy Impact Effects"
     },
     [2] = {
-        convar = "kill",
-        max = 0,
+        convar = "arccw_scopepp",
+        max = 1,
         min = 0,
-        printname = "GET GOOD GET LMAOBOX (2)"
+        printname = "PIP Scope Post-Processing"
+    },
+    [3] = {
+        convar = "arccw_scopepp_refract",
+        max = 1,
+        min = 0,
+        printname = "PIP Scope Refraction"
+    },
+    [4] = {
+        convar = "arccw_drawbarrel",
+        max = 1,
+        min = 0,
+        printname = "Draw Barrel in PIP Scope (Expensive!)"
+    },
+    [5] = {
+        convar = "arccw_cheapscopes",
+        max = 1,
+        min = 0,
+        printname = "RT PIP Scopes"
+    },
+    [6] = {
+        convar = "arccw_cheapscopesv2_ratio",
+        max = 1, -- float
+        min = 0, -- float
+        printname = "Cheap Scope FOV"
+    },
+    [7] = {
+        convar = "arccw_scope_r",
+        max = 255,
+        min = 0,
+        printname = "Sight Color (R)"
+    },
+    [8] = {
+        convar = "arccw_scope_g",
+        max = 255,
+        min = 0,
+        printname = "Sight Color (B)"
+    },
+    [9] = {
+        convar = "arccw_scope_b",
+        max = 255,
+        min = 0,
+        printname = "Sight Color (G)"
+    },
+    [5] = {
+        convar = "arccw_cheapscopes",
+        max = 1,
+        min = 0,
+        printname = "RT PIP Scopes"
     }
 }
 
@@ -210,43 +258,42 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local settingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    settingsScrollPanel:SetPos(525, 235)
-    settingsScrollPanel:SetSize(820, 635)
+    local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
+    videoSettingsScrollPanel:SetPos(525, 235)
+    videoSettingsScrollPanel:SetSize(820, 635)
+    videoSettingsScrollPanel:Hide()
 
-    function settingsScrollPanel:Paint(w, h)
+    function videoSettingsScrollPanel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
 
-    local settingsScrollBar = settingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
-    settingsScrollBar:SetHideButtons(true)
-    settingsScrollBar:SetPos(525, 235)
-    function settingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+    local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
+    videoSettingsScrollBar:SetHideButtons(true)
+    videoSettingsScrollBar:SetPos(525, 235)
+    function videoSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
         draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
     end
-    function settingsScrollBar.btnGrip:Paint(w, h)
-        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74))
+    function videoSettingsScrollBar.btnGrip:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for i = 0, 100 do
-        local settingsScrollPanelTestButton = settingsScrollPanel:Add("DButton")
+    for k, v in ipairs(videoSettingsOptions) do
+        local settingsScrollPanelTestButton = videoSettingsScrollPanel:Add("DButton")
         settingsScrollPanelTestButton:SetText("")
         settingsScrollPanelTestButton:Dock(TOP)
-        settingsScrollPanelTestButton:DockMargin(0, 0, 0, 5)
+        settingsScrollPanelTestButton:DockMargin(0, 0, 3, 4)
         settingsScrollPanelTestButton:SetSize(800, 44)
         function settingsScrollPanelTestButton:Paint(w, h)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
             if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                 surface.SetDrawColor(255, 86, 65)
-                DrawOutlinedTexturedRect(self, gradient_mat, 4)
+                DrawOutlinedTexturedRect(self, gradient_mat, 3)
                 settingsHelpText:SetText("Love?")
             end
-            surface.SetTextColor(primarytext)
-            surface.SetTextPos(14, 12)
-            surface.SetFont("MichromaRegular")
-            surface.DrawText("Button #" .. i)
+            draw.DrawText(v.printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
+            draw.DrawText(GetConVar(v.convar):GetInt(), "MichromaRegular", 700, 12, primarytext, TEXT_ALIGN_RIGHT)
         end
         function settingsScrollPanelTestButton:DoClick()
             if IsValid(OpenDropdown) then
@@ -271,7 +318,7 @@ net.Receive("chicagoRP_settings", function()
                 draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
             end
             function DropdownBar.btnGrip:Paint(w, h)
-                draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74))
+                draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
             end
 
             OpenDropdown = Dropdown
@@ -280,14 +327,14 @@ net.Receive("chicagoRP_settings", function()
                 local DropdownTestButton = Dropdown:Add("DButton")
                 DropdownTestButton:SetText("")
                 DropdownTestButton:Dock(TOP)
-                DropdownTestButton:DockMargin(0, 0, 0, 5)
+                DropdownTestButton:DockMargin(0, 0, 4, 3)
                 DropdownTestButton:SetSize(400, 44)
                 function DropdownTestButton:Paint(w, h)
                     surface.SetDrawColor(40, 40, 40, 100)
                     surface.DrawRect(0, 0, w, h)
                     if DropdownTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                         surface.SetDrawColor(255, 86, 65)
-                        DrawOutlinedTexturedRect(self, gradient_mat, 4)
+                        DrawOutlinedTexturedRect(self, gradient_mat, 3)
                         settingsHelpText:SetText("Love.")
                     end
                     surface.SetTextColor(primarytext)
@@ -298,6 +345,28 @@ net.Receive("chicagoRP_settings", function()
             end
         end
     end
+    ---
+
+    local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
+    gameSettingsScrollPanel:SetPos(525, 235)
+    gameSettingsScrollPanel:SetSize(820, 635)
+    gameSettingsScrollPanel:Hide()
+
+    function gameSettingsScrollPanel:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
+
+    local gameSettingsScrollBar = gameSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
+    gameSettingsScrollBar:SetHideButtons(true)
+    gameSettingsScrollBar:SetPos(525, 235)
+    function gameSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+        draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
+    end
+    function gameSettingsScrollBar.btnGrip:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+    end
+    ---
 
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
     videoSettingsButton:SetPos(103, 230)
@@ -307,8 +376,14 @@ net.Receive("chicagoRP_settings", function()
     videoSettingsButton:SetTextColor(primarytext)
 
     function videoSettingsButton:Paint(w, h)
-        if self:IsHovered() then
+        if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
+            surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(57, 57, 57, 255)
+            surface.DrawRect(0, 0, w, h)
+        elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(66, 66, 66, 255)
             surface.DrawRect(0, 0, w, h)
         end
         surface.SetTextColor(primarytext)
@@ -318,18 +393,36 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function videoSettingsButton:DoClick()
-        -- PrintTable(videoSettingsOptions)
-        for k, v in ipairs(videoSettingsOptions) do
-            print(v.convar)
-            print(v.printname)
-            local button = settingsScrollPanel:Add("DButton")
-            button:SetText(v.printname)
-            button.DoClick = function()
-                local current = v
-                current:Hide()
-                v:Show()
-            end
+        videoSettingsScrollPanel:Show()
+    end
+    ---
+
+    local gameSettingsButton = vgui.Create("DButton", motherFrame)
+    gameSettingsButton:SetPos(103, 290)
+    gameSettingsButton:SetSize(394, 56)
+    gameSettingsButton:SetFont("MichromaRegular")
+    gameSettingsButton:SetText("")
+    gameSettingsButton:SetTextColor(primarytext)
+
+    function gameSettingsButton:Paint(w, h)
+        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(34, 34, 34, 100)
+            surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(57, 57, 57, 255)
+            surface.DrawRect(0, 0, w, h)
+        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(66, 66, 66, 255)
+            surface.DrawRect(0, 0, w, h)
         end
+        surface.SetTextColor(primarytext)
+        surface.SetTextPos(w - 383, h - 42)
+        surface.SetFont("MichromaRegular")
+        surface.DrawText("GAME")
+    end
+
+    function gameSettingsButton:DoClick()
+        gameSettingsScrollPanel:Show()
     end
 
     OpenMotherFrame = motherFrame
