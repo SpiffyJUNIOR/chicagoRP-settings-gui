@@ -250,7 +250,7 @@ local function CreateCategoryButton(name, x, y, parent) -- GOING DEATH CON 3 ON 
     end
 end
 
-local function CreateSettingsButton(printname, convar, helptext, x, y, parent)
+local function CreateSettingsButton(printname, convar, helptext, parent)
     local settingsButton = parent:Add("DButton")
     settingsButton:SetText("")
     settingsButton:Dock(TOP)
@@ -606,6 +606,10 @@ net.Receive("chicagoRP_settings", function()
     -- function gameSettingsButton:DoClick()
     --     gameSettingsScrollPanel:Show()
     -- end
+
+    CreateCategoryButton("VIDEO", 103, 230, motherFrame)
+    CreateCategoryButton("GAME", 103, 290, motherFrame)
+    print(CreateCategoryButton("GAME", 103, 290, motherFrame))
 
     OpenMotherFrame = motherFrame
 end)
