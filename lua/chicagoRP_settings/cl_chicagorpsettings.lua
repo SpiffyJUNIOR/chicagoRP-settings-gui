@@ -310,178 +310,184 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    -- local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    -- videoSettingsScrollPanel:SetPos(525, 235)
-    -- videoSettingsScrollPanel:SetSize(820, 635)
-    -- videoSettingsScrollPanel:Hide()
+    local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
+    videoSettingsScrollPanel:SetPos(525, 235)
+    videoSettingsScrollPanel:SetSize(820, 635)
+    videoSettingsScrollPanel:Hide()
 
-    -- function videoSettingsScrollPanel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     return nil
-    -- end
+    function videoSettingsScrollPanel:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
 
-    -- local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
-    -- videoSettingsScrollBar:SetHideButtons(true)
-    -- videoSettingsScrollBar:SetPos(525, 235)
-    -- function videoSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
-    -- end
-    -- function videoSettingsScrollBar.btnGrip:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
-    -- end
+    local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
+    videoSettingsScrollBar:SetHideButtons(true)
+    videoSettingsScrollBar:SetPos(525, 235)
+    function videoSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+        draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
+    end
+    function videoSettingsScrollBar.btnGrip:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+    end
 
-    -- for k, v in ipairs(videoSettingsOptions) do
-    --     local settingsScrollPanelTestButton = videoSettingsScrollPanel:Add("DButton")
-    --     settingsScrollPanelTestButton:SetText("")
-    --     settingsScrollPanelTestButton:Dock(TOP)
-    --     settingsScrollPanelTestButton:DockMargin(0, 0, 3, 4)
-    --     settingsScrollPanelTestButton:SetSize(800, 44)
-    --     function settingsScrollPanelTestButton:Paint(w, h)
-    --         local statusString = "Disabled"
-    --         surface.SetDrawColor(40, 40, 40, 100)
-    --         surface.DrawRect(0, 0, w, h)
-    --         if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
-    --             surface.SetDrawColor(255, 86, 65)
-    --             DrawOutlinedTexturedRect(self, gradient_mat, 3)
-    --             settingsHelpText:SetText(v.text)
-    --         end
-    --         if (GetConVar(v.convar):GetInt() == 1) and (v.max == 1) then -- add float check pls
-    --             statusString = "Enabled"
-    --         elseif (GetConVar(v.convar):GetInt() > 1) and (v.max > 1) then
-    --             statusString = GetConVar(v.convar):GetInt()
-    --         end
-    --         draw.DrawText(v.printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
-    --         draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
-    --     end
-    --     function settingsScrollPanelTestButton:DoClick()
-    --         if IsValid(OpenDropdown) then
-    --             OpenDropdown:Remove()
-    --         end
+    for k, v in ipairs(videoSettingsOptions) do
+        local settingsScrollPanelTestButton = videoSettingsScrollPanel:Add("DButton")
+        settingsScrollPanelTestButton:SetText("")
+        settingsScrollPanelTestButton:Dock(TOP)
+        settingsScrollPanelTestButton:DockMargin(0, 0, 3, 4)
+        settingsScrollPanelTestButton:SetSize(800, 44)
+        function settingsScrollPanelTestButton:Paint(w, h)
+            local statusString = "Disabled"
+            surface.SetDrawColor(40, 40, 40, 100)
+            surface.DrawRect(0, 0, w, h)
+            if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
+                surface.SetDrawColor(255, 86, 65)
+                DrawOutlinedTexturedRect(self, gradient_mat, 3)
+                settingsHelpText:SetText(v.text)
+            end
+            if (GetConVar(v.convar):GetInt() == 1) and (v.max == 1) then -- add float check pls
+                statusString = "Enabled"
+            elseif (GetConVar(v.convar):GetInt() > 1) and (v.max > 1) then
+                statusString = GetConVar(v.convar):GetInt()
+            end
+            draw.DrawText(v.printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
+            draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
+        end
+        function settingsScrollPanelTestButton:DoClick()
+            if IsValid(OpenDropdown) then
+                OpenDropdown:Remove()
+            end
 
-    --         local Dropdown = vgui.Create("DScrollPanel", motherFrame)
-    --         local _,ScreenY = settingsScrollPanelTestButton:LocalToScreen()
-    --         local DropdownBar = Dropdown:GetVBar()
-    --         Dropdown:SetSize(500, 210) -- button size (465, 50)
-    --         Dropdown:SetPos(1348, ScreenY)
-    --         DropdownBar:SetHideButtons(true)
-    --         print(ScreenY)
+            local Dropdown = vgui.Create("DScrollPanel", motherFrame)
+            local _,ScreenY = settingsScrollPanelTestButton:LocalToScreen()
+            local DropdownBar = Dropdown:GetVBar()
+            Dropdown:SetSize(500, 210) -- button size (465, 50)
+            Dropdown:SetPos(1348, ScreenY)
+            DropdownBar:SetHideButtons(true)
+            print(ScreenY)
 
-    --         function Dropdown:Paint(w, h)
-    --             -- surface.SetDrawColor(200, 0, 0, 10)
-    --             -- surface.DrawRect(0, 0, w, h)
-    --             return nil
-    --         end
+            function Dropdown:Paint(w, h)
+                -- surface.SetDrawColor(200, 0, 0, 10)
+                -- surface.DrawRect(0, 0, w, h)
+                return nil
+            end
 
-    --         function DropdownBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
-    --             draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
-    --         end
-    --         function DropdownBar.btnGrip:Paint(w, h)
-    --             draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
-    --         end
+            function DropdownBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+                draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
+            end
+            function DropdownBar.btnGrip:Paint(w, h)
+                draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+            end
 
-    --         OpenDropdown = Dropdown
+            OpenDropdown = Dropdown
 
-    --         for i = 0, 6 do
-    --             local DropdownTestButton = Dropdown:Add("DButton")
-    --             DropdownTestButton:SetText("")
-    --             DropdownTestButton:Dock(TOP)
-    --             DropdownTestButton:DockMargin(0, 0, 4, 3)
-    --             DropdownTestButton:SetSize(400, 44)
-    --             function DropdownTestButton:Paint(w, h)
-    --                 surface.SetDrawColor(40, 40, 40, 100)
-    --                 surface.DrawRect(0, 0, w, h)
-    --                 if DropdownTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
-    --                     surface.SetDrawColor(255, 86, 65)
-    --                     DrawOutlinedTexturedRect(self, gradient_mat, 3)
-    --                     settingsHelpText:SetText("Love.")
-    --                 end
-    --                 surface.SetTextColor(primarytext)
-    --                 surface.SetTextPos(14, 12)
-    --                 surface.SetFont("MichromaRegular")
-    --                 surface.DrawText("Button #" .. i)
-    --             end
-    --         end
-    --     end
-    -- end
+            for i = 0, 6 do
+                local DropdownTestButton = Dropdown:Add("DButton")
+                DropdownTestButton:SetText("")
+                DropdownTestButton:Dock(TOP)
+                DropdownTestButton:DockMargin(0, 0, 4, 3)
+                DropdownTestButton:SetSize(400, 44)
+                function DropdownTestButton:Paint(w, h)
+                    surface.SetDrawColor(40, 40, 40, 100)
+                    surface.DrawRect(0, 0, w, h)
+                    if DropdownTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
+                        surface.SetDrawColor(255, 86, 65)
+                        DrawOutlinedTexturedRect(self, gradient_mat, 3)
+                        settingsHelpText:SetText("Love.")
+                    end
+                    surface.SetTextColor(primarytext)
+                    surface.SetTextPos(14, 12)
+                    surface.SetFont("MichromaRegular")
+                    surface.DrawText("Button #" .. i)
+                end
+            end
+        end
+    end
     ---
 
-    -- local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    -- gameSettingsScrollPanel:SetPos(525, 235)
-    -- gameSettingsScrollPanel:SetSize(820, 635)
-    -- gameSettingsScrollPanel:Hide()
+    local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
+    gameSettingsScrollPanel:SetPos(525, 235)
+    gameSettingsScrollPanel:SetSize(820, 635)
+    gameSettingsScrollPanel:Hide()
 
-    -- function gameSettingsScrollPanel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     return nil
-    -- end
+    function gameSettingsScrollPanel:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
 
-    -- local gameSettingsScrollBar = gameSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
-    -- gameSettingsScrollBar:SetHideButtons(true)
-    -- gameSettingsScrollBar:SetPos(525, 235)
-    -- function gameSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
-    -- end
-    -- function gameSettingsScrollBar.btnGrip:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
-    -- end
+    local gameSettingsScrollBar = gameSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
+    gameSettingsScrollBar:SetHideButtons(true)
+    gameSettingsScrollBar:SetPos(525, 235)
+    function gameSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+        draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
+    end
+    function gameSettingsScrollBar.btnGrip:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+    end
     ---
 
-    -- local videoSettingsButton = vgui.Create("DButton", motherFrame)
-    -- videoSettingsButton:SetPos(103, 230)
-    -- videoSettingsButton:SetSize(394, 56)
-    -- videoSettingsButton:SetFont("MichromaRegular")
-    -- videoSettingsButton:SetText("")
-    -- videoSettingsButton:SetTextColor(primarytext)
+    local videoSettingsButton = vgui.Create("DButton", motherFrame)
+    videoSettingsButton:SetPos(103, 230)
+    videoSettingsButton:SetSize(394, 56)
+    videoSettingsButton:SetFont("MichromaRegular")
+    videoSettingsButton:SetText("")
+    videoSettingsButton:SetTextColor(primarytext)
 
-    -- function videoSettingsButton:Paint(w, h)
-    --     if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
-    --         surface.SetDrawColor(34, 34, 34, 100)
-    --         surface.DrawRect(0, 0, w, h)
-    --     elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
-    --         surface.SetDrawColor(57, 57, 57, 255)
-    --         surface.DrawRect(0, 0, w, h)
-    --     elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
-    --         surface.SetDrawColor(66, 66, 66, 255)
-    --         surface.DrawRect(0, 0, w, h)
-    --     end
-    --     surface.SetTextColor(primarytext)
-    --     surface.SetTextPos(w - 383, h - 42)
-    --     surface.SetFont("MichromaRegular")
-    --     surface.DrawText("VIDEO")
-    -- end
+    function videoSettingsButton:Paint(w, h)
+        if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(34, 34, 34, 100)
+            surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(57, 57, 57, 255)
+            surface.DrawRect(0, 0, w, h)
+        elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(66, 66, 66, 255)
+            surface.DrawRect(0, 0, w, h)
+        end
+        surface.SetTextColor(primarytext)
+        surface.SetTextPos(w - 383, h - 42)
+        surface.SetFont("MichromaRegular")
+        surface.DrawText("VIDEO")
+    end
 
-    -- function videoSettingsButton:DoClick()
-    --     videoSettingsScrollPanel:Show()
-    -- end
-    -- ---
+    function videoSettingsButton:DoClick()
+        if IsValid(gameSettingsScrollPanel) then
+            gameSettingsScrollPanel:Hide()
+        end
+        videoSettingsScrollPanel:Show()
+    end
+    ---
 
-    -- local gameSettingsButton = vgui.Create("DButton", motherFrame)
-    -- gameSettingsButton:SetPos(103, 290)
-    -- gameSettingsButton:SetSize(394, 56)
-    -- gameSettingsButton:SetFont("MichromaRegular")
-    -- gameSettingsButton:SetText("")
-    -- gameSettingsButton:SetTextColor(primarytext)
+    local gameSettingsButton = vgui.Create("DButton", motherFrame)
+    gameSettingsButton:SetPos(103, 290)
+    gameSettingsButton:SetSize(394, 56)
+    gameSettingsButton:SetFont("MichromaRegular")
+    gameSettingsButton:SetText("")
+    gameSettingsButton:SetTextColor(primarytext)
 
-    -- function gameSettingsButton:Paint(w, h)
-    --     if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
-    --         surface.SetDrawColor(34, 34, 34, 100)
-    --         surface.DrawRect(0, 0, w, h)
-    --     elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
-    --         surface.SetDrawColor(57, 57, 57, 255)
-    --         surface.DrawRect(0, 0, w, h)
-    --     elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
-    --         surface.SetDrawColor(66, 66, 66, 255)
-    --         surface.DrawRect(0, 0, w, h)
-    --     end
-    --     surface.SetTextColor(primarytext)
-    --     surface.SetTextPos(w - 383, h - 42)
-    --     surface.SetFont("MichromaRegular")
-    --     surface.DrawText("GAME")
-    -- end
+    function gameSettingsButton:Paint(w, h)
+        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(34, 34, 34, 100)
+            surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(57, 57, 57, 255)
+            surface.DrawRect(0, 0, w, h)
+        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(66, 66, 66, 255)
+            surface.DrawRect(0, 0, w, h)
+        end
+        surface.SetTextColor(primarytext)
+        surface.SetTextPos(w - 383, h - 42)
+        surface.SetFont("MichromaRegular")
+        surface.DrawText("GAME")
+    end
 
-    -- function gameSettingsButton:DoClick()
-    --     gameSettingsScrollPanel:Show()
-    -- end
+    function gameSettingsButton:DoClick()
+        if IsValid(videoSettingsScrollPanel) then
+            videoSettingsScrollPanel:Hide()
+        end
+        gameSettingsScrollPanel:Show()
+    end
 
     OpenMotherFrame = motherFrame
 end)
