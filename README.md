@@ -1,5 +1,5 @@
 # chicagorp-settings-gui
-client settings gui for chicagorp (my in-development darkrp server), really unfinished atm
+client settings gui for chicagorp (my in-development darkrp server), constantly changing and non-functional rn
 
 # to-do
 [ ] - base layout    
