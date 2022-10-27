@@ -37,6 +37,11 @@ surface.CreateFont("MichromaHelpText", { -- check to make sure these aren't bein
 })
 
 local blurMat = Material("pp/blurscreen")
+local tex_corner8   = surface.GetTextureID( "gui/corner8" )
+local tex_corner16  = surface.GetTextureID( "gui/corner16" )
+local tex_corner32  = surface.GetTextureID( "gui/corner32" )
+local tex_corner64  = surface.GetTextureID( "gui/corner64" )
+local tex_corner512 = surface.GetTextureID( "gui/corner512" )
 local Dynamic = 0
 
 local function BlurBackground(panel)
@@ -113,15 +118,15 @@ local videoSettingsOptions = { -- simfphys camera, arccw, first person shadow, s
         convar = "arccw_cheapscopes",
         max = 1,
         min = 0,
-        printname = "RT PIP Scopes",
-        text = "Picture in Picture scopes. Disable it if you have framerate issues while ADSing."
+        printname = "Cheap Scopes",
+        text = "Cheap Scopes. Only enable if you have framerate issues while ADSing."
     },
     [6] = {
         convar = "arccw_cheapscopesv2_ratio",
         max = 1, -- float
         min = 0, -- float
         printname = "Cheap Scope FOV",
-        text = "Controls scope FOV when ADSing with PIP disabled. Recommended value is 0.10."
+        text = "Controls scope FOV when ADSing with RT PIP disabled. Recommended value is 0.10."
     },
     [7] = {
         convar = "arccw_scope_r",
@@ -337,7 +342,7 @@ net.Receive("chicagoRP_settings", function()
         settingsScrollPanelTestButton:DockMargin(0, 0, 3, 4)
         settingsScrollPanelTestButton:SetSize(800, 44)
         function settingsScrollPanelTestButton:Paint(w, h)
-            local statusString = "Disabled"
+            local statusString = ""
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
             if settingsScrollPanelTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
@@ -345,13 +350,23 @@ net.Receive("chicagoRP_settings", function()
                 DrawOutlinedTexturedRect(self, gradient_mat, 3)
                 settingsHelpText:SetText(v.text)
             end
-            if (GetConVar(v.convar):GetInt() == 1) and (v.max == 1) then -- add float check pls
+            if (GetConVar(v.convar):GetInt() == 0) and (v.max == 1) then -- add float check pls
                 statusString = "Enabled"
-            elseif (GetConVar(v.convar):GetInt() > 1) and (v.max > 1) then
+                surface.SetDrawColor(255, 255, 255, 255)
+                -- surface.DrawRect(770, 18, 12, 12)
+                -- draw.RoundedBox(4, 775, 17, 12, 12, primarytext)
+                surface.DrawOutlinedRect(770, 12, 22, 22, 2)
+            elseif (GetConVar(v.convar):GetInt() == 1) and (v.max == 1) then -- add float check pls
+                statusString = "Enabled"
+                surface.SetDrawColor(255, 255, 255, 255)
+                -- surface.DrawRect(770, 18, 12, 12)
+                draw.RoundedBox(4, 775, 17, 12, 12, primarytext)
+                surface.DrawOutlinedRect(770, 12, 22, 22, 2)
+            elseif (GetConVar(v.convar):GetInt() >= 0) and (v.max > 1) then
                 statusString = GetConVar(v.convar):GetInt()
+                draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
             end
             draw.DrawText(v.printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
-            draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
         end
         function settingsScrollPanelTestButton:DoClick()
             if IsValid(OpenDropdown) then
@@ -379,6 +394,12 @@ net.Receive("chicagoRP_settings", function()
                 draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
             end
 
+            if (GetConVar(v.convar):GetInt() == 0) and (v.max == 1) then -- add float check pls
+                RunConsoleCommand(v.convar, "1")
+            elseif (GetConVar(v.convar):GetInt() == 1) and (v.max == 1) then -- add float check pls
+                RunConsoleCommand(v.convar, "0")
+            end
+
             OpenDropdown = Dropdown
 
             for i = 0, 6 do
@@ -393,7 +414,6 @@ net.Receive("chicagoRP_settings", function()
                     if DropdownTestButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
                         surface.SetDrawColor(255, 86, 65)
                         DrawOutlinedTexturedRect(self, gradient_mat, 3)
-                        settingsHelpText:SetText("Love.")
                     end
                     surface.SetTextColor(primarytext)
                     surface.SetTextPos(14, 12)
@@ -402,6 +422,30 @@ net.Receive("chicagoRP_settings", function()
                 end
             end
         end
+    end
+
+    local settingsScrollPanelTestSlider = videoSettingsScrollPanel:Add("DNumSlider")
+    settingsScrollPanelTestSlider:SetText("")
+    settingsScrollPanelTestSlider:Dock(TOP)
+    settingsScrollPanelTestSlider:DockMargin(0, 0, 3, 4)
+    settingsScrollPanelTestSlider:SetSize(800, 44)
+    settingsScrollPanelTestSlider:SetMin(0)
+    settingsScrollPanelTestSlider:SetMax(255)
+    settingsScrollPanelTestSlider:SetDecimals(0)
+    settingsScrollPanelTestSlider.Scratch:Hide()
+
+    function settingsScrollPanelTestSlider:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+        surface.SetDrawColor(40, 40, 40, 100)
+        surface.DrawRect(0, 0, w, h)
+    end
+    function settingsScrollPanelTestSlider.Slider:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+        surface.SetDrawColor(80, 80, 80, 100)
+        surface.DrawRect(0, 0, settingsScrollPanelTestSlider.Slider:GetSlideX() * 255, h)
+    end
+    function settingsScrollPanelTestSlider.Slider.Knob:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+        surface.SetDrawColor(80, 80, 80, 100)
+        -- surface.DrawRect(0, 0, settingsScrollPanelTestSlider:GetValue(), 44)
     end
     ---
 
@@ -438,10 +482,10 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
         elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
-            surface.SetDrawColor(57, 57, 57, 255)
+            surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
-            surface.SetDrawColor(66, 66, 66, 255)
+            surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
         end
         surface.SetTextColor(primarytext)
