@@ -8,7 +8,7 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
 
 print("chicagoRP client LUA loaded!")
 
--- wish i didn't have to make three fonts but i think that's a minor sin compared to what other devs do
+-- wish i didn't have to make three fonts but i think that's a minor sin in the face of what other devs do
 surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being created constantly
     font = "Michroma",
     extended = false,
@@ -76,7 +76,7 @@ local function DrawOutlinedTexturedRect(panel, material, thickness) -- figure ou
 end
 
 local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent)
-    if (GetConVar(convar):GetInt() == 0 or GetConVar(convar):GetInt() == 1) and (max == 1) then
+    if (GetConVar(convar):GetInt() == 0 or GetConVar(convar):GetInt() == 1) and (max == 1) and ConVarExists(convar) then
         local settingsButton = parent:Add("DButton")
         settingsButton:SetText("")
         settingsButton:Dock(TOP)
@@ -110,7 +110,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 RunConsoleCommand(convar, "0")
             end
         end
-    elseif (GetConVar(convar):GetInt() >= 0 or GetConVar(convar):GetInt() <= 0) and (max > 1) then
+    elseif (GetConVar(convar):GetInt() >= 0 or GetConVar(convar):GetInt() <= 0) and (max > 1) and ConVarExists(convar) then
         local settingsSliderParent = parent:Add("DButton")
         settingsSliderParent:SetText("")
         settingsSliderParent:Dock(TOP)
@@ -361,7 +361,6 @@ net.Receive("chicagoRP_settings", function()
     local exitButton = vgui.Create("DButton", motherFrame)
     exitButton:SetPos(86, 96)
     exitButton:SetSize(80, 20)
-    -- exitButton:SetSize(200, 200)
     exitButton:SetFont("MichromaSmall")
     exitButton:SetText("< GAME")
     exitButton:SetTextColor(secondarytext)
