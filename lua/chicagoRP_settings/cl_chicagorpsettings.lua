@@ -9,7 +9,7 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
 print("chicagoRP client LUA loaded!")
 
 -- wish i didn't have to make three fonts but i think that's a minor sin in the face of what other devs do
-surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being created constantly
+surface.CreateFont("MichromaSmall", {
     font = "Michroma",
     extended = false,
     size = 20,
@@ -18,7 +18,7 @@ surface.CreateFont("MichromaSmall", { -- check to make sure these aren't being c
     shadow = false
 })
 
-surface.CreateFont("MichromaRegular", { -- check to make sure these aren't being created constantly
+surface.CreateFont("MichromaRegular", {
     font = "Michroma",
     extended = false,
     size = 24,
@@ -27,7 +27,7 @@ surface.CreateFont("MichromaRegular", { -- check to make sure these aren't being
     shadow = false
 })
 
-surface.CreateFont("MichromaHelpText", { -- check to make sure these aren't being created constantly
+surface.CreateFont("MichromaHelpText", {
     font = "Michroma",
     extended = false,
     size = 18,
@@ -90,10 +90,10 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 DrawOutlinedTexturedRect(self, gradient_mat, 3)
                 helptextparent:SetText(helptext)
             end
-            if (GetConVar(convar):GetInt() == 0) and (max == 1) then -- add float check pls
+            if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(255, 255, 255, 255)
                 surface.DrawOutlinedRect(770, 12, 22, 22, 2)
-            elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then -- add float check pls
+            elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(255, 255, 255, 255)
                 draw.RoundedBox(4, 775, 17, 12, 12, primarytext)
                 surface.DrawOutlinedRect(770, 12, 22, 22, 2)
@@ -159,164 +159,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
     end
 end
 
-hook.Add("HUDPaint", "chicagoRP_HideHUD", function() -- we also need to hide hints and prop protection display
+hook.Add("HUDPaint", "chicagoRP_HideHUD", function()
     if HideHUD then
         return false
     end
 end)
-
-local videoSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
-    [1] = {
-        convar = "cl_new_impact_effects",
-        max = 1,
-        min = 0,
-        printname = "Fancy Impact Effects",
-        text = "Fancy impact particles. Might have heavy performance impact on low-spec computers."
-    },
-    [2] = {
-        convar = "arccw_scopepp",
-        max = 1,
-        min = 0,
-        printname = "Scope Chromatic Aberration",
-        text = "Chromatic Aberration for scopes. Should have no impact on framerate."
-    },
-    [3] = {
-        convar = "arccw_thermalpp",
-        max = 1,
-        min = 0,
-        printname = "Thermal Scope Post-Processing",
-        text = "Post-Processing for thermal scopes. Disable if you dislike thermal scope's choppiness."
-    },
-    [4] = {
-        convar = "arccw_scopepp_refract",
-        max = 1,
-        min = 0,
-        printname = "PIP Scope Refraction",
-        text = "Refraction inside of scopes when ADSing. Generally has little impact on framerate."
-    },
-    [5] = {
-        convar = "arccw_drawbarrel",
-        max = 1,
-        min = 0,
-        printname = "Draw Barrel in PIP Scope (Expensive!)",
-        text = "Draws weapon barrel in scope when ADSing. Disable unless you have a high-spec computer."
-    },
-    [6] = {
-        convar = "arccw_cheapscopes",
-        max = 1,
-        min = 0,
-        printname = "Cheap Scopes",
-        text = "Cheap Scopes. Only enable if you have framerate issues while ADSing."
-    },
-    [7] = {
-        convar = "arccw_cheapscopesv2_ratio",
-        max = 1, -- float
-        min = 0, -- float
-        printname = "Cheap Scope FOV",
-        text = "Controls scope FOV when ADSing with RT PIP disabled. Recommended value is 0.10."
-    },
-    [8] = {
-        convar = "arccw_scope_r",
-        max = 255,
-        min = 0,
-        printname = "Sight Color (R)",
-        text = "Red color value for sight color."
-    },
-    [9] = {
-        convar = "arccw_scope_g",
-        max = 255,
-        min = 0,
-        printname = "Sight Color (G)",
-        text = "Green color value for sight color."
-    },
-    [10] = {
-        convar = "arccw_scope_b",
-        max = 255,
-        min = 0,
-        printname = "Sight Color (B)",
-        text = "Blue color value for sight color."
-    },
-    [11] = {
-        convar = "arccw_vm_fov",
-        max = 15.00,
-        min = -15.00,
-        printname = "Viewmodel FOV",
-        text = "Viewmodel FOV, only affects ArcCW weapons. Keep at default for a consistent look."
-    },
-    [12] = {
-        convar = "arccw_blur",
-        max = 1,
-        min = 0,
-        printname = "Weapon Customization Blur",
-        text = "Blurs screen when customizing weapons."
-    },
-    [13] = {
-        convar = "arccw_blur_toytown",
-        max = 1,
-        min = 0,
-        printname = "Weapon ADS Blur",
-        text = "Blurs edges of screen when ADSing."
-    },
-    [14] = {
-        convar = "cl_playershadow",
-        max = 1,
-        min = 0,
-        printname = "First-Person Player Shadow",
-        text = "Casts first-person player shadow."
-    },
-    [15] = {
-        convar = "cl_simfphys_frontlamps",
-        max = 1,
-        min = 0,
-        printname = "Vehicle Front Projected Textures",
-        text = "Enables dynamic lights for vehicles front lights. Recommended to disable on low-spec rigs."
-    },
-    [16] = {
-        convar = "cl_simfphys_rearlamps",
-        max = 1,
-        min = 0,
-        printname = "Vehicle Rear Projected Textures",
-        text = "Enables dynamic lights for vehicles rear lights. Recommended to disable on low-spec rigs."
-    },
-    [17] = {
-        convar = "cl_simfphys_shadows",
-        max = 1,
-        min = 0,
-        printname = "Vehicle Light Shadows",
-        text = "Enables light shadows for vehicle lights. Recommended to disable on low-spec rigs."
-    }
-}
-
-local gameSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
-    [1] = {
-        convar = "arccw_crosshair_clr_a",
-        max = 255,
-        min = 0,
-       printname = "Crosshair Color (A)",
-        text = "Alpha transparency value for crosshair color. Only affects ArcCW Weapons."
-    },
-    [2] = {
-        convar = "arccw_crosshair_clr_r",
-        max = 255,
-        min = 0,
-        printname = "Crosshair Color (R)",
-        text = "Red color value for crosshair color. Only affects ArcCW Weapons."
-    },
-    [3] = {
-        convar = "arccw_crosshair_clr_g",
-        max = 255,
-        min = 0,
-        printname = "Crosshair Color (G)",
-        text = "Green color value for crosshair color. Only affects ArcCW Weapons."
-    },
-    [4] = {
-        convar = "arccw_crosshair_clr_b",
-        max = 255,
-        min = 0,
-        printname = "Crosshair Color (B)",
-        text = "Blue color value for crosshair color. Only affects ArcCW Weapons."
-    }
-}
 
 net.Receive("chicagoRP_settings", function()
     if IsValid(OpenMotherFrame) then return end
@@ -332,7 +179,7 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:ParentToHUD()
     HideHUD = true
 
-    if IsValid(ArcCW.InvHUD) then -- also add tfa, cw2, and fas2 compatibility please
+    if IsValid(ArcCW.InvHUD) then
         ArcCW.InvHUD:Hide()
     end
 
@@ -440,14 +287,14 @@ net.Receive("chicagoRP_settings", function()
     local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     videoSettingsScrollBar:SetHideButtons(true)
     videoSettingsScrollBar:SetPos(525, 235)
-    function videoSettingsScrollBar:Paint(w, h) -- we still need to figure out how to separate the scroll bar from the frame
+    function videoSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
     end
     function videoSettingsScrollBar.btnGrip:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for k, v in ipairs(videoSettingsOptions) do
+    for k, v in ipairs(chicagoRPvideoSettingsOptions) do
         CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, videoSettingsScrollPanel, settingsHelpText)
     end
     ---
@@ -472,7 +319,7 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for k, v in ipairs(gameSettingsOptions) do
+    for k, v in ipairs(chicagoRPgameSettingsOptions) do
         CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, gameSettingsScrollPanel, settingsHelpText)
     end
     ---
@@ -547,8 +394,11 @@ end)
 
 -- still need:
 -- slider text looks less bold
+-- disable falco ppi hudpaint temporarily
+-- add tfa, cw2, and fas2 compatibility please
 -- keyboard nagivation
 -- changeable colors
+-- rounded outline
 -- two-tone gradient material that can be changed ingame
 -- ui sounds
 -- fade in/out

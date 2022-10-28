@@ -1,7 +1,4 @@
-chicagoRP.videoSettingsOptions = videoSettingsOptions or {}
-chicagoRP.gameSettingsOptions = gameSettingsOptions or {}
-
-local videoSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
+chicagoRPvideoSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
     [1] = {
         convar = "cl_new_impact_effects",
         max = 1,
@@ -123,7 +120,7 @@ local videoSettingsOptions = { -- simfphys camera, arccw, first person shadow, s
     }
 }
 
-local gameSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
+chicagoRPgameSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
     [1] = {
         convar = "arccw_crosshair_clr_a",
         max = 255,
