@@ -287,6 +287,37 @@ local videoSettingsOptions = { -- simfphys camera, arccw, first person shadow, s
     }
 }
 
+local gameSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
+    [1] = {
+        convar = "arccw_crosshair_clr_a",
+        max = 255,
+        min = 0,
+       printname = "Crosshair Color (A)",
+        text = "Alpha transparency value for crosshair color. Only affects ArcCW Weapons."
+    },
+    [2] = {
+        convar = "arccw_crosshair_clr_r",
+        max = 255,
+        min = 0,
+        printname = "Crosshair Color (R)",
+        text = "Red color value for crosshair color. Only affects ArcCW Weapons."
+    },
+    [3] = {
+        convar = "arccw_crosshair_clr_g",
+        max = 255,
+        min = 0,
+        printname = "Crosshair Color (G)",
+        text = "Green color value for crosshair color. Only affects ArcCW Weapons."
+    },
+    [4] = {
+        convar = "arccw_crosshair_clr_b",
+        max = 255,
+        min = 0,
+        printname = "Crosshair Color (B)",
+        text = "Blue color value for crosshair color. Only affects ArcCW Weapons."
+    }
+}
+
 net.Receive("chicagoRP_settings", function()
     if IsValid(OpenMotherFrame) then return end
     local ply = LocalPlayer()
@@ -441,6 +472,10 @@ net.Receive("chicagoRP_settings", function()
     function gameSettingsScrollBar.btnGrip:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
+
+    for k, v in ipairs(gameSettingsOptions) do
+        CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, gameSettingsScrollPanel, settingsHelpText)
+    end
     ---
 
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
@@ -511,12 +546,11 @@ net.Receive("chicagoRP_settings", function()
     OpenMotherFrame = motherFrame
 end)
 
-
-
-
-
-
-
-
-
-
+-- still need:
+-- slider text looks less bold
+-- keyboard nagivation
+-- changeable colors
+-- two-tone gradient material that can be changed ingame
+-- ui sounds
+-- fade in/out
+-- color pulse when click button
