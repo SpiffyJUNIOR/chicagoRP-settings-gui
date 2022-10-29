@@ -95,7 +95,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsButton:SetText("")
         settingsButton:Dock(TOP)
         settingsButton:DockMargin(0, 0, 3, 4)
-        settingsButton:SetSize(800, 50)
+        settingsButton:SetSize(1340, 50)
         function settingsButton:Paint(w, h)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
@@ -106,11 +106,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             end
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                surface.DrawOutlinedRect(770, 12, 22, 22, 2)
+                surface.DrawOutlinedRect(1300, 13, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                draw.RoundedBox(4, 775, 17, 12, 12, primarytext)
-                surface.DrawOutlinedRect(770, 12, 22, 22, 2)
+                draw.RoundedBox(4, 1305, 18, 12, 12, primarytext)
+                surface.DrawOutlinedRect(1300, 13, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
@@ -129,7 +129,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSliderParent:SetText("")
         settingsSliderParent:Dock(TOP)
         settingsSliderParent:DockMargin(0, 0, 3, 4)
-        settingsSliderParent:SetSize(800, 50)
+        settingsSliderParent:SetSize(1340, 50)
         function settingsSliderParent:Paint(w, h)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
@@ -144,7 +144,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         local settingsSlider = vgui.Create("DNumSlider", settingsSliderParent)
         settingsSlider:SetText("")
         settingsSlider:SetSize(335, 50)
-        settingsSlider:SetPos(467, 0)
+        settingsSlider:SetPos(1007, 0)
         settingsSlider:SetMin(min)
         settingsSlider:SetMax(max)
         settingsSlider:SetDecimals(0)
@@ -281,7 +281,7 @@ net.Receive("chicagoRP_settings", function()
 
     local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
     videoSettingsScrollPanel:SetPos(525, 235)
-    videoSettingsScrollPanel:SetSize(820, 635)
+    videoSettingsScrollPanel:SetSize(1360, 635)
     videoSettingsScrollPanel:Hide()
 
     function videoSettingsScrollPanel:Paint(w, h)
@@ -399,8 +399,8 @@ end)
 
 -- still need:
 -- extended panel
--- rounded outline
--- two-tone gradient material that can be changed ingame
 -- ui sounds
 -- fade in/out
 -- color pulse when click button
+-- rounded outline
+-- two-tone gradient material that can be changed ingame
