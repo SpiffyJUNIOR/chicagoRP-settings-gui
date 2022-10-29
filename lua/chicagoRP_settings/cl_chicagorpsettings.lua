@@ -106,11 +106,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             end
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                surface.DrawOutlinedRect(1300, 13, 22, 22, 2)
+                surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                draw.RoundedBox(4, 1305, 18, 12, 12, primarytext)
-                surface.DrawOutlinedRect(1300, 13, 22, 22, 2)
+                draw.RoundedBox(4, 1305, 19, 12, 12, primarytext)
+                surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
@@ -306,7 +306,7 @@ net.Receive("chicagoRP_settings", function()
 
     local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
     gameSettingsScrollPanel:SetPos(525, 235)
-    gameSettingsScrollPanel:SetSize(820, 635)
+    gameSettingsScrollPanel:SetSize(1360, 635)
     gameSettingsScrollPanel:Hide()
 
     function gameSettingsScrollPanel:Paint(w, h)
