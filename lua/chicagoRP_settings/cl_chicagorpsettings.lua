@@ -6,6 +6,20 @@ list.Set("DesktopWindows", "chicagoRP Settings", {
     end
 })
 
+CreateClientConVar("chicagoRP_primary_r", 255, true, false, "Changes the (R) color value for the settings GUI's primary text.", 1, 255)
+CreateClientConVar("chicagoRP_primary_g", 255, true, false, "Changes the (G) color value for the settings GUI's primary text.", 1, 255)
+CreateClientConVar("chicagoRP_primary_b", 255, true, false, "Changes the (B) color value for the settings GUI's primary text.", 1, 255)
+CreateClientConVar("chicagoRP_secondary_r", 130, true, false, "Changes the (R) color value for the settings GUI's secondary text.", 1, 255)
+CreateClientConVar("chicagoRP_secondary_g", 25, true, false, "Changes the (G) color value for the settings GUI's secondary text.", 1, 255)
+CreateClientConVar("chicagoRP_secondary_b", 40, true, false, "Changes the (B) color value for the settings GUI's secondary text.", 1, 255)
+
+local CVarPrimaryRed = GetConVar("chicagoRP_primary_r"):GetInt()
+local CVarPrimaryGreen = GetConVar("chicagoRP_primary_g"):GetInt()
+local CVarPrimaryBlue = GetConVar("chicagoRP_primary_b"):GetInt()
+local CVarSecondaryRed = GetConVar("chicagoRP_secondary_r"):GetInt()
+local CVarSecondaryGreen = GetConVar("chicagoRP_secondary_g"):GetInt()
+local CVarSecondaryBlue = GetConVar("chicagoRP_secondary_b"):GetInt()
+
 print("chicagoRP client LUA loaded!")
 
 -- wish i didn't have to make three fonts but i think that's a minor sin in the face of what other devs do
@@ -42,8 +56,8 @@ local HideHUD = false
 local OpenMotherFrame = nil
 local OpenPanel = nil
 local Dynamic = 0
-local primarytext = (Color(255, 255, 255, 255))
-local secondarytext = (Color(130, 25, 39, 255))
+local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
+local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
 
 local function BlurBackground(panel)
     if (!IsValid(panel) and !panel:IsVisible()) then return end
@@ -91,10 +105,10 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 helptextparent:SetText(helptext)
             end
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
-                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetDrawColor(primarytext:Unpack())
                 surface.DrawOutlinedRect(770, 12, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
-                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetDrawColor(primarytext:Unpack())
                 draw.RoundedBox(4, 775, 17, 12, 12, primarytext)
                 surface.DrawOutlinedRect(770, 12, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
@@ -117,10 +131,10 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSliderParent:DockMargin(0, 0, 3, 4)
         settingsSliderParent:SetSize(800, 50)
         function settingsSliderParent:Paint(w, h)
-            draw.DrawText(printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
+            draw.DrawText(printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
             if self:IsHovered() or self:IsChildHovered() then
                 DrawOutlinedTexturedRect(self, gradient_mat, 3)
             end
@@ -177,7 +191,11 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:ShowCloseButton(false)
     motherFrame:SetTitle("")
     motherFrame:ParentToHUD()
+    motherFrame:SetKeyboardInputEnabled(true)
     HideHUD = true
+
+    print(primarytext)
+    print(secondarytext)
 
     if IsValid(ArcCW.InvHUD) then
         ArcCW.InvHUD:Hide()
@@ -249,26 +267,13 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local controlHelpText = vgui.Create("DLabel", motherFrame)
-    controlHelpText:SetPos(100, 1004)
+    controlHelpText:SetPos(100, 984)
     controlHelpText:SetSize(160, 30)
     controlHelpText:SetFont("MichromaHelpText")
-    controlHelpText:SetText("[ENTER]   SELECT")
+    controlHelpText:SetText("[Q]   BACK")
     controlHelpText:SetTextColor(secondarytext)
 
     function controlHelpText:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        return nil
-    end
-    ---
-
-    local controlHelpText2 = vgui.Create("DLabel", motherFrame)
-    controlHelpText2:SetPos(285, 1004)
-    controlHelpText2:SetSize(115, 30)
-    controlHelpText2:SetFont("MichromaHelpText")
-    controlHelpText2:SetText("[ESC]   BACK")
-    controlHelpText2:SetTextColor(secondarytext)
-
-    function controlHelpText2:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
@@ -393,11 +398,7 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- slider text looks less bold
--- disable falco ppi hudpaint temporarily
--- add tfa, cw2, and fas2 compatibility please
--- keyboard nagivation
--- changeable colors
+-- extended panel
 -- rounded outline
 -- two-tone gradient material that can be changed ingame
 -- ui sounds
