@@ -1,5 +1,5 @@
-# chicagorp-settings-gui
-client settings gui for chicagorp (my in-development darkrp server), constantly changing and non-functional rn
+# chicagoRP-settings-gui
+client settings gui for chicagoRP (in-development darkrp server), likely stable enough for other developers to use now
 
 # to-do
 [x] - base layout    
