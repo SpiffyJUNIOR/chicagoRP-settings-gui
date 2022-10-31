@@ -58,6 +58,29 @@ local OpenPanel = nil
 local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
+local LoadedSounds = {}
+
+local function NonDSPPlaySound(FileName)
+    local sound
+    local filter
+    if !LoadedSounds[FileName] then
+        -- The sound is always re-created serverside because of the RecipientFilter.
+        sound = CreateSound(game.GetWorld(), FileName, filter) -- create the new sound, parented to the worldspawn (which always exists)
+        if sound then
+            sound:SetDSP(0, true)
+            sound:SetSoundLevel(0) -- play everywhere
+            LoadedSounds[FileName] = {sound, filter} -- cache the CSoundPatch
+        end
+    else
+        sound = LoadedSounds[FileName][1]
+        filter = LoadedSounds[FileName][2]
+    end
+    if sound then
+        sound:Stop() -- it won't play again otherwise
+        sound:Play()
+    end
+    return sound -- useful if you want to stop the sound yourself
+end
 
 local function BlurBackground(panel)
     if (!IsValid(panel) and !panel:IsVisible()) then return end
@@ -96,6 +119,13 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsButton:Dock(TOP)
         settingsButton:DockMargin(0, 0, 3, 4)
         settingsButton:SetSize(1340, 50)
+
+        function settingsButton:OnCursorEntered()
+            if self:IsHovered() then
+                surface.PlaySound("chicagoRP_settings/hover.wav")
+            end
+        end
+
         function settingsButton:Paint(w, h)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
@@ -117,11 +147,14 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             end
             draw.DrawText(printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
         end
+
         function settingsButton:DoClick()
             if (GetConVar(convar):GetInt() == 0) then -- add float check pls
                 RunConsoleCommand(convar, "1")
+                surface.PlaySound("chicagoRP_settings/select.wav")
             elseif (GetConVar(convar):GetInt() == 1) then -- add float check pls
                 RunConsoleCommand(convar, "0")
+                surface.PlaySound("chicagoRP_settings/select.wav")
             end
         end
     elseif (GetConVar(convar):GetInt() >= 0 or GetConVar(convar):GetInt() <= 0) and (max > 1) and ConVarExists(convar) then
@@ -130,6 +163,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSliderParent:Dock(TOP)
         settingsSliderParent:DockMargin(0, 0, 3, 4)
         settingsSliderParent:SetSize(1340, 50)
+
         function settingsSliderParent:Paint(w, h)
             surface.SetDrawColor(40, 40, 40, 100)
             surface.DrawRect(0, 0, w, h)
@@ -148,6 +182,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSlider:SetMin(min)
         settingsSlider:SetMax(max)
         settingsSlider:SetDecimals(0)
+        settingsSlider:SetValue(GetConVar(convar):GetInt())
         settingsSlider:SetConVar(convar)
         settingsSlider.Scratch:Hide() -- based? retarded? you decide!
         settingsSlider.Label:Hide()
@@ -169,6 +204,27 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsSlider.Slider.Knob:Paint(w, h)
             return nil
+        end
+
+        function settingsSlider.Slider:OnCursorEntered()
+            if self:IsHovered() then
+                surface.PlaySound("chicagoRP_settings/hover.wav")
+            end
+        end
+
+        function settingsSliderParent:OnCursorEntered()
+            if self:IsHovered() then
+                surface.PlaySound("chicagoRP_settings/hover.wav")
+            end
+        end
+
+        function settingsSlider:OnValueChanged(value)
+            self:SetValue(math.Round(value, 0))
+            -- surface.PlaySound("chicagoRP_settings/hover_slide.wav")
+            local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
+            hoverslide:SetSoundLevel(0) -- play everywhere
+            hoverslide:Stop()
+            hoverslide:Play()
         end
     end
 end
@@ -203,11 +259,14 @@ net.Receive("chicagoRP_settings", function()
 
     function motherFrame:Paint(w, h)
         BlurBackground(self)
+        -- local color = Color(0, 0, 0, Lerp(RealFrameTime(), 0, 10))
         draw.RoundedBox(8, 0, 0, w, h, Color(0, 0, 0, 10))
     end
 
     motherFrame:MakePopup()
     motherFrame:Center()
+    -- ply:SetDSP(30, false)
+    surface.PlaySound("chicagoRP_settings/back.wav")
 
     function motherFrame:OnKeyCodePressed(key)
         if key == KEY_ESCAPE or key == KEY_Q then
@@ -220,6 +279,8 @@ net.Receive("chicagoRP_settings", function()
         if IsValid(ArcCW.InvHUD) then
             ArcCW.InvHUD:Show()
         end
+        ply:SetDSP(0, false)
+        surface.PlaySound("chicagoRP_settings/back.wav")
     end
     ---
 
@@ -336,6 +397,14 @@ net.Receive("chicagoRP_settings", function()
     videoSettingsButton:SetText("")
     videoSettingsButton:SetTextColor(primarytext)
 
+    function videoSettingsButton:OnCursorEntered()
+        if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+    end
+
     function videoSettingsButton:Paint(w, h)
         if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
@@ -359,6 +428,7 @@ net.Receive("chicagoRP_settings", function()
         end
         videoSettingsScrollPanel:Show()
         OpenPanel = videoSettingsScrollPanel
+        surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
 
@@ -368,6 +438,14 @@ net.Receive("chicagoRP_settings", function()
     gameSettingsButton:SetFont("MichromaRegular")
     gameSettingsButton:SetText("")
     gameSettingsButton:SetTextColor(primarytext)
+
+    function gameSettingsButton:OnCursorEntered()
+        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+    end
 
     function gameSettingsButton:Paint(w, h)
         if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
@@ -392,14 +470,14 @@ net.Receive("chicagoRP_settings", function()
         end
         gameSettingsScrollPanel:Show()
         OpenPanel = gameSettingsScrollPanel
+        surface.PlaySound("chicagoRP_settings/select.wav")
     end
 
     OpenMotherFrame = motherFrame
 end)
 
 -- still need:
--- extended panel
--- ui sounds
+-- ui layout pass
 -- fade in/out
 -- color pulse when click button
 -- rounded outline
