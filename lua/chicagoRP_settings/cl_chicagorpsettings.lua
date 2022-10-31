@@ -612,9 +612,12 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- ui layout pass
 -- enter in key so people can copy and paste binds easily
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function, test if local doclick function is possible)
+-- create special exit button icon
+-- add top category name text
+-- ui layout pass
+-- make UI scale correctly with screen resolution
 -- rounded outline
 -- two-tone gradient material that can be changed ingame
 -- MAYBE a slight move anim when opened/closed
