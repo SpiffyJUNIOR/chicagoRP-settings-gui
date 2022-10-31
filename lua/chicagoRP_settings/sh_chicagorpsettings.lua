@@ -125,7 +125,7 @@ chicagoRPgameSettingsOptions = { -- simfphys camera, arccw, first person shadow,
         convar = "arccw_crosshair_clr_a",
         max = 255,
         min = 0,
-       printname = "Crosshair Color (A)",
+        printname = "Crosshair Color (A)",
         text = "Alpha transparency value for crosshair color. Only affects ArcCW Weapons."
     },
     [2] = {
@@ -148,5 +148,13 @@ chicagoRPgameSettingsOptions = { -- simfphys camera, arccw, first person shadow,
         min = 0,
         printname = "Crosshair Color (B)",
         text = "Blue color value for crosshair color. Only affects ArcCW Weapons."
+    }
+}
+
+chicagoRPcontrolsSettingsOptions = {
+    [1] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
     }
 }

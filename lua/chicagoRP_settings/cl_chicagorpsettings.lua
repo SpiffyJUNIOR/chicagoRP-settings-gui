@@ -127,9 +127,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         end
 
         function settingsButton:Paint(w, h)
-            surface.SetDrawColor(40, 40, 40, 100)
+            surface.SetDrawColor(40, 40, 40, 80)
             surface.DrawRect(0, 0, w, h)
             if settingsButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
+                surface.SetDrawColor(80, 80, 80, 20)
+                surface.DrawRect(0, 0, w, h)
                 surface.SetDrawColor(255, 86, 65)
                 DrawOutlinedTexturedRect(self, gradient_mat, 3)
                 helptextparent:SetText(helptext)
@@ -165,12 +167,14 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSliderParent:SetSize(1340, 50)
 
         function settingsSliderParent:Paint(w, h)
-            surface.SetDrawColor(40, 40, 40, 100)
+            surface.SetDrawColor(40, 40, 40, 80)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
             draw.DrawText(printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
             if self:IsHovered() or self:IsChildHovered() then
                 DrawOutlinedTexturedRect(self, gradient_mat, 3)
+                surface.SetDrawColor(80, 80, 80, 20)
+                surface.DrawRect(0, 0, w, h)
             end
             -- return nil
         end
@@ -268,7 +272,11 @@ net.Receive("chicagoRP_settings", function()
 
     motherFrame:MakePopup()
     motherFrame:Center()
-    ply:SetDSP(30, false)
+
+    timer.Simple(0.2, function()
+        ply:SetDSP(30, false)
+    end)
+
     surface.PlaySound("chicagoRP_settings/back.wav")
 
     function motherFrame:OnKeyCodePressed(key)
@@ -396,6 +404,31 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
+    local controlsSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
+    controlsSettingsScrollPanel:SetPos(525, 235)
+    controlsSettingsScrollPanel:SetSize(1360, 635)
+    controlsSettingsScrollPanel:Hide()
+
+    function controlsSettingsScrollPanel:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
+
+    local controlsSettingsScrollBar = controlsSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
+    controlsSettingsScrollBar:SetHideButtons(true)
+    controlsSettingsScrollBar:SetPos(525, 235)
+    function controlsSettingsScrollBar:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(43, 39, 35, 66))
+    end
+    function controlsSettingsScrollBar.btnGrip:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+    end
+
+    -- for k, v in ipairs(chicagoRPcontrolsSettingsOptions) do
+    --     CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, controlsSettingsScrollPanel, settingsHelpText)
+    -- end
+    ---
+
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
     videoSettingsButton:SetPos(103, 230)
     videoSettingsButton:SetSize(394, 56)
@@ -415,12 +448,16 @@ net.Receive("chicagoRP_settings", function()
         if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         end
         surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
@@ -433,6 +470,8 @@ net.Receive("chicagoRP_settings", function()
             OpenPanel:Hide()
         end
         videoSettingsScrollPanel:Show()
+        videoSettingsScrollPanel:SetAlpha(0)
+        videoSettingsScrollPanel:AlphaTo(255, 0.2, 0)
         OpenPanel = videoSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -457,12 +496,16 @@ net.Receive("chicagoRP_settings", function()
         if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         end
         surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
@@ -475,49 +518,57 @@ net.Receive("chicagoRP_settings", function()
             OpenPanel:Hide()
         end
         gameSettingsScrollPanel:Show()
+        gameSettingsScrollPanel:SetAlpha(0)
+        gameSettingsScrollPanel:AlphaTo(255, 0.2, 0)
         OpenPanel = gameSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
 
-    local gameSettingsButton = vgui.Create("DButton", motherFrame)
-    gameSettingsButton:SetPos(103, 290)
-    gameSettingsButton:SetSize(394, 56)
-    gameSettingsButton:SetFont("MichromaRegular")
-    gameSettingsButton:SetText("")
-    gameSettingsButton:SetTextColor(primarytext)
+    local controlsSettingsButton = vgui.Create("DButton", motherFrame)
+    controlsSettingsButton:SetPos(103, 350)
+    controlsSettingsButton:SetSize(394, 56)
+    controlsSettingsButton:SetFont("MichromaRegular")
+    controlsSettingsButton:SetText("")
+    controlsSettingsButton:SetTextColor(primarytext)
 
-    function gameSettingsButton:OnCursorEntered()
-        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+    function controlsSettingsButton:OnCursorEntered()
+        if self:IsHovered() and !controlsSettingsScrollPanel:IsVisible() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
-        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+        elseif self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
     end
 
-    function gameSettingsButton:Paint(w, h)
-        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+    function controlsSettingsButton:Paint(w, h)
+        if self:IsHovered() and !controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 2)
+        elseif !self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+        elseif self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         end
         surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
         surface.SetFont("MichromaRegular")
-        surface.DrawText("GAME")
+        surface.DrawText("CONTROLS")
     end
 
-    function gameSettingsButton:DoClick()
+    function controlsSettingsButton:DoClick()
         if IsValid(OpenPanel) then
             OpenPanel:Hide()
         end
-        gameSettingsScrollPanel:Show()
-        OpenPanel = gameSettingsScrollPanel
+        controlsSettingsScrollPanel:Show()
+        controlsSettingsScrollPanel:SetAlpha(0)
+        controlsSettingsScrollPanel:AlphaTo(255, 0.2, 0)
+        OpenPanel = controlsSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
 
@@ -526,7 +577,6 @@ end)
 
 -- still need:
 -- ui layout pass
--- fade in/out
--- color pulse when click button
+-- color pulse when click button 86, 65, 66
 -- rounded outline
 -- two-tone gradient material that can be changed ingame
