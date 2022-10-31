@@ -613,6 +613,7 @@ end)
 
 -- still need:
 -- ui layout pass
+-- enter in key so people can copy and paste binds easily
 -- color pulse when click button 86, 65, 66
 -- rounded outline
 -- two-tone gradient material that can be changed ingame
