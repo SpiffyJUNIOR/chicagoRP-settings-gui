@@ -260,17 +260,23 @@ net.Receive("chicagoRP_settings", function()
     function motherFrame:Paint(w, h)
         BlurBackground(self)
         -- local color = Color(0, 0, 0, Lerp(RealFrameTime(), 0, 10))
-        draw.RoundedBox(8, 0, 0, w, h, Color(0, 0, 0, 10))
+        draw.RoundedBox(8, 0, 0, w, h, Color(0, 0, 0, 0))
     end
+
+    motherFrame:SetAlpha(0)
+    motherFrame:AlphaTo(255, 0.2, 0)
 
     motherFrame:MakePopup()
     motherFrame:Center()
-    -- ply:SetDSP(30, false)
+    ply:SetDSP(30, false)
     surface.PlaySound("chicagoRP_settings/back.wav")
 
     function motherFrame:OnKeyCodePressed(key)
         if key == KEY_ESCAPE or key == KEY_Q then
-            self:Close()
+            self:AlphaTo(50, 0.1, 0)
+            timer.Simple(0.1, function()
+                self:Close()
+            end)
         end
     end
 
@@ -428,6 +434,48 @@ net.Receive("chicagoRP_settings", function()
         end
         videoSettingsScrollPanel:Show()
         OpenPanel = videoSettingsScrollPanel
+        surface.PlaySound("chicagoRP_settings/select.wav")
+    end
+    ---
+
+    local gameSettingsButton = vgui.Create("DButton", motherFrame)
+    gameSettingsButton:SetPos(103, 290)
+    gameSettingsButton:SetSize(394, 56)
+    gameSettingsButton:SetFont("MichromaRegular")
+    gameSettingsButton:SetText("")
+    gameSettingsButton:SetTextColor(primarytext)
+
+    function gameSettingsButton:OnCursorEntered()
+        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+    end
+
+    function gameSettingsButton:Paint(w, h)
+        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(34, 34, 34, 100)
+            surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(66, 66, 66, 30)
+            surface.DrawRect(0, 0, w, h)
+        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+            surface.SetDrawColor(66, 66, 66, 60)
+            surface.DrawRect(0, 0, w, h)
+        end
+        surface.SetTextColor(primarytext)
+        surface.SetTextPos(w - 383, h - 42)
+        surface.SetFont("MichromaRegular")
+        surface.DrawText("GAME")
+    end
+
+    function gameSettingsButton:DoClick()
+        if IsValid(OpenPanel) then
+            OpenPanel:Hide()
+        end
+        gameSettingsScrollPanel:Show()
+        OpenPanel = gameSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
