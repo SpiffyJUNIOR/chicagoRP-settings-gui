@@ -6,6 +6,7 @@ client settings gui for chicagorp (my in-development darkrp server), constantly 
 [x] - base functionality    
 [w] - prettify    
 [w] - animations    
+[ ] - make layout scalable
 [ ] - optimize    
 [ ] - write documentation and release    
 
