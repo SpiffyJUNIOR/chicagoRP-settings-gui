@@ -224,12 +224,48 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsSlider:OnValueChanged(value)
             self:SetValue(math.Round(value, 0))
-            -- surface.PlaySound("chicagoRP_settings/hover_slide.wav")
             local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
             hoverslide:SetSoundLevel(0) -- play everywhere
             hoverslide:Stop()
             hoverslide:Play()
         end
+    end
+end
+
+local function CreateControlsButton(bind, printname, helptext, parent, helptextparent)
+    local controlsButton = parent:Add("DButton")
+    controlsButton:SetText("")
+    controlsButton:Dock(TOP)
+    controlsButton:DockMargin(0, 0, 3, 4)
+    controlsButton:SetSize(800, 44)
+
+    function controlsButton:OnCursorEntered()
+        if self:IsHovered() then
+            surface.PlaySound("chicagoRP_controls/hover.wav")
+        end
+    end
+
+    function controlsButton:Paint(w, h)
+        local statusString = "Unbound"
+        surface.SetDrawColor(40, 40, 40, 80)
+        surface.DrawRect(0, 0, w, h)
+        if controlsButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
+            surface.SetDrawColor(80, 80, 80, 20)
+            surface.DrawRect(0, 0, w, h)
+            surface.SetDrawColor(255, 86, 65)
+            DrawOutlinedTexturedRect(self, gradient_mat, 3)
+            helptextparent:SetText(helptext)
+        end
+        if input.LookupBinding(bind, false) then
+            statusString = string.upper(input.LookupBinding(bind, false))
+            draw.DrawText(statusString, "MichromaRegular", 1320, 10, primarytext, TEXT_ALIGN_RIGHT)
+        end
+        draw.DrawText(printname, "MichromaRegular", 14, 10, primarytext, TEXT_ALIGN_LEFT)
+    end
+
+    function controlsButton:DoClick()
+        surface.PlaySound("chicagoRP_controls/select.wav")
+        print(self:GetSize())
     end
 end
 
@@ -282,6 +318,7 @@ net.Receive("chicagoRP_settings", function()
     function motherFrame:OnKeyCodePressed(key)
         if key == KEY_ESCAPE or key == KEY_Q then
             self:AlphaTo(50, 0.1, 0)
+            surface.PlaySound("chicagoRP_settings/back.wav")
             timer.Simple(0.1, function()
                 self:Close()
             end)
@@ -294,7 +331,6 @@ net.Receive("chicagoRP_settings", function()
             ArcCW.InvHUD:Show()
         end
         ply:SetDSP(0, false)
-        surface.PlaySound("chicagoRP_settings/back.wav")
     end
     ---
 
@@ -424,9 +460,9 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    -- for k, v in ipairs(chicagoRPcontrolsSettingsOptions) do
-    --     CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, controlsSettingsScrollPanel, settingsHelpText)
-    -- end
+    for k, v in ipairs(chicagoRPcontrolsSettingsOptions) do
+        CreateControlsButton(v.bind, v.printname, v.text, controlsSettingsScrollPanel, settingsHelpText)
+    end
     ---
 
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
@@ -580,3 +616,4 @@ end)
 -- color pulse when click button 86, 65, 66
 -- rounded outline
 -- two-tone gradient material that can be changed ingame
+-- MAYBE a slight move anim when opened/closed

@@ -156,5 +156,90 @@ chicagoRPcontrolsSettingsOptions = {
         bind = "+drop",
         printname = "Drop Weapon",
         text = "Drops the currently held weapon."
+    },
+    [2] = {
+        bind = "holsterweapon",
+        printname = "Holster Weapon",
+        text = "Holsters the currently equipped weapon."
+    },
+    [3] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [4] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [5] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [6] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [7] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [8] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [9] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [10] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [11] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [12] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [13] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [14] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [15] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [16] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [17] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
+    },
+    [18] = {
+        bind = "+drop",
+        printname = "Drop Weapon",
+        text = "Drops the currently held weapon."
     }
 }
