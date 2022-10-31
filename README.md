@@ -2,10 +2,10 @@
 client settings gui for chicagorp (my in-development darkrp server), constantly changing and non-functional rn
 
 # to-do
-[ ] - base layout    
-[ ] - base functionality    
-[ ] - prettify    
-[ ] - animations    
+[x] - base layout    
+[x] - base functionality    
+[w] - prettify    
+[w] - animations    
 [ ] - optimize    
 [ ] - write documentation and release    
 
