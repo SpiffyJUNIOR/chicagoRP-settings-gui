@@ -243,6 +243,17 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
     function controlsButton:DoClick()
         surface.PlaySound("chicagoRP_controls/select.wav")
         print(self:GetSize())
+
+        local controlsTextEntry = parent:Add("TextEntry")
+        controlsTextEntry:Dock(RIGHT)
+        controlsTextEntry:DockMargin(0, 0, 0, 0)
+        controlsTextEntry:SetSize(60, 44)
+
+        function controlsTextEntry:OnKeyCodeTyped(keyCode)
+            print("Please enter bind" .. keyCode .. bind .. "in your console.")
+            surface.PlaySound("chicagoRP_controls/select.wav")
+            controlsTextEntry:Remove()
+        end
     end
 end
 
@@ -591,8 +602,9 @@ end)
 -- still need:
 -- convert min/max to getconvar
 -- add funny HOLY SHIT... sound
+-- change hide/show to remove/add?
 -- create box to enter key so people can copy and paste binds easily (setclipboardtext, add bottom right helptext, enter directly without additional popup with TextEntry)
--- color pulse when click button 86, 65, 66 (lerp between color values in paint function, test if local doclick function is possible)
+-- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
 -- create special exit button icon (convert png to material then make a label that displays it)
 -- add top category name text (draw additional text behind it or try https://github.com/Mikey-Howell/moat-texteffects)
 -- tighten up UI layout
