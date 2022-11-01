@@ -58,29 +58,6 @@ local OpenPanel = nil
 local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
-local LoadedSounds = {}
-
-local function NonDSPPlaySound(FileName)
-    local sound
-    local filter
-    if !LoadedSounds[FileName] then
-        -- The sound is always re-created serverside because of the RecipientFilter.
-        sound = CreateSound(game.GetWorld(), FileName, filter) -- create the new sound, parented to the worldspawn (which always exists)
-        if sound then
-            sound:SetDSP(0, true)
-            sound:SetSoundLevel(0) -- play everywhere
-            LoadedSounds[FileName] = {sound, filter} -- cache the CSoundPatch
-        end
-    else
-        sound = LoadedSounds[FileName][1]
-        filter = LoadedSounds[FileName][2]
-    end
-    if sound then
-        sound:Stop() -- it won't play again otherwise
-        sound:Play()
-    end
-    return sound -- useful if you want to stop the sound yourself
-end
 
 local function BlurBackground(panel)
     if (!IsValid(panel) and !panel:IsVisible()) then return end
@@ -485,7 +462,7 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 2)
+            DrawOutlinedTexturedRect(self, gradient_mat, Lerp(SysTime(), 4, 0))
         elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
@@ -612,12 +589,14 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- enter in key so people can copy and paste binds easily
+-- convert min/max to getconvar
+-- add funny HOLY SHIT... sound
+-- create box to enter key so people can copy and paste binds easily (setclipboardtext, add bottom right helptext, enter directly without additional popup with TextEntry)
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function, test if local doclick function is possible)
--- create special exit button icon
--- add top category name text
--- ui layout pass
--- make UI scale correctly with screen resolution
--- rounded outline
--- two-tone gradient material that can be changed ingame
--- MAYBE a slight move anim when opened/closed
+-- create special exit button icon (convert png to material then make a label that displays it)
+-- add top category name text (draw additional text behind it or try https://github.com/Mikey-Howell/moat-texteffects)
+-- tighten up UI layout
+-- make UI scale correctly with screen resolution (math and maybe performlayout)
+-- rounded outline (requires stencils)
+-- two-tone gradient material that can be changed ingame (idk)
+-- MAYBE a slight move anim when opened/closed (Panel:MoveTo)
