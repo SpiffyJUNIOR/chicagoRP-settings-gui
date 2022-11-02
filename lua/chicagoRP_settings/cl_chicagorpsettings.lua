@@ -241,16 +241,22 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
     end
 
     function controlsButton:DoClick()
-        surface.PlaySound("chicagoRP_controls/select.wav")
+        surface.PlaySound("chicagoRP_settings/select.wav")
         print(self:GetSize())
 
-        local controlsTextEntry = parent:Add("TextEntry")
+        local controlsTextEntry = self:Add("DTextEntry")
         controlsTextEntry:Dock(RIGHT)
-        controlsTextEntry:DockMargin(0, 0, 0, 0)
+        -- controlsTextEntry:DockMargin(0, 0, 0, 0)
         controlsTextEntry:SetSize(60, 44)
 
-        function controlsTextEntry:OnKeyCodeTyped(keyCode)
-            print("Please enter bind" .. keyCode .. bind .. "in your console.")
+        function controlsTextEntry:Paint(w, h)
+            surface.SetDrawColor(80, 80, 80, 20)
+            surface.DrawRect(0, 0, w, h)
+        end
+
+        function controlsTextEntry:OnKeyCode(keyCode)
+            local keyname = tostring(input.GetKeyName(keyCode) .. " ")
+            print("Please enter bind " .. keyname .. bind .. " in your console.") -- add spaces pls
             surface.PlaySound("chicagoRP_controls/select.wav")
             controlsTextEntry:Remove()
         end
@@ -600,9 +606,6 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- convert min/max to getconvar
--- add funny HOLY SHIT... sound
--- change hide/show to remove/add?
 -- create box to enter key so people can copy and paste binds easily (setclipboardtext, add bottom right helptext, enter directly without additional popup with TextEntry)
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
 -- create special exit button icon (convert png to material then make a label that displays it)
