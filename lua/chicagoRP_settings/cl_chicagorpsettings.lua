@@ -218,7 +218,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
     function controlsButton:OnCursorEntered()
         if self:IsHovered() then
-            surface.PlaySound("chicagoRP_controls/hover.wav")
+            surface.PlaySound("chicagoRP_settings/hover.wav")
         end
     end
 
@@ -233,7 +233,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             DrawOutlinedTexturedRect(self, gradient_mat, 3)
             helptextparent:SetText(helptext)
         end
-        if input.LookupBinding(bind, false) then
+        if input.LookupBinding(bind, false) then -- how do we hide this for a certain button?
             statusString = string.upper(input.LookupBinding(bind, false))
             draw.DrawText(statusString, "MichromaRegular", 1320, 10, primarytext, TEXT_ALIGN_RIGHT)
         end
@@ -248,17 +248,29 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlsTextEntry:Dock(RIGHT)
         -- controlsTextEntry:DockMargin(0, 0, 0, 0)
         controlsTextEntry:SetSize(60, 44)
+        controlsTextEntry:MakePopup()
+
+        controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
             surface.SetDrawColor(80, 80, 80, 20)
             surface.DrawRect(0, 0, w, h)
+            draw.DrawText(self:GetText(), "MichromaRegular", 6, 6, primarytext, TEXT_ALIGN_CENTER)
         end
 
         function controlsTextEntry:OnKeyCode(keyCode)
             local keyname = tostring(input.GetKeyName(keyCode) .. " ")
+            local bindtext = tostring("bind " .. input.GetKeyName(keyCode) .. " " .. bind)
             print("Please enter bind " .. keyname .. bind .. " in your console.") -- add spaces pls
-            surface.PlaySound("chicagoRP_controls/select.wav")
+            SetClipboardText(bindtext)
+            surface.PlaySound("chicagoRP_settings/select.wav")
             controlsTextEntry:Remove()
+        end
+
+        function controlsTextEntry:OnLoseFocus()
+            surface.PlaySound("chicagoRP_settings/back.wav")
+            controlsTextEntry:Remove()
+        end
         end
     end
 end
@@ -316,6 +328,11 @@ net.Receive("chicagoRP_settings", function()
             timer.Simple(0.1, function()
                 self:Close()
             end)
+        end
+        if key == KEY_W then -- experimental keyboard nagivation, will likely require much more work
+            self:FocusNext()
+        elseif key == KEY_S then
+            self:FocusPrevious()
         end
     end
 
