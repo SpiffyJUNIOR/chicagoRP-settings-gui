@@ -50,11 +50,29 @@ surface.CreateFont("MichromaHelpText", {
     shadow = false
 })
 
+local blockedkeys = {
+    [1] = KEY_ESCAPE, 
+    [2] = KEY_TAB,
+    [3] = KEY_Q,
+    [4] = KEY_W,
+    [5] = KEY_S,
+    [6] = KEY_A,
+    [7] = KEY_D,
+    [8] = KEY_E,
+    [9] = KEY_ENTER,
+    [10] = KEY_CAPSLOCK,
+    [11] = KEY_R,
+    [12] = KEY_V,
+    [13] = KEY_F,
+    [13] = KEY_C
+}
+
 local blurMat = Material("pp/blurscreen")
 local gradient_mat = Material("vgui/gradient-u") -- gradient-d, gradient-r, gradient-u, gradient_down, gradient_up
 local HideHUD = false
 local OpenMotherFrame = nil
-local OpenPanel = nil
+local OpenScrollPanel = nil
+local OpenControlText = nil
 local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
@@ -89,7 +107,7 @@ local function DrawOutlinedTexturedRect(panel, material, thickness) -- figure ou
     surface.DrawTexturedRectUV(w - thickness, 0, thickness, h, 0, 0, 0, 1) -- right
 end
 
-local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent)
+local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent, frame)
     if (GetConVar(convar):GetInt() == 0 or GetConVar(convar):GetInt() == 1) and (max == 1) and ConVarExists(convar) then
         local settingsButton = parent:Add("DButton")
         settingsButton:SetText("")
@@ -209,7 +227,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
     end
 end
 
-local function CreateControlsButton(bind, printname, helptext, parent, helptextparent)
+local function CreateControlsButton(bind, printname, helptext, parent, helptextparent, frame)
     local controlsButton = parent:Add("DButton")
     controlsButton:SetText("")
     controlsButton:Dock(TOP)
@@ -244,34 +262,91 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         surface.PlaySound("chicagoRP_settings/select.wav")
         print(self:GetSize())
 
+        if IsValid(OpenControlText) then
+            OpenControlText:Remove()
+        end
+
+        local controlHelpText = vgui.Create("DLabel", frame)
+        controlHelpText:SetPos(1495, 880)
+        controlHelpText:SetSize(390, 30)
+        controlHelpText:SetFont("MichromaHelpText")
+        controlHelpText:SetText("Press a key to bind.")
+
+        function controlHelpText:Paint(w, h)
+            surface.SetDrawColor(200, 0, 0, 10)
+            surface.DrawRect(0, 0, w, h)
+            draw.DrawText(self:GetText(), "MichromaSmall", 0, 5, primarytext, TEXT_ALIGN_LEFT)
+
+            return true
+            -- return nil
+        end
+
+        function controlHelpText:OnRemove()
+            -- self:SetAlpha(255)
+            -- self:AlphaTo(10, 1, 0)
+            print("helptext removed")
+        end
+
+        controlHelpText:SetAlpha(0)
+        controlHelpText:AlphaTo(255, 0.2, 0)
+
         local controlsTextEntry = self:Add("DTextEntry")
         controlsTextEntry:Dock(RIGHT)
-        -- controlsTextEntry:DockMargin(0, 0, 0, 0)
         controlsTextEntry:SetSize(60, 44)
-        controlsTextEntry:MakePopup()
-
         controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
             surface.SetDrawColor(80, 80, 80, 20)
             surface.DrawRect(0, 0, w, h)
-            draw.DrawText(self:GetText(), "MichromaRegular", 6, 6, primarytext, TEXT_ALIGN_CENTER)
+            draw.DrawText(self:GetText(), "MichromaRegular", 0, 0, primarytext, TEXT_ALIGN_CENTER)
         end
 
         function controlsTextEntry:OnKeyCode(keyCode)
+            local bindblocked = false
             local keyname = tostring(input.GetKeyName(keyCode) .. " ")
             local bindtext = tostring("bind " .. input.GetKeyName(keyCode) .. " " .. bind)
+            for k, v in ipairs(blockedkeys) do
+                if keyCode == v then
+                    surface.PlaySound("chicagoRP_settings/back.wav")
+                    controlHelpText:SetText("Binding default key blocked.")
+                    self:Remove()
+                    timer.Simple(5, function()
+                        if IsValid(controlHelpText) then
+                            controlHelpText:SetAlpha(255)
+                            controlHelpText:AlphaTo(0, 0.5, 0)
+                        end
+                    end)
+                    bindblocked = true
+                end
+            end
+            if bindblocked then return end
             print("Please enter bind " .. keyname .. bind .. " in your console.") -- add spaces pls
             SetClipboardText(bindtext)
             surface.PlaySound("chicagoRP_settings/select.wav")
-            controlsTextEntry:Remove()
+            controlHelpText:SetText("Key bound, paste in console then enter.")
+            self:Remove()
+            timer.Simple(5, function()
+                if IsValid(controlHelpText) then
+                    controlHelpText:SetAlpha(255)
+                    controlHelpText:AlphaTo(0, 0.5, 0)
+                end
+            end)
         end
 
         function controlsTextEntry:OnLoseFocus()
             surface.PlaySound("chicagoRP_settings/back.wav")
-            controlsTextEntry:Remove()
+            controlHelpText:SetText("Bind cancelled.")
+            print("bind cancelled")
+            self:Remove()
+            timer.Simple(5, function()
+                if IsValid(controlHelpText) then
+                    controlHelpText:SetAlpha(255)
+                    controlHelpText:AlphaTo(0, 0.5, 0)
+                end
+            end)
         end
-        end
+
+        OpenControlText = controlHelpText
     end
 end
 
@@ -329,11 +404,12 @@ net.Receive("chicagoRP_settings", function()
                 self:Close()
             end)
         end
-        if key == KEY_W then -- experimental keyboard nagivation, will likely require much more work
-            self:FocusNext()
-        elseif key == KEY_S then
-            self:FocusPrevious()
-        end
+        -- if key == KEY_W then -- lets put on hold for now, probably really hard
+        --     self:FocusPrevious()
+        --     print("yea")
+        -- elseif key == KEY_S then
+        --     self:FocusNext()
+        -- end
     end
 
     function motherFrame:OnClose()
@@ -388,14 +464,14 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local controlHelpText = vgui.Create("DLabel", motherFrame)
-    controlHelpText:SetPos(100, 984)
-    controlHelpText:SetSize(160, 30)
-    controlHelpText:SetFont("MichromaHelpText")
-    controlHelpText:SetText("[Q]   BACK")
-    controlHelpText:SetTextColor(secondarytext)
+    local exitHelpText = vgui.Create("DLabel", motherFrame)
+    exitHelpText:SetPos(100, 984)
+    exitHelpText:SetSize(160, 30)
+    exitHelpText:SetFont("MichromaHelpText")
+    exitHelpText:SetText("[Q]   BACK")
+    exitHelpText:SetTextColor(secondarytext)
 
-    function controlHelpText:Paint(w, h)
+    function exitHelpText:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
@@ -422,7 +498,7 @@ net.Receive("chicagoRP_settings", function()
     end
 
     for k, v in ipairs(chicagoRPvideoSettingsOptions) do
-        CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, videoSettingsScrollPanel, settingsHelpText)
+        CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, videoSettingsScrollPanel, settingsHelpText, motherFrame)
     end
     ---
 
@@ -447,7 +523,7 @@ net.Receive("chicagoRP_settings", function()
     end
 
     for k, v in ipairs(chicagoRPgameSettingsOptions) do
-        CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, gameSettingsScrollPanel, settingsHelpText)
+        CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, gameSettingsScrollPanel, settingsHelpText, motherFrame)
     end
     ---
 
@@ -472,7 +548,7 @@ net.Receive("chicagoRP_settings", function()
     end
 
     for k, v in ipairs(chicagoRPcontrolsSettingsOptions) do
-        CreateControlsButton(v.bind, v.printname, v.text, controlsSettingsScrollPanel, settingsHelpText)
+        CreateControlsButton(v.bind, v.printname, v.text, controlsSettingsScrollPanel, settingsHelpText, motherFrame)
     end
     ---
 
@@ -496,7 +572,6 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, Lerp(SysTime(), 4, 0))
         elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
@@ -504,7 +579,6 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         end
         surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
@@ -513,13 +587,13 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function videoSettingsButton:DoClick()
-        if IsValid(OpenPanel) then
-            OpenPanel:Hide()
+        if IsValid(OpenScrollPanel) then
+            OpenScrollPanel:Hide()
         end
         videoSettingsScrollPanel:Show()
         videoSettingsScrollPanel:SetAlpha(0)
         videoSettingsScrollPanel:AlphaTo(255, 0.2, 0)
-        OpenPanel = videoSettingsScrollPanel
+        OpenScrollPanel = videoSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
@@ -544,7 +618,6 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
@@ -552,7 +625,6 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         end
         surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
@@ -561,13 +633,13 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function gameSettingsButton:DoClick()
-        if IsValid(OpenPanel) then
-            OpenPanel:Hide()
+        if IsValid(OpenScrollPanel) then
+            OpenScrollPanel:Hide()
         end
         gameSettingsScrollPanel:Show()
         gameSettingsScrollPanel:SetAlpha(0)
         gameSettingsScrollPanel:AlphaTo(255, 0.2, 0)
-        OpenPanel = gameSettingsScrollPanel
+        OpenScrollPanel = gameSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
@@ -592,7 +664,6 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         elseif !self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
@@ -600,7 +671,6 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 2)
         end
         surface.SetTextColor(primarytext)
         surface.SetTextPos(w - 383, h - 42)
@@ -609,13 +679,13 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function controlsSettingsButton:DoClick()
-        if IsValid(OpenPanel) then
-            OpenPanel:Hide()
+        if IsValid(OpenScrollPanel) then
+            OpenScrollPanel:Hide()
         end
         controlsSettingsScrollPanel:Show()
         controlsSettingsScrollPanel:SetAlpha(0)
         controlsSettingsScrollPanel:AlphaTo(255, 0.2, 0)
-        OpenPanel = controlsSettingsScrollPanel
+        OpenScrollPanel = controlsSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
 
@@ -623,9 +693,9 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- create box to enter key so people can copy and paste binds easily (setclipboardtext, add bottom right helptext, enter directly without additional popup with TextEntry)
+-- create box to enter key so people can copy and paste binds easily (add bottom right helptext, enter directly without additional popup with DTextEntry)
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
--- create special exit button icon (convert png to material then make a label that displays it)
+-- create special exit button icon (DButton:SetMaterial with Material(""))
 -- add top category name text (draw additional text behind it or try https://github.com/Mikey-Howell/moat-texteffects)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)

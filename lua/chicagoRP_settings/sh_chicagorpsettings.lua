@@ -1,10 +1,10 @@
-chicagoRPvideoSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
+chicagoRPvideoSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos
     [1] = {
         convar = "cl_new_impact_effects",
         max = 1,
         min = 0,
         printname = "Fancy Impact Effects",
-        text = "Fancy impact particles. Might have heavy performance impact on low-spec computers."
+        text = "Fancy impact particles. May have heavy performance impact on low-spec computers."
     },
     [2] = {
         convar = "arccw_scopepp",
