@@ -163,14 +163,14 @@ chicagoRPcontrolsSettingsOptions = {
         text = "Holsters the currently equipped weapon."
     },
     [3] = {
-        bind = "+drop",
-        printname = "Drop Weapon",
-        text = "Drops the currently held weapon."
+        bind = "jmod_ez_inv",
+        printname = "Open Armor Inventory",
+        text = "Open's JMod's armor inventory."
     },
     [4] = {
-        bind = "+drop",
-        printname = "Drop Weapon",
-        text = "Drops the currently held weapon."
+        bind = "jmod_ez_togglegoggles",
+        printname = "Toggle/Untoggle Goggles",
+        text = "Toggles or untoggles your currently equipped goggles."
     },
     [5] = {
         bind = "+drop",

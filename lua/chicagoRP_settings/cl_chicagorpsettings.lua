@@ -273,9 +273,9 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlHelpText:SetText("Press a key to bind.")
 
         function controlHelpText:Paint(w, h)
-            surface.SetDrawColor(200, 0, 0, 10)
-            surface.DrawRect(0, 0, w, h)
-            draw.DrawText(self:GetText(), "MichromaSmall", 0, 5, primarytext, TEXT_ALIGN_LEFT)
+            -- surface.SetDrawColor(200, 0, 0, 10)
+            -- surface.DrawRect(0, 0, w, h)
+            draw.DrawText(self:GetText(), "MichromaSmall", 385, 5, primarytext, TEXT_ALIGN_RIGHT)
 
             return true
             -- return nil
@@ -693,10 +693,10 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- create box to enter key so people can copy and paste binds easily (add bottom right helptext, enter directly without additional popup with DTextEntry)
+-- create box to enter key so people can copy and paste binds easily (remove keybind letter when binding, and blinking underscore)
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
 -- create special exit button icon (DButton:SetMaterial with Material(""))
--- add top category name text (draw additional text behind it or try https://github.com/Mikey-Howell/moat-texteffects)
+-- add top category name text (draw outline with offset)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
 -- rounded outline (requires stencils)
