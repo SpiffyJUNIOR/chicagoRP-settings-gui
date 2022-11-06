@@ -59,6 +59,8 @@ surface.CreateFont("MichromaHelpText", {
     shadow = false
 })
 
+local exiticon = Material("chicagoRP_settings/exiticon.png")
+
 local blockedkeys = {
     [1] = KEY_ESCAPE,
     [2] = KEY_TAB,
@@ -411,18 +413,12 @@ net.Receive("chicagoRP_settings", function()
 
     function motherFrame:OnKeyCodePressed(key)
         if key == KEY_ESCAPE or key == KEY_Q then
-            self:AlphaTo(50, 0.1, 0)
+            self:AlphaTo(50, 0.15, 0)
             surface.PlaySound("chicagoRP_settings/back.wav")
-            timer.Simple(0.1, function()
+            timer.Simple(0.15, function()
                 self:Close()
             end)
         end
-        -- if key == KEY_W then -- lets put on hold for now, probably really hard
-        --     self:FocusPrevious()
-        --     print("yea")
-        -- elseif key == KEY_S then
-        --     self:FocusNext()
-        -- end
     end
 
     function motherFrame:OnClose()
@@ -442,12 +438,40 @@ net.Receive("chicagoRP_settings", function()
     exitButton:SetTextColor(secondarytext)
 
     function exitButton:DoClick()
-        motherFrame:Close()
+        motherFrame:AlphaTo(50, 0.15, 0)
+        surface.PlaySound("chicagoRP_settings/back.wav")
+        timer.Simple(0.15, function()
+            if IsValid(motherFrame) then
+                motherFrame:Close()
+            end
+        end)
     end
 
     function exitButton:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
+    end
+    ---
+
+    local exitIconButton = vgui.Create("DButton", motherFrame)
+    exitIconButton:SetPos(100, 150)
+    exitIconButton:SetSize(80, 80)
+    exitIconButton:SetMaterial(exiticon)
+
+    function exitIconButton:DoClick()
+        motherFrame:AlphaTo(50, 0.15, 0)
+        surface.PlaySound("chicagoRP_settings/back.wav")
+        timer.Simple(0.15, function()
+            if IsValid(motherFrame) then
+                motherFrame:Close()
+            end
+        end)
+    end
+
+    function exitIconButton:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        -- return nil
+        return true
     end
     ---
 
@@ -774,11 +798,9 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- button fade (Panel:AlphaTo)
--- add top category name text (draw outline with offset)
--- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
 -- create special exit button icon (DButton:SetMaterial with Material(""))
--- MAYBE a slight move anim when opened/closed (Panel:MoveTo)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
+-- button fade (ask discord about this, or we could lerp between color values in paint function or use tween library)
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
