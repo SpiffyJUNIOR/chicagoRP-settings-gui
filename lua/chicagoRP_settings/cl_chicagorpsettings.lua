@@ -44,7 +44,7 @@ surface.CreateFont("MichromaRegular", {
 surface.CreateFont("MichromaLarge", {
     font = "Michroma",
     extended = false,
-    size = 32,
+    size = 52,
     weight = 550,
     antialias = true,
     shadow = false
@@ -60,7 +60,7 @@ surface.CreateFont("MichromaHelpText", {
 })
 
 local blockedkeys = {
-    [1] = KEY_ESCAPE, 
+    [1] = KEY_ESCAPE,
     [2] = KEY_TAB,
     [3] = KEY_Q,
     [4] = KEY_W,
@@ -85,6 +85,7 @@ local OpenControlText = nil
 local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
+local accenttext = Color(181, 22, 4, 255)
 
 local function BlurBackground(panel)
     if (!IsValid(panel) and !panel:IsVisible()) then return end
@@ -247,16 +248,12 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         if self:IsHovered() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
-        self:SetAlpha(80)
-        self:AlphaTo(20, 0.5, 0)
     end
 
     function controlsButton:OnCursorExited()
         if self:IsHovered() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
-        self:SetAlpha(20)
-        self:AlphaTo(80, 0.5, 0)
     end
 
     function controlsButton:Paint(w, h)
@@ -264,8 +261,8 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         surface.SetDrawColor(40, 40, 40, 80)
         surface.DrawRect(0, 0, w, h)
         if self:IsHovered() or self:HasChildren() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
-            surface.SetDrawColor(80, 80, 80, 20)
-            surface.DrawRect(0, 0, w, h)
+            -- surface.SetDrawColor(80, 80, 80, 20)
+            -- surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
             DrawOutlinedTexturedRect(self, gradient_mat, 3)
             helptextparent:SetText(helptext)
@@ -454,30 +451,30 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
-    settingsTitleLabel:SetPos(101, 119)
-    settingsTitleLabel:SetSize(130, 20)
-    settingsTitleLabel:SetFont("MichromaRegular")
-    settingsTitleLabel:SetText("SETTINGS")
-    settingsTitleLabel:SetTextColor(primarytext)
+    local settingsLabel = vgui.Create("DLabel", motherFrame)
+    settingsLabel:SetPos(101, 119)
+    settingsLabel:SetSize(130, 20)
+    settingsLabel:SetFont("MichromaRegular")
+    settingsLabel:SetText("SETTINGS")
+    settingsLabel:SetTextColor(primarytext)
 
-    function settingsTitleLabel:Paint(w, h)
+    function settingsLabel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
     ---
 
     local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
-    settingsTitleLabel:SetPos(700, 100)
-    settingsTitleLabel:SetSize(300, 50)
-    settingsTitleLabel:SetFont("MichromaRegular")
+    settingsTitleLabel:SetPos(520, 130)
+    settingsTitleLabel:SetSize(500, 70)
     settingsTitleLabel:SetText("")
     settingsTitleLabel:SetTextColor(primarytext)
 
     function settingsTitleLabel:Paint(w, h)
-        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        draw.DrawText(self:GetText(), "MichromaLarge", 12, 12, accenttext, TEXT_ALIGN_LEFT)
         draw.DrawText(self:GetText(), "MichromaLarge", 14, 10, primarytext, TEXT_ALIGN_LEFT)
-        -- return nil
+        return true
     end
     ---
 
@@ -597,46 +594,50 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
-    function videoSettingsButton:OnCursorExited()
-        if videoSettingsScrollPanel:IsVisible() then
-            self:SetAlpha(60)
-            self:AlphaTo(30, 0.5, 0)
-        elseif !videoSettingsScrollPanel:IsVisible() then
-            self:SetAlpha(100)
-            self:AlphaTo(30, 0.5, 0)
-        end
-    end
-
     function videoSettingsButton:Paint(w, h)
         if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-            -- surface.SetDrawColor(255, 86, 65)
         elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
-            -- surface.SetDrawColor(255, 86, 65)
         end
         draw.DrawText("VIDEO", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
     function videoSettingsButton:DoClick()
-        if IsValid(OpenScrollPanel) then
+        if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
             OpenScrollPanel:SetAlpha(255)
-            OpenScrollPanel:AlphaTo(0, 0.2, 0)
+            OpenScrollPanel:AlphaTo(0, 0.15, 0)
+            settingsTitleLabel:SetAlpha(255)
+            settingsTitleLabel:AlphaTo(0, 0.15, 0)
             timer.Simple(0.2, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
                 end
             end)
+            if OpenScrollPanel == videoSettingsScrollPanel then OpenScrollPanel = nil return end
+            timer.Simple(0.2, function()
+                if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) then
+                    settingsTitleLabel:SetAlpha(0)
+                    settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                    videoSettingsScrollPanel:Show()
+                    videoSettingsScrollPanel:SetAlpha(0)
+                    videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+                    settingsTitleLabel:SetText("VIDEO")
+                end
+            end)
+        elseif IsValid(videoSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
+            settingsTitleLabel:SetAlpha(0)
+            settingsTitleLabel:AlphaTo(255, 0.15, 0)
+            videoSettingsScrollPanel:Show()
+            videoSettingsScrollPanel:SetAlpha(0)
+            videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+            settingsTitleLabel:SetText("VIDEO")
         end
-        videoSettingsScrollPanel:Show()
-        videoSettingsScrollPanel:SetAlpha(0)
-        videoSettingsScrollPanel:AlphaTo(255, 0.2, 0)
-        settingsTitleLabel:SetText("VIDEO")
         OpenScrollPanel = videoSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -657,28 +658,16 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
-    function gameSettingsButton:OnCursorExited()
-        if gameSettingsScrollPanel:IsVisible() then
-            self:SetAlpha(60)
-            self:AlphaTo(30, 0.5, 0)
-        elseif !gameSettingsScrollPanel:IsVisible() then
-            self:SetAlpha(100)
-            self:AlphaTo(30, 0.5, 0)
-        end
-    end
-
     function gameSettingsButton:Paint(w, h)
         if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-            -- surface.SetDrawColor(255, 86, 65)
         elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
-            -- surface.SetDrawColor(255, 86, 65)
         end
         draw.DrawText("GAME", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
@@ -686,17 +675,33 @@ net.Receive("chicagoRP_settings", function()
     function gameSettingsButton:DoClick()
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
-            OpenScrollPanel:AlphaTo(0, 0.2, 0)
+            OpenScrollPanel:AlphaTo(0, 0.15, 0)
+            settingsTitleLabel:SetAlpha(255)
+            settingsTitleLabel:AlphaTo(0, 0.15, 0)
             timer.Simple(0.2, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
                 end
             end)
+            if OpenScrollPanel == gameSettingsScrollPanel then OpenScrollPanel = nil return end
+            timer.Simple(0.2, function()
+                if IsValid(gameSettingsScrollPanel) and IsValid(settingsTitleLabel) then
+                    settingsTitleLabel:SetAlpha(0)
+                    settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                    gameSettingsScrollPanel:Show()
+                    gameSettingsScrollPanel:SetAlpha(0)
+                    gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+                    settingsTitleLabel:SetText("GAME")
+                end
+            end)
+        elseif IsValid(gameSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
+            settingsTitleLabel:SetAlpha(0)
+            settingsTitleLabel:AlphaTo(255, 0.15, 0)
+            gameSettingsScrollPanel:Show()
+            gameSettingsScrollPanel:SetAlpha(0)
+            gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+            settingsTitleLabel:SetText("GAME")
         end
-        gameSettingsScrollPanel:Show()
-        gameSettingsScrollPanel:SetAlpha(0)
-        gameSettingsScrollPanel:AlphaTo(255, 0.2, 0)
-        settingsTitleLabel:SetText("GAME")
         OpenScrollPanel = gameSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -717,53 +722,50 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
-    function controlsSettingsButton:OnCursorExited()
-        if controlsSettingsScrollPanel:IsVisible() then
-            self:SetAlpha(60)
-            self:AlphaTo(30, 0.5, 0)
-        elseif !controlsSettingsScrollPanel:IsVisible() then
-            self:SetAlpha(100)
-            self:AlphaTo(30, 0.5, 0)
-        end
-    end
-
     function controlsSettingsButton:Paint(w, h)
         if self:IsHovered() and !controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-            -- surface.SetDrawColor(255, 86, 65)
         elseif !self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
-            -- surface.SetDrawColor(255, 86, 65)
         end
         draw.DrawText("CONTROLS", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
-
     end
 
     function controlsSettingsButton:DoClick()
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
-            OpenScrollPanel:AlphaTo(0, 0.2, 0)
+            OpenScrollPanel:AlphaTo(0, 0.15, 0)
+            settingsTitleLabel:SetAlpha(255)
+            settingsTitleLabel:AlphaTo(0, 0.15, 0)
             timer.Simple(0.2, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
                 end
             end)
-        end
-        if IsValid(OpenScrollPanel) and OpenScrollPanel != controlsSettingsScrollPanel then
+            if OpenScrollPanel == controlsSettingsScrollPanel then OpenScrollPanel = nil return end
+            timer.Simple(0.2, function()
+                if IsValid(controlsSettingsScrollPanel) and IsValid(settingsTitleLabel) then
+                    settingsTitleLabel:SetAlpha(0)
+                    settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                    controlsSettingsScrollPanel:Show()
+                    controlsSettingsScrollPanel:SetAlpha(0)
+                    controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+                    settingsTitleLabel:SetText("KEY BINDINGS")
+                end
+            end)
+        elseif IsValid(controlsSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
+            settingsTitleLabel:SetAlpha(0)
+            settingsTitleLabel:AlphaTo(255, 0.15, 0)
             controlsSettingsScrollPanel:Show()
             controlsSettingsScrollPanel:SetAlpha(0)
-            controlsSettingsScrollPanel:AlphaTo(255, 0.2, 0)
-        elseif IsValid(OpenScrollPanel) and OpenScrollPanel == controlsSettingsScrollPanel then
-            controlsSettingsScrollPanel:SetAlpha(255)
-            controlsSettingsScrollPanel:AlphaTo(0, 0.2, 0)
-            controlsSettingsScrollPanel:Hide()
+            controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+            settingsTitleLabel:SetText("KEY BINDINGS")
         end
-        settingsTitleLabel:SetText("CONTROLS")
         OpenScrollPanel = controlsSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
