@@ -4,7 +4,7 @@ client settings gui for chicagoRP (in-development darkrp server), likely stable 
 # to-do
 [x] - base layout    
 [x] - base functionality    
-[w] - control bind code    
+[x] - control bind code    
 [w] - prettify    
 [w] - animations    
 [ ] - make layout scalable          
