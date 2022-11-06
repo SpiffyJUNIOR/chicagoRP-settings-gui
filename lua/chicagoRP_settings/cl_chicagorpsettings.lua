@@ -240,20 +240,28 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         end
     end
 
+    function controlsButton:OnCursorExited()
+        if self:IsHovered() then
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+    end
+
     function controlsButton:Paint(w, h)
         local statusString = "Unbound"
         surface.SetDrawColor(40, 40, 40, 80)
         surface.DrawRect(0, 0, w, h)
-        if controlsButton:IsHovered() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
+        if self:IsHovered() or self:HasChildren() then -- gradient start: (255, 86, 65) end: (255, 190, 131)
             surface.SetDrawColor(80, 80, 80, 20)
             surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
             DrawOutlinedTexturedRect(self, gradient_mat, 3)
             helptextparent:SetText(helptext)
         end
-        if input.LookupBinding(bind, false) then -- how do we hide this for a certain button?
+        if input.LookupBinding(bind, false) and !self:HasChildren() then -- how do we hide this for a certain button?
             statusString = string.upper(input.LookupBinding(bind, false))
-            draw.DrawText(statusString, "MichromaRegular", 1320, 10, primarytext, TEXT_ALIGN_RIGHT)
+            draw.DrawText(statusString, "MichromaRegular", 1325, 10, primarytext, TEXT_ALIGN_RIGHT)
+        -- else
+        --     draw.DrawText("PRESS KEY", "MichromaRegular", 1325, 10, primarytext, TEXT_ALIGN_RIGHT)
         end
         draw.DrawText(printname, "MichromaRegular", 14, 10, primarytext, TEXT_ALIGN_LEFT)
     end
@@ -278,12 +286,9 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             draw.DrawText(self:GetText(), "MichromaSmall", 385, 5, primarytext, TEXT_ALIGN_RIGHT)
 
             return true
-            -- return nil
         end
 
-        function controlHelpText:OnRemove()
-            -- self:SetAlpha(255)
-            -- self:AlphaTo(10, 1, 0)
+        function controlHelpText:OnRemove() -- debug function
             print("helptext removed")
         end
 
@@ -296,9 +301,12 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
-            surface.SetDrawColor(80, 80, 80, 20)
-            surface.DrawRect(0, 0, w, h)
-            draw.DrawText(self:GetText(), "MichromaRegular", 0, 0, primarytext, TEXT_ALIGN_CENTER)
+            -- surface.SetDrawColor(80, 80, 80, 20)
+            -- surface.DrawRect(0, 0, w, h)
+            -- draw.DrawText(self:GetText(), "MichromaRegular", 0, 0, primarytext, TEXT_ALIGN_CENTER)
+            if math.sin((SysTime() * 1) * 8) > 0 then -- 5) * 10) > 0
+                draw.DrawText("__", "MichromaRegular", 34, 14, primarytext, TEXT_ALIGN_CENTER)
+            end
         end
 
         function controlsTextEntry:OnKeyCode(keyCode)
@@ -693,7 +701,8 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- create box to enter key so people can copy and paste binds easily (remove keybind letter when binding, and blinking underscore)
+-- button fade (Panel:AlphaTo)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this)
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
 -- create special exit button icon (DButton:SetMaterial with Material(""))
 -- add top category name text (draw outline with offset)
