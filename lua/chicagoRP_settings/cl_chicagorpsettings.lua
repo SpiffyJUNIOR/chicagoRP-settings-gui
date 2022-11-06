@@ -41,6 +41,15 @@ surface.CreateFont("MichromaRegular", {
     shadow = false
 })
 
+surface.CreateFont("MichromaLarge", {
+    font = "Michroma",
+    extended = false,
+    size = 32,
+    weight = 550,
+    antialias = true,
+    shadow = false
+})
+
 surface.CreateFont("MichromaHelpText", {
     font = "Michroma",
     extended = false,
@@ -238,12 +247,16 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         if self:IsHovered() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
+        self:SetAlpha(80)
+        self:AlphaTo(20, 0.5, 0)
     end
 
     function controlsButton:OnCursorExited()
         if self:IsHovered() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
+        self:SetAlpha(20)
+        self:AlphaTo(80, 0.5, 0)
     end
 
     function controlsButton:Paint(w, h)
@@ -260,8 +273,6 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         if input.LookupBinding(bind, false) and !self:HasChildren() then -- how do we hide this for a certain button?
             statusString = string.upper(input.LookupBinding(bind, false))
             draw.DrawText(statusString, "MichromaRegular", 1325, 10, primarytext, TEXT_ALIGN_RIGHT)
-        -- else
-        --     draw.DrawText("PRESS KEY", "MichromaRegular", 1325, 10, primarytext, TEXT_ALIGN_RIGHT)
         end
         draw.DrawText(printname, "MichromaRegular", 14, 10, primarytext, TEXT_ALIGN_LEFT)
     end
@@ -301,10 +312,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
-            -- surface.SetDrawColor(80, 80, 80, 20)
-            -- surface.DrawRect(0, 0, w, h)
-            -- draw.DrawText(self:GetText(), "MichromaRegular", 0, 0, primarytext, TEXT_ALIGN_CENTER)
-            if math.sin((SysTime() * 1) * 8) > 0 then -- 5) * 10) > 0
+            if math.sin((SysTime() * 1) * 8) > 0 then -- math.floor(SysTime()) % 2 == 0
                 draw.DrawText("__", "MichromaRegular", 34, 14, primarytext, TEXT_ALIGN_CENTER)
             end
         end
@@ -459,6 +467,20 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
+    local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
+    settingsTitleLabel:SetPos(700, 100)
+    settingsTitleLabel:SetSize(300, 50)
+    settingsTitleLabel:SetFont("MichromaRegular")
+    settingsTitleLabel:SetText("")
+    settingsTitleLabel:SetTextColor(primarytext)
+
+    function settingsTitleLabel:Paint(w, h)
+        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        draw.DrawText(self:GetText(), "MichromaLarge", 14, 10, primarytext, TEXT_ALIGN_LEFT)
+        -- return nil
+    end
+    ---
+
     local settingsHelpText = vgui.Create("DLabel", motherFrame)
     settingsHelpText:SetPos(100, 935)
     settingsHelpText:SetSize(1000, 30)
@@ -575,32 +597,46 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
+    function videoSettingsButton:OnCursorExited()
+        if videoSettingsScrollPanel:IsVisible() then
+            self:SetAlpha(60)
+            self:AlphaTo(30, 0.5, 0)
+        elseif !videoSettingsScrollPanel:IsVisible() then
+            self:SetAlpha(100)
+            self:AlphaTo(30, 0.5, 0)
+        end
+    end
+
     function videoSettingsButton:Paint(w, h)
         if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-            surface.SetDrawColor(255, 86, 65)
+            -- surface.SetDrawColor(255, 86, 65)
         elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
-            surface.SetDrawColor(255, 86, 65)
+            -- surface.SetDrawColor(255, 86, 65)
         end
-        surface.SetTextColor(primarytext)
-        surface.SetTextPos(w - 383, h - 42)
-        surface.SetFont("MichromaRegular")
-        surface.DrawText("VIDEO")
+        draw.DrawText("VIDEO", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
     function videoSettingsButton:DoClick()
         if IsValid(OpenScrollPanel) then
-            OpenScrollPanel:Hide()
+            OpenScrollPanel:SetAlpha(255)
+            OpenScrollPanel:AlphaTo(0, 0.2, 0)
+            timer.Simple(0.2, function()
+                if IsValid(OpenScrollPanel) then
+                    OpenScrollPanel:Hide()
+                end
+            end)
         end
         videoSettingsScrollPanel:Show()
         videoSettingsScrollPanel:SetAlpha(0)
         videoSettingsScrollPanel:AlphaTo(255, 0.2, 0)
+        settingsTitleLabel:SetText("VIDEO")
         OpenScrollPanel = videoSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -621,32 +657,46 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
+    function gameSettingsButton:OnCursorExited()
+        if gameSettingsScrollPanel:IsVisible() then
+            self:SetAlpha(60)
+            self:AlphaTo(30, 0.5, 0)
+        elseif !gameSettingsScrollPanel:IsVisible() then
+            self:SetAlpha(100)
+            self:AlphaTo(30, 0.5, 0)
+        end
+    end
+
     function gameSettingsButton:Paint(w, h)
         if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-            surface.SetDrawColor(255, 86, 65)
+            -- surface.SetDrawColor(255, 86, 65)
         elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
-            surface.SetDrawColor(255, 86, 65)
+            -- surface.SetDrawColor(255, 86, 65)
         end
-        surface.SetTextColor(primarytext)
-        surface.SetTextPos(w - 383, h - 42)
-        surface.SetFont("MichromaRegular")
-        surface.DrawText("GAME")
+        draw.DrawText("GAME", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
     function gameSettingsButton:DoClick()
         if IsValid(OpenScrollPanel) then
-            OpenScrollPanel:Hide()
+            OpenScrollPanel:SetAlpha(255)
+            OpenScrollPanel:AlphaTo(0, 0.2, 0)
+            timer.Simple(0.2, function()
+                if IsValid(OpenScrollPanel) then
+                    OpenScrollPanel:Hide()
+                end
+            end)
         end
         gameSettingsScrollPanel:Show()
         gameSettingsScrollPanel:SetAlpha(0)
         gameSettingsScrollPanel:AlphaTo(255, 0.2, 0)
+        settingsTitleLabel:SetText("GAME")
         OpenScrollPanel = gameSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -667,32 +717,53 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
+    function controlsSettingsButton:OnCursorExited()
+        if controlsSettingsScrollPanel:IsVisible() then
+            self:SetAlpha(60)
+            self:AlphaTo(30, 0.5, 0)
+        elseif !controlsSettingsScrollPanel:IsVisible() then
+            self:SetAlpha(100)
+            self:AlphaTo(30, 0.5, 0)
+        end
+    end
+
     function controlsSettingsButton:Paint(w, h)
         if self:IsHovered() and !controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-            surface.SetDrawColor(255, 86, 65)
+            -- surface.SetDrawColor(255, 86, 65)
         elseif !self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
-            surface.SetDrawColor(255, 86, 65)
+            -- surface.SetDrawColor(255, 86, 65)
         end
-        surface.SetTextColor(primarytext)
-        surface.SetTextPos(w - 383, h - 42)
-        surface.SetFont("MichromaRegular")
-        surface.DrawText("CONTROLS")
+        draw.DrawText("CONTROLS", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
+
     end
 
     function controlsSettingsButton:DoClick()
         if IsValid(OpenScrollPanel) then
-            OpenScrollPanel:Hide()
+            OpenScrollPanel:SetAlpha(255)
+            OpenScrollPanel:AlphaTo(0, 0.2, 0)
+            timer.Simple(0.2, function()
+                if IsValid(OpenScrollPanel) then
+                    OpenScrollPanel:Hide()
+                end
+            end)
         end
-        controlsSettingsScrollPanel:Show()
-        controlsSettingsScrollPanel:SetAlpha(0)
-        controlsSettingsScrollPanel:AlphaTo(255, 0.2, 0)
+        if IsValid(OpenScrollPanel) and OpenScrollPanel != controlsSettingsScrollPanel then
+            controlsSettingsScrollPanel:Show()
+            controlsSettingsScrollPanel:SetAlpha(0)
+            controlsSettingsScrollPanel:AlphaTo(255, 0.2, 0)
+        elseif IsValid(OpenScrollPanel) and OpenScrollPanel == controlsSettingsScrollPanel then
+            controlsSettingsScrollPanel:SetAlpha(255)
+            controlsSettingsScrollPanel:AlphaTo(0, 0.2, 0)
+            controlsSettingsScrollPanel:Hide()
+        end
+        settingsTitleLabel:SetText("CONTROLS")
         OpenScrollPanel = controlsSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -702,12 +773,12 @@ end)
 
 -- still need:
 -- button fade (Panel:AlphaTo)
--- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this)
--- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
--- create special exit button icon (DButton:SetMaterial with Material(""))
 -- add top category name text (draw outline with offset)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
+-- create special exit button icon (DButton:SetMaterial with Material(""))
+-- MAYBE a slight move anim when opened/closed (Panel:MoveTo)
+-- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
 -- rounded outline (requires stencils)
 -- two-tone gradient material that can be changed ingame (idk)
--- MAYBE a slight move anim when opened/closed (Panel:MoveTo)
