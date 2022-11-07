@@ -59,7 +59,7 @@ surface.CreateFont("MichromaHelpText", {
     shadow = false
 })
 
-local exiticon = Material("chicagoRP_settings/exiticon.png")
+local exiticon = Material("chicagoRP_settings/exiticon.png", "smooth")
 
 local blockedkeys = {
     [1] = KEY_ESCAPE,
@@ -434,7 +434,7 @@ net.Receive("chicagoRP_settings", function()
     exitButton:SetPos(86, 96)
     exitButton:SetSize(80, 20)
     exitButton:SetFont("MichromaSmall")
-    exitButton:SetText("< GAME")
+    exitButton:SetText("  GAME")
     exitButton:SetTextColor(secondarytext)
 
     function exitButton:DoClick()
@@ -453,10 +453,10 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local exitIconButton = vgui.Create("DButton", motherFrame)
-    exitIconButton:SetPos(100, 150)
-    exitIconButton:SetSize(80, 80)
-    exitIconButton:SetMaterial(exiticon)
+    local exitIconButton = vgui.Create("DImageButton", motherFrame)
+    exitIconButton:SetPos(77, 98)
+    exitIconButton:SetSize(14, 15)
+    exitIconButton:SetMaterial(exiticon) -- i hate gmod
 
     function exitIconButton:DoClick()
         motherFrame:AlphaTo(50, 0.15, 0)
@@ -798,10 +798,10 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- create special exit button icon (DButton:SetMaterial with Material(""))
--- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
+-- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library)
 -- button fade (ask discord about this, or we could lerp between color values in paint function or use tween library)
--- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library, test if local doclick function is possible)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
+-- make close material transparent and colorable
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
 -- rounded outline (requires stencils)
