@@ -22,7 +22,7 @@ local CVarSecondaryBlue = GetConVar("chicagoRP_secondary_b"):GetInt()
 
 print("chicagoRP client LUA loaded!")
 
--- wish i didn't have to make three fonts but i think that's a minor sin in the face of what other devs do
+-- wish i didn't have to make four fonts but i think that's a minor sin in the face of what other devs do
 surface.CreateFont("MichromaSmall", {
     font = "Michroma",
     extended = false,
@@ -79,7 +79,7 @@ local blockedkeys = {
 }
 
 local blurMat = Material("pp/blurscreen")
-local gradient_mat = Material("vgui/gradient-u") -- gradient-d, gradient-r, gradient-u, gradient_down, gradient_up
+local gradientMat = Material("vgui/gradient-u") -- gradient-d, gradient-r, gradient-u, gradient_down, gradient_up
 local HideHUD = false
 local OpenMotherFrame = nil
 local OpenScrollPanel = nil
@@ -140,7 +140,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 surface.SetDrawColor(80, 80, 80, 20)
                 surface.DrawRect(0, 0, w, h)
                 surface.SetDrawColor(255, 86, 65)
-                DrawOutlinedTexturedRect(self, gradient_mat, 3)
+                DrawOutlinedTexturedRect(self, gradientMat, 3)
                 helptextparent:SetText(helptext)
             end
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
@@ -179,7 +179,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             surface.SetDrawColor(255, 86, 65)
             draw.DrawText(printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
             if self:IsHovered() or self:IsChildHovered() then
-                DrawOutlinedTexturedRect(self, gradient_mat, 3)
+                DrawOutlinedTexturedRect(self, gradientMat, 3)
                 surface.SetDrawColor(80, 80, 80, 20)
                 surface.DrawRect(0, 0, w, h)
             end
@@ -266,7 +266,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             -- surface.SetDrawColor(80, 80, 80, 20)
             -- surface.DrawRect(0, 0, w, h)
             surface.SetDrawColor(255, 86, 65)
-            DrawOutlinedTexturedRect(self, gradient_mat, 3)
+            DrawOutlinedTexturedRect(self, gradientMat, 3)
             helptextparent:SetText(helptext)
         end
         if input.LookupBinding(bind, false) and !self:HasChildren() then -- how do we hide this for a certain button?
@@ -760,6 +760,15 @@ net.Receive("chicagoRP_settings", function()
         draw.DrawText("CONTROLS", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
+    -- function controlsSettingsButton:DoClick()
+    --   self.value = !self.value
+    -- end
+
+    -- function controlsSettingsButton:Paint(w, h)
+    --   surface.SetDrawColor(self.value and 0 or 255, 255, 255)
+    --   surface.DrawRect(0, 0, w, h)
+    -- end
+
     function controlsSettingsButton:DoClick()
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
@@ -798,6 +807,7 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
+-- how to change paint function stuff when doclick?
 -- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library)
 -- button fade (ask discord about this, or we could lerp between color values in paint function or use tween library)
 -- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
