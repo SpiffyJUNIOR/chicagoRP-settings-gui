@@ -109,7 +109,7 @@ local function BlurBackground(panel)
     Dynamic = math.Clamp(Dynamic + (1 / FrameRate) * 7, 0, 1)
 end
 
-local function DrawOutlinedTexturedRect(panel, material, thickness) -- figure out how to make gradient mat
+local function DrawOutlinedTexturedRect(panel, material, thickness) -- colorcube uses r and d texture
     if (!IsValid(panel) and !panel:IsVisible()) then return end
     local w, h = panel:GetSize()
     surface.SetMaterial(material)
@@ -209,7 +209,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             surface.DrawRect(0, 0, settingsSlider.Slider:GetSlideX() * w, h)
             surface.SetDrawColor(80, 80, 80, 20)
             surface.DrawRect(0, 0, w, h)
-            print(settingsSlider.Slider:GetSlideX())
             draw.DrawText(GetConVar(convar):GetInt(), "MichromaRegular", 325, 13, primarytext, TEXT_ALIGN_RIGHT)
         end
 
@@ -278,7 +277,6 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
     function controlsButton:DoClick()
         surface.PlaySound("chicagoRP_settings/select.wav")
-        print(self:GetSize())
 
         if IsValid(OpenControlText) then
             OpenControlText:Remove()
@@ -311,8 +309,8 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
-            if math.sin((SysTime() * 1) * 8) > 0 then -- math.floor(SysTime()) % 2 == 0
-                draw.DrawText("__", "MichromaRegular", 34, 14, primarytext, TEXT_ALIGN_CENTER)
+            if math.sin((SysTime() * 1) * 6) > 0 then -- math.floor(SysTime()) % 2 == 0
+                draw.DrawText("__", "MichromaRegular", 34, 12, primarytext, TEXT_ALIGN_CENTER)
             end
         end
 
@@ -385,6 +383,7 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:ParentToHUD()
     motherFrame:SetKeyboardInputEnabled(true)
     HideHUD = true
+    OpenScrollPanel = nil
 
     print(primarytext)
     print(secondarytext)
@@ -548,7 +547,7 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for k, v in ipairs(chicagoRPvideoSettingsOptions) do
+    for _, v in ipairs(chicagoRPvideoSettingsOptions) do
         CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, videoSettingsScrollPanel, settingsHelpText, motherFrame)
     end
     ---
@@ -573,7 +572,7 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for k, v in ipairs(chicagoRPgameSettingsOptions) do
+    for _, v in ipairs(chicagoRPgameSettingsOptions) do
         CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, gameSettingsScrollPanel, settingsHelpText, motherFrame)
     end
     ---
@@ -598,7 +597,7 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for k, v in ipairs(chicagoRPcontrolsSettingsOptions) do
+    for _, v in ipairs(chicagoRPcontrolsSettingsOptions) do
         CreateControlsButton(v.bind, v.printname, v.text, controlsSettingsScrollPanel, settingsHelpText, motherFrame)
     end
     ---
@@ -619,13 +618,16 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function videoSettingsButton:Paint(w, h)
-        if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
+        local panelActive = videoSettingsScrollPanel:IsVisible()
+        -- print(panelActive)
+        -- print(OpenScrollPanel)
+        if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+        elseif !self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
+        elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
         end
@@ -633,7 +635,8 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function videoSettingsButton:DoClick()
-        if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
+        self.value = !self.value
+        if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
             settingsTitleLabel:SetAlpha(255)
@@ -643,15 +646,20 @@ net.Receive("chicagoRP_settings", function()
                     OpenScrollPanel:Hide()
                 end
             end)
-            if OpenScrollPanel == videoSettingsScrollPanel then OpenScrollPanel = nil return end
+            if OpenScrollPanel == videoSettingsScrollPanel then 
+                OpenScrollPanel = nil
+                print(OpenScrollPanel)
+            end
+            if OpenScrollPanel == nil then return end
             timer.Simple(0.2, function()
-                if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) then
+                if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) and OpenScrollPanel != videoSettingsScrollPanel then
                     settingsTitleLabel:SetAlpha(0)
                     settingsTitleLabel:AlphaTo(255, 0.15, 0)
                     videoSettingsScrollPanel:Show()
                     videoSettingsScrollPanel:SetAlpha(0)
                     videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
                     settingsTitleLabel:SetText("VIDEO")
+                    OpenScrollPanel = videoSettingsScrollPanel
                 end
             end)
         elseif IsValid(videoSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
@@ -661,8 +669,8 @@ net.Receive("chicagoRP_settings", function()
             videoSettingsScrollPanel:SetAlpha(0)
             videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
             settingsTitleLabel:SetText("VIDEO")
+            OpenScrollPanel = videoSettingsScrollPanel
         end
-        OpenScrollPanel = videoSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
@@ -683,13 +691,16 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function gameSettingsButton:Paint(w, h)
-        if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
+        local panelActive = gameSettingsScrollPanel:IsVisible()
+        -- print(panelActive)
+        -- print(OpenScrollPanel)
+        if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+        elseif !self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
+        elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
         end
@@ -697,6 +708,7 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function gameSettingsButton:DoClick()
+        self.value = !self.value
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
@@ -707,15 +719,20 @@ net.Receive("chicagoRP_settings", function()
                     OpenScrollPanel:Hide()
                 end
             end)
-            if OpenScrollPanel == gameSettingsScrollPanel then OpenScrollPanel = nil return end
+            if OpenScrollPanel == gameSettingsScrollPanel then 
+                OpenScrollPanel = nil
+                print(OpenScrollPanel)
+            end
+            if OpenScrollPanel == nil then return end
             timer.Simple(0.2, function()
-                if IsValid(gameSettingsScrollPanel) and IsValid(settingsTitleLabel) then
+                if IsValid(gameSettingsScrollPanel) and IsValid(settingsTitleLabel) and OpenScrollPanel != gameSettingsScrollPanel then
                     settingsTitleLabel:SetAlpha(0)
                     settingsTitleLabel:AlphaTo(255, 0.15, 0)
                     gameSettingsScrollPanel:Show()
                     gameSettingsScrollPanel:SetAlpha(0)
                     gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
                     settingsTitleLabel:SetText("GAME")
+                    OpenScrollPanel = gameSettingsScrollPanel
                 end
             end)
         elseif IsValid(gameSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
@@ -725,8 +742,8 @@ net.Receive("chicagoRP_settings", function()
             gameSettingsScrollPanel:SetAlpha(0)
             gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
             settingsTitleLabel:SetText("GAME")
+            OpenScrollPanel = gameSettingsScrollPanel
         end
-        OpenScrollPanel = gameSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
     ---
@@ -746,15 +763,34 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
+    local colorfrom = Color(66, 66, 66, 30):ToVector()
+    local colorto = Color(200, 10, 10, 30):ToVector()
+    local lerpedvector = LerpVector(RealFrameTime() * math.random(10, 45), colorfrom, colorto)
+    local lerpedcolor = lerpedvector:ToColor()
+
+    local sTime = CurTime()
+    local eTime = CurTime() + 10
+    local alpha = 255 * math.min(1, (CurTime() - sTime) / (eTime - sTime))
+
     function controlsSettingsButton:Paint(w, h)
-        if self:IsHovered() and !controlsSettingsScrollPanel:IsVisible() then
+        local panelActive = controlsSettingsScrollPanel:IsVisible()
+        -- print(panelActive)
+        -- print(OpenScrollPanel)
+        local sTime = CurTime()
+        local eTime = CurTime() + 10
+
+        local alpha = 255 * math.min(1, (CurTime() - sTime) / (eTime - sTime))
+        print(alpha)
+        print(CurTime())
+
+        if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
             surface.SetDrawColor(34, 34, 34, 100)
             surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
+        elseif !self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 30)
             surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
-            surface.SetDrawColor(66, 66, 66, 60)
+        elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
+            surface.SetDrawColor(66, 66, 66, alpha)
             surface.DrawRect(0, 0, w, h)
         end
         draw.DrawText("CONTROLS", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
@@ -770,6 +806,7 @@ net.Receive("chicagoRP_settings", function()
     -- end
 
     function controlsSettingsButton:DoClick()
+        self.value = !self.value
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
@@ -780,15 +817,20 @@ net.Receive("chicagoRP_settings", function()
                     OpenScrollPanel:Hide()
                 end
             end)
-            if OpenScrollPanel == controlsSettingsScrollPanel then OpenScrollPanel = nil return end
+            if OpenScrollPanel == controlsSettingsScrollPanel then 
+                OpenScrollPanel = nil
+                print(OpenScrollPanel)
+            end
+            if OpenScrollPanel == nil then return end
             timer.Simple(0.2, function()
-                if IsValid(controlsSettingsScrollPanel) and IsValid(settingsTitleLabel) then
+                if IsValid(controlsSettingsScrollPanel) and IsValid(settingsTitleLabel) and OpenScrollPanel != controlsSettingsScrollPanel then
                     settingsTitleLabel:SetAlpha(0)
                     settingsTitleLabel:AlphaTo(255, 0.15, 0)
                     controlsSettingsScrollPanel:Show()
                     controlsSettingsScrollPanel:SetAlpha(0)
                     controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
                     settingsTitleLabel:SetText("KEY BINDINGS")
+                    OpenScrollPanel = controlsSettingsScrollPanel
                 end
             end)
         elseif IsValid(controlsSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
@@ -798,8 +840,8 @@ net.Receive("chicagoRP_settings", function()
             controlsSettingsScrollPanel:SetAlpha(0)
             controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
             settingsTitleLabel:SetText("KEY BINDINGS")
+            OpenScrollPanel = controlsSettingsScrollPanel
         end
-        OpenScrollPanel = controlsSettingsScrollPanel
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
 
@@ -807,12 +849,13 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- how to change paint function stuff when doclick?
--- color pulse when click button 86, 65, 66 (lerp between color values in paint function or use tween library)
--- button fade (ask discord about this, or we could lerp between color values in paint function or use tween library)
--- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this because i'm fucking stumped)
--- make close material transparent and colorable
+-- action/bind labels for control menu
+-- two-tone gradient material that can be changed ingame (ask discord about this)
+-- button fade (ask discord about this)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this)
+-- rounded outline (ask discord about this)
+-- make close material transparent and colorable (ask discord about this)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
--- rounded outline (requires stencils)
--- two-tone gradient material that can be changed ingame (idk)
+
+-- color pulse when click button 86, 65, 66 (i can't take another second spent on this stupid fucking issue so it's the last thing that i'll try if i feel like it)
