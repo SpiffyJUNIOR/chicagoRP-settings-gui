@@ -682,11 +682,26 @@ net.Receive("chicagoRP_settings", function()
     gameSettingsButton:SetText("")
     gameSettingsButton:SetTextColor(primarytext)
 
+    local lerpcalc_r = lerp(SysTime(), oldcolor.r, newcolor.r)
+    local oldcolor = Color(34, 34, 34, 100)
+    local newcolor = Color(200, 10, 10, 100)
+
     function gameSettingsButton:OnCursorEntered()
         if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+
+        if self:IsHovered() then
+            oldcolor.r = oldcolor.r
+            oldcolor.g = oldcolor.g
+            oldcolor.b = oldcolor.b
+            oldcolor.a = oldcolor.a
+            newcolor.r = 200
+            newcolor.g = 10
+            newcolor.b = 10
+            newcolor.a = 100
         end
     end
 
