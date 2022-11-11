@@ -630,6 +630,9 @@ net.Receive("chicagoRP_settings", function()
         elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 60)
             surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and !panelActive and OpenScrollPanel != nil then
+            surface.SetDrawColor(0, 0, 0, 0)
+            surface.DrawRect(0, 0, w, h)
         end
         draw.DrawText("VIDEO", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
@@ -682,46 +685,16 @@ net.Receive("chicagoRP_settings", function()
     gameSettingsButton:SetText("")
     gameSettingsButton:SetTextColor(primarytext)
 
-    local oldcolor = Color(34, 34, 34, 100)
-    local newcolor = Color(200, 10, 10, 100)
-    local lerpcalc_r = Lerp(10 * RealFrameTime(), oldcolor.r, newcolor.r)
-
     function gameSettingsButton:OnCursorEntered()
         if self:IsHovered() and !gameSettingsScrollPanel:IsVisible() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         elseif self:IsHovered() and gameSettingsScrollPanel:IsVisible() then
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
-
-        if self:IsHovered() then
-            oldcolor.r = 34
-            -- oldcolor.g = oldcolor.g
-            -- oldcolor.b = oldcolor.b
-            -- oldcolor.a = oldcolor.a
-            newcolor.r = 200
-            -- newcolor.g = 10
-            -- newcolor.b = 10
-            -- newcolor.a = 100
-        end
-    end
-
-    function gameSettingsButton:OnCursorExited()
-        oldcolor.r = 200
-        -- oldcolor.g = oldcolor.g
-        -- oldcolor.b = oldcolor.b
-        -- oldcolor.a = oldcolor.a
-        newcolor.r = 34
-        -- newcolor.g = 10
-        -- newcolor.b = 10
-        -- newcolor.a = 100
     end
 
     function gameSettingsButton:Paint(w, h)
         local panelActive = gameSettingsScrollPanel:IsVisible()
-        local nnn = Lerp(FrameTime() * 0.01, oldcolor.r, newcolor.r)
-        print("lerp: " .. nnn)
-        print("oldcolor: " .. oldcolor.r)
-        print("newcolor: " .. newcolor.r)
         -- print(panelActive)
         -- print(OpenScrollPanel)
         if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
@@ -732,6 +705,9 @@ net.Receive("chicagoRP_settings", function()
             surface.DrawRect(0, 0, w, h)
         elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
             surface.SetDrawColor(66, 66, 66, 60)
+            surface.DrawRect(0, 0, w, h)
+        elseif !self:IsHovered() and !panelActive and OpenScrollPanel != nil then
+            surface.SetDrawColor(0, 0, 0, 0)
             surface.DrawRect(0, 0, w, h)
         end
         draw.DrawText("GAME", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
@@ -798,47 +774,33 @@ net.Receive("chicagoRP_settings", function()
     local lerpedvector = LerpVector(RealFrameTime() * math.random(10, 45), colorfrom, colorto)
     local lerpedcolor = lerpedvector:ToColor()
 
-    local sTime = CurTime()
-    local eTime = CurTime() + 3
-
     function controlsSettingsButton:Paint(w, h)
         local panelActive = controlsSettingsScrollPanel:IsVisible()
-        -- print(panelActive)
-        -- print(OpenScrollPanel)
 
-        -- local alpha = math.Clamp(200 * math.min(100, (CurTime() - sTime) + 34 / (eTime - sTime) + 34), 1, 200)
-        -- local val = math.min(1, (CurTime() - sTime) / (eTime - sTime))
-        -- local alpha = Lerp(val, 34, 200)
+        local hovered = self:IsHovered()
+        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 5
 
-        -- print(alpha)
-        print(CurTime())
+        self.__hoverBuf = buf
+        buf = math.EaseInOut(buf, 0.2, 0.2)
+        local alpha, clr = 0, 0
 
-        if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
-            -- sTime = CurTime()
-            eTime = sTime - eTime
-            local val = math.min(1, (CurTime() - sTime) / (eTime - sTime))
-            local alpha = Lerp(val, 100, 200)
-            print(alpha)
-            surface.SetDrawColor(34, 34, 34, alpha)
-            surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(66, 66, 66, 30)
-            surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(66, 66, 66, 30)
-            surface.DrawRect(0, 0, w, h)
+        if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
+            buf = math.min(1, step + buf)
+            alpha, clr = Lerp(buf, 30, 100), Lerp(buf, 34, 66)
+        elseif !hovered and buf > 0 and panelActive and OpenScrollPanel != nil then
+            print("pre-buf: " .. buf)
+            buf = math.max(0, step - buf)
+            alpha, clr = Lerp(buf, 30, 100), Lerp(buf, 66, 34)
+        elseif hovered and buf < 1 and panelActive and OpenScrollPanel != nil then
+            print("pre-buf: " .. buf)
+            buf = math.min(1, step + buf)
+            alpha, clr = Lerp(buf, 30, 100), Lerp(buf, 66, 34)
         end
+
+        surface.SetDrawColor(clr, clr, clr, alpha)
+        surface.DrawRect(0, 0, w, h)
         draw.DrawText("CONTROLS", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
-
-    -- function controlsSettingsButton:DoClick()
-    --   self.value = !self.value
-    -- end
-
-    -- function controlsSettingsButton:Paint(w, h)
-    --   surface.SetDrawColor(self.value and 0 or 255, 255, 255)
-    --   surface.DrawRect(0, 0, w, h)
-    -- end
 
     function controlsSettingsButton:DoClick()
         self.value = !self.value
