@@ -602,6 +602,34 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
+    local actionLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
+    actionLabel:SetPos(10, -25)
+    actionLabel:SetSize(100, 30)
+    actionLabel:SetText("ACTION")
+    actionLabel:SetTextColor(secondarytext)
+    actionLabel:NoClipping(true) -- fuck you derma
+
+    function actionLabel:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        draw.DrawText(self:GetText(), "MichromaSmall", 0, 0, secondarytext, TEXT_ALIGN_LEFT)
+        return true
+    end
+    ---
+
+    local bindLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
+    bindLabel:SetPos(1240, -25)
+    bindLabel:SetSize(100, 30)
+    bindLabel:SetText("BINDING")
+    bindLabel:SetTextColor(secondarytext)
+    bindLabel:NoClipping(true) -- fuck you derma
+
+    function bindLabel:Paint(w, h)
+        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        draw.DrawText(self:GetText(), "MichromaSmall", 96, 0, secondarytext, TEXT_ALIGN_RIGHT)
+        return true
+    end
+    ---
+
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
     videoSettingsButton:SetPos(103, 230)
     videoSettingsButton:SetSize(394, 56)
@@ -610,34 +638,42 @@ net.Receive("chicagoRP_settings", function()
     videoSettingsButton:SetTextColor(primarytext)
 
     function videoSettingsButton:OnCursorEntered()
-        if self:IsHovered() and !videoSettingsScrollPanel:IsVisible() then
-            surface.PlaySound("chicagoRP_settings/hover.wav")
-        elseif self:IsHovered() and videoSettingsScrollPanel:IsVisible() then
-            surface.PlaySound("chicagoRP_settings/hover.wav")
-        end
+        surface.PlaySound("chicagoRP_settings/hover.wav")
     end
 
     function videoSettingsButton:Paint(w, h)
         local panelActive = videoSettingsScrollPanel:IsVisible()
-        -- print(panelActive)
-        -- print(OpenScrollPanel)
-        if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
-            surface.SetDrawColor(34, 34, 34, 100)
-            surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(66, 66, 66, 30)
-            surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(66, 66, 66, 60)
-            surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and !panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(0, 0, 0, 0)
-            surface.DrawRect(0, 0, w, h)
+        local hovered = self:IsHovered()
+        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 5
+
+        self.__hoverBuf = buf
+        buf = math.EaseInOut(buf, 0.2, 0.2)
+        local alpha, clr = 0, 0
+
+        if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
+            print("pre-buf1: " .. buf)
+            buf = math.min(1, step + buf)
+            alpha, clr = Lerp(buf, 66, 100), Lerp(buf, 34, 66)
+        elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == videoSettingsScrollPanel) then -- kill yourself
+            print("pre-buf2: " .. buf)
+            buf = math.max(0, step - buf)
+            alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66)
+        elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == videoSettingsScrollPanel) then
+            print("pre-buf3: " .. buf)
+            buf = math.min(1, step + buf)
+            alpha, clr = Lerp(buf, 60, 30), Lerp(buf, 66, 66)
+        elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
+            print("pre-buf4: " .. buf)
+            buf = math.max(0, step - buf)
+            alpha, clr = Lerp(buf, 0, 100), Lerp(buf, 0, 100)
         end
+
+        surface.SetDrawColor(clr, clr, clr, alpha)
+        surface.DrawRect(0, 0, w, h)
         draw.DrawText("VIDEO", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
-    function videoSettingsButton:DoClick()
+    function videoSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
         self.value = !self.value
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
@@ -695,25 +731,37 @@ net.Receive("chicagoRP_settings", function()
 
     function gameSettingsButton:Paint(w, h)
         local panelActive = gameSettingsScrollPanel:IsVisible()
-        -- print(panelActive)
-        -- print(OpenScrollPanel)
-        if self:IsHovered() and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
-            surface.SetDrawColor(34, 34, 34, 100)
-            surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(66, 66, 66, 30)
-            surface.DrawRect(0, 0, w, h)
-        elseif self:IsHovered() and panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(66, 66, 66, 60)
-            surface.DrawRect(0, 0, w, h)
-        elseif !self:IsHovered() and !panelActive and OpenScrollPanel != nil then
-            surface.SetDrawColor(0, 0, 0, 0)
-            surface.DrawRect(0, 0, w, h)
+        local hovered = self:IsHovered()
+        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 5
+
+        self.__hoverBuf = buf
+        buf = math.EaseInOut(buf, 0.2, 0.2)
+        local alpha, clr = 0, 0
+
+        if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
+            print("pre-buf1: " .. buf)
+            buf = math.min(1, step + buf)
+            alpha, clr = Lerp(buf, 66, 100), Lerp(buf, 34, 66)
+        elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == gameSettingsScrollPanel) then -- kill yourself
+            print("pre-buf2: " .. buf)
+            buf = math.max(0, step - buf)
+            alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66)
+        elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == gameSettingsScrollPanel) then
+            print("pre-buf3: " .. buf)
+            buf = math.min(1, step + buf)
+            alpha, clr = Lerp(buf, 60, 30), Lerp(buf, 66, 66)
+        elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
+            print("pre-buf4: " .. buf)
+            buf = math.max(0, step - buf)
+            alpha, clr = Lerp(buf, 0, 100), Lerp(buf, 0, 100)
         end
+
+        surface.SetDrawColor(clr, clr, clr, alpha)
+        surface.DrawRect(0, 0, w, h)
         draw.DrawText("GAME", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
-    function gameSettingsButton:DoClick()
+    function gameSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
         self.value = !self.value
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
@@ -762,21 +810,11 @@ net.Receive("chicagoRP_settings", function()
     controlsSettingsButton:SetTextColor(primarytext)
 
     function controlsSettingsButton:OnCursorEntered()
-        if self:IsHovered() and !controlsSettingsScrollPanel:IsVisible() then
-            surface.PlaySound("chicagoRP_settings/hover.wav")
-        elseif self:IsHovered() and controlsSettingsScrollPanel:IsVisible() then
-            surface.PlaySound("chicagoRP_settings/hover.wav")
-        end
+        surface.PlaySound("chicagoRP_settings/hover.wav")
     end
-
-    local colorfrom = Color(66, 66, 66, 30):ToVector()
-    local colorto = Color(200, 10, 10, 30):ToVector()
-    local lerpedvector = LerpVector(RealFrameTime() * math.random(10, 45), colorfrom, colorto)
-    local lerpedcolor = lerpedvector:ToColor()
 
     function controlsSettingsButton:Paint(w, h)
         local panelActive = controlsSettingsScrollPanel:IsVisible()
-
         local hovered = self:IsHovered()
         local buf, step = self.__hoverBuf or 0, RealFrameTime() * 5
 
@@ -785,16 +823,21 @@ net.Receive("chicagoRP_settings", function()
         local alpha, clr = 0, 0
 
         if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
+            print("pre-buf1: " .. buf)
             buf = math.min(1, step + buf)
-            alpha, clr = Lerp(buf, 30, 100), Lerp(buf, 34, 66)
-        elseif !hovered and buf > 0 and panelActive and OpenScrollPanel != nil then
-            print("pre-buf: " .. buf)
+            alpha, clr = Lerp(buf, 66, 100), Lerp(buf, 34, 66)
+        elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == controlsSettingsScrollPanel) then -- kill yourself
+            print("pre-buf2: " .. buf)
             buf = math.max(0, step - buf)
-            alpha, clr = Lerp(buf, 30, 100), Lerp(buf, 66, 34)
-        elseif hovered and buf < 1 and panelActive and OpenScrollPanel != nil then
-            print("pre-buf: " .. buf)
+            alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66)
+        elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == controlsSettingsScrollPanel) then
+            print("pre-buf3: " .. buf)
             buf = math.min(1, step + buf)
-            alpha, clr = Lerp(buf, 30, 100), Lerp(buf, 66, 34)
+            alpha, clr = Lerp(buf, 60, 30), Lerp(buf, 66, 66)
+        elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
+            print("pre-buf4: " .. buf)
+            buf = math.max(0, step - buf)
+            alpha, clr = Lerp(buf, 0, 100), Lerp(buf, 0, 100)
         end
 
         surface.SetDrawColor(clr, clr, clr, alpha)
@@ -802,7 +845,7 @@ net.Receive("chicagoRP_settings", function()
         draw.DrawText("CONTROLS", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
-    function controlsSettingsButton:DoClick()
+    function controlsSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
         self.value = !self.value
         if IsValid(OpenScrollPanel) then
             OpenScrollPanel:SetAlpha(255)
@@ -846,13 +889,11 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- action/bind labels for control menu
 -- two-tone gradient material that can be changed ingame (ask discord about this)
--- button fade (ask discord about this)
+-- button fade (reuse category button doclick code)
 -- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this)
--- rounded outline (ask discord about this)
+-- rounded outline (ask discord about this, requires stencils likely)
 -- make close material transparent and colorable (ask discord about this)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
-
--- color pulse when click button 86, 65, 66 (i can't take another second spent on this stupid fucking issue so it's the last thing that i'll try if i feel like it)
+-- if possible, COLOR PULSE WHEN BUTTON IS CLICKED
