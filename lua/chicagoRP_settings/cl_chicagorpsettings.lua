@@ -159,11 +159,37 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsButton:DockMargin(0, 0, 3, 4)
         settingsButton:SetSize(1340, 50)
 
+        local lasthovered = nil
+        local lasthoveredbool = false
+
+        -- function settingsButton:OnCursorEntered()
+        --     surface.PlaySound("chicagoRP_settings/hover.wav")
+        -- end
+
         function settingsButton:OnCursorEntered()
+            local lasthoveredInside = self
+            lasthoveredbool = false
             surface.PlaySound("chicagoRP_settings/hover.wav")
+            print("cursor entered")
+            lasthovered = lasthoveredInside
+        end
+
+        function settingsButton:OnCursorExited()
+            local lasthoveredInside = self
+            lasthoveredbool = true
+            print("cursor exited")
+            lasthovered = lasthoveredInside
         end
 
         function settingsButton:Paint(w, h)
+            print(lasthovered)
+            print(lasthoveredbool)
+            if lasthoveredbool == true and IsValid(lasthovered) then
+                surface.SetDrawColor(60, 60, 60, 80)
+                surface.DrawRect(0, 0, w, h)
+                DrawOutlinedGradientRect(lasthovered, (gradientcolor1), (gradientcolor2), 3)
+            end
+
             local hovered = self:IsHovered()
             local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
 
@@ -499,26 +525,16 @@ net.Receive("chicagoRP_settings", function()
     end
 
     motherFrame:SetAlpha(0)
-    motherFrame:AlphaTo(255, 0.2, 0)
+    motherFrame:AlphaTo(255, 0.15, 0)
 
     motherFrame:MakePopup()
     motherFrame:Center()
 
-    timer.Simple(0.2, function()
+    timer.Simple(0.15, function()
         ply:SetDSP(30, false)
     end)
 
     surface.PlaySound("chicagoRP_settings/back.wav")
-
-    function motherFrame:OnKeyCodePressed(key)
-        if key == KEY_ESCAPE or key == KEY_Q then
-            self:AlphaTo(50, 0.15, 0)
-            surface.PlaySound("chicagoRP_settings/back.wav")
-            timer.Simple(0.15, function()
-                self:Close()
-            end)
-        end
-    end
 
     function motherFrame:OnClose()
         HideHUD = false
@@ -589,7 +605,7 @@ net.Receive("chicagoRP_settings", function()
 
     local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
     settingsTitleLabel:SetPos(520, 130)
-    settingsTitleLabel:SetSize(500, 70)
+    settingsTitleLabel:SetSize(500, 200)
     settingsTitleLabel:SetText("")
     settingsTitleLabel:SetTextColor(primarytext)
 
@@ -730,6 +746,28 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
+    function motherFrame:OnKeyCodePressed(key)
+        if IsValid(OpenScrollPanel) and (key == KEY_ESCAPE or key == KEY_Q) then
+            OpenScrollPanel:SetAlpha(255)
+            OpenScrollPanel:AlphaTo(0, 0.15, 0)
+            settingsTitleLabel:SetAlpha(255)
+            settingsTitleLabel:AlphaTo(0, 0.15, 0)
+            surface.PlaySound("chicagoRP_settings/back.wav")
+            timer.Simple(0.2, function()
+                if IsValid(OpenScrollPanel) then
+                    OpenScrollPanel:Hide()
+                end
+            end)
+            OpenScrollPanel = nil
+        elseif !IsValid(OpenScrollPanel) and (key == KEY_ESCAPE or key == KEY_Q) then
+            self:AlphaTo(50, 0.15, 0)
+            surface.PlaySound("chicagoRP_settings/back.wav")
+            timer.Simple(0.15, function()
+                self:Close()
+            end)
+        end
+    end
+    ---
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
     videoSettingsButton:SetPos(103, 230)
     videoSettingsButton:SetSize(394, 56)
