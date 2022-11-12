@@ -151,6 +151,69 @@ local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thicknes
     DrawOutlinedTexturedRect(panel, gradientRightMat, thickness)
 end
 
+local function TexturedQuadPart(tex, x1, y1, w, h, tx, ty, tw, th) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+    local x2, y2 = x1 + w, y1 + h
+    local tw0, th0 = surface.GetTextureSize(tex)
+    local u1, v1, u2, v2 = tx / tw0, ty / th0, (tx + tw) / tw0, (ty + th) / th0
+    
+    local v = {}
+    v[1] = {
+        x = x1,
+        y = y1,
+        u = u1,
+        v = v1
+    }
+
+    v[2] = {
+        x = x2,
+        y = y1,
+        u = u2,
+        v = v1
+    }
+
+    v[3] = {
+        x = x2,
+        y = y2,
+        u = u2,
+        v = v2
+    }
+
+    v[4] = {
+        x = x1,
+        y = y2,
+        u = u1,
+        v = v2
+    }
+
+    surface.SetTexture(tex)
+    surface.DrawPoly(v)
+end
+
+local function BorderPanel(tex, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+    local tw, th = surface.GetTextureSize(tex)
+    local dx = draw_corner_width
+    local dy = draw_corner_height
+
+    local Dx = src_corner_width
+    local Dy = src_corner_height
+
+    local x1, y1 = x + dx, y + dy
+    local x2, y2 = x + w - dx, y + h - dy
+    local w2, h2 = w - 2 * dx, h - 2 * dy
+
+    TexturedQuadPart(tex, x, y, dx, dy, 0, 0, Dx, Dy) -- corners
+    TexturedQuadPart(tex, x2, y, dx, dy, tw - Dx, 0, Dx, Dy) -- corners
+    TexturedQuadPart(tex, x, y2, dx, dy, 0, th - Dy, Dx, Dy) -- corners
+    TexturedQuadPart(tex, x2, y2, dx, dy, tw - Dy, th - Dy, Dx, Dy) -- corners
+
+    TexturedQuadPart(tex, x1, y, w2, dy, Dx, 0, tw - 2 * Dx, Dy) -- borders
+    TexturedQuadPart(tex, x1, y2, w2, dy, Dx, th - Dy, tw - 2 * Dx, Dy) -- borders
+    TexturedQuadPart(tex, x, y1, dx, h2, 0, Dy, Dx, th - 2 * Dy) -- borders
+    TexturedQuadPart(tex, x2, y1, dx, h2, tw - Dx, Dy, Dx, th - 2 * Dy) -- borders
+    
+    TexturedQuadPart(tex, x1, y1, w2, h2, Dx, Dy, tw - 2 * Dx, th - 2 * Dy) -- inside
+end
+
 local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent, frame)
     if (GetConVar(convar):GetInt() == 0 or GetConVar(convar):GetInt() == 1) and (max == 1) and ConVarExists(convar) then
         local settingsButton = parent:Add("DButton")
