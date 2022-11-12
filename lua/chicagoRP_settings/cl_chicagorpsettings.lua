@@ -99,6 +99,7 @@ local blockedkeys = {
 local blurMat = Material("pp/blurscreen")
 local gradientLeftMat = Material("vgui/gradient-l") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
 local gradientRightMat = Material("vgui/gradient-r") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
+local roundedOutlineMat = surface.GetTextureID("chicagoRP_settings/color_panel_clear")
 local HideHUD = false
 local OpenMotherFrame = nil
 local OpenScrollPanel = nil
@@ -107,7 +108,7 @@ local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
 local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 255)
-local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 150) -- Color(247, 31, 251, 200)
+local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 50) -- Color(247, 31, 251, 200)
 local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 150) -- Color(4, 164, 255, 200)
 local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
 hoverslide:SetSoundLevel(0) -- play everywhere
@@ -155,7 +156,7 @@ local function TexturedQuadPart(tex, x1, y1, w, h, tx, ty, tw, th) -- ripped fro
     local x2, y2 = x1 + w, y1 + h
     local tw0, th0 = surface.GetTextureSize(tex)
     local u1, v1, u2, v2 = tx / tw0, ty / th0, (tx + tw) / tw0, (ty + th) / th0
-    
+
     local v = {}
     v[1] = {
         x = x1,
@@ -201,6 +202,9 @@ local function BorderPanel(tex, x, y, w, h, src_corner_width, src_corner_height,
     local x2, y2 = x + w - dx, y + h - dy
     local w2, h2 = w - 2 * dx, h - 2 * dy
 
+    print(tex)
+    print(surface.GetTextureNameByID(56))
+
     TexturedQuadPart(tex, x, y, dx, dy, 0, 0, Dx, Dy) -- corners
     TexturedQuadPart(tex, x2, y, dx, dy, tw - Dx, 0, Dx, Dy) -- corners
     TexturedQuadPart(tex, x, y2, dx, dy, 0, th - Dy, Dx, Dy) -- corners
@@ -222,36 +226,14 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsButton:DockMargin(0, 0, 3, 4)
         settingsButton:SetSize(1340, 50)
 
-        local lasthovered = nil
-        local lasthoveredbool = false
-
-        -- function settingsButton:OnCursorEntered()
-        --     surface.PlaySound("chicagoRP_settings/hover.wav")
-        -- end
-
         function settingsButton:OnCursorEntered()
-            local lasthoveredInside = self
-            lasthoveredbool = false
             surface.PlaySound("chicagoRP_settings/hover.wav")
-            print("cursor entered")
-            lasthovered = lasthoveredInside
-        end
-
-        function settingsButton:OnCursorExited()
-            local lasthoveredInside = self
-            lasthoveredbool = true
-            print("cursor exited")
-            lasthovered = lasthoveredInside
         end
 
         function settingsButton:Paint(w, h)
-            print(lasthovered)
-            print(lasthoveredbool)
-            if lasthoveredbool == true and IsValid(lasthovered) then
-                surface.SetDrawColor(60, 60, 60, 80)
-                surface.DrawRect(0, 0, w, h)
-                DrawOutlinedGradientRect(lasthovered, (gradientcolor1), (gradientcolor2), 3)
-            end
+            print(roundedOutlineMat)
+            print(surface.GetTextureNameByID(roundedOutlineMat))
+            -- BorderPanel(roundedOutlineMat, 0, 0, w, h, 4, 4, 4, 4)
 
             local hovered = self:IsHovered()
             local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
@@ -684,7 +666,7 @@ net.Receive("chicagoRP_settings", function()
     settingsHelpText:SetPos(100, 935)
     settingsHelpText:SetSize(1000, 30)
     settingsHelpText:SetFont("MichromaSmall")
-    settingsHelpText:SetText("This should not appear when nothing is highlighted.")
+    settingsHelpText:SetText("")
     settingsHelpText:SetTextColor(primarytext)
 
     function settingsHelpText:Paint(w, h)
@@ -713,6 +695,7 @@ net.Receive("chicagoRP_settings", function()
 
     function videoSettingsScrollPanel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        -- print(self:IsVisible())
         return nil
     end
 
@@ -738,6 +721,7 @@ net.Receive("chicagoRP_settings", function()
 
     function gameSettingsScrollPanel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        -- print(self:IsVisible())
         return nil
     end
 
@@ -763,6 +747,7 @@ net.Receive("chicagoRP_settings", function()
 
     function controlsSettingsScrollPanel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        -- print(self:IsVisible())
         return nil
     end
 
@@ -884,25 +869,33 @@ net.Receive("chicagoRP_settings", function()
 
     function videoSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
         self.value = !self.value
-        if IsValid(OpenScrollPanel) then
+        if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
             OpenScrollPanel:SetAlpha(255)
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
             settingsTitleLabel:SetAlpha(255)
             settingsTitleLabel:AlphaTo(0, 0.15, 0)
-            timer.Simple(0.2, function()
+            settingsHelpText:SetAlpha(255)
+            settingsHelpText:AlphaTo(0, 0.15, 0)
+            timer.Simple(0.15, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
+                    settingsHelpText:SetText("")
                 end
             end)
-            if OpenScrollPanel == videoSettingsScrollPanel then 
-                OpenScrollPanel = nil
-                print(OpenScrollPanel)
-            end
+            timer.Simple(0.15, function()
+                if IsValid(OpenScrollPanel) and OpenScrollPanel == videoSettingsScrollPanel then
+                    if !OpenScrollPanel:IsVisible() then
+                        OpenScrollPanel = nil
+                    end
+                end
+            end)
             if OpenScrollPanel == nil then return end
             timer.Simple(0.2, function()
-                if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) and OpenScrollPanel != videoSettingsScrollPanel then
+                if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
                     settingsTitleLabel:SetAlpha(0)
                     settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                    settingsHelpText:SetAlpha(0)
+                    settingsHelpText:AlphaTo(255, 0.15, 0)
                     videoSettingsScrollPanel:Show()
                     videoSettingsScrollPanel:SetAlpha(0)
                     videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
@@ -913,6 +906,8 @@ net.Receive("chicagoRP_settings", function()
         elseif IsValid(videoSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
             settingsTitleLabel:SetAlpha(0)
             settingsTitleLabel:AlphaTo(255, 0.15, 0)
+            settingsHelpText:SetAlpha(0)
+            settingsHelpText:AlphaTo(255, 0.15, 0)
             videoSettingsScrollPanel:Show()
             videoSettingsScrollPanel:SetAlpha(0)
             videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
@@ -975,39 +970,49 @@ net.Receive("chicagoRP_settings", function()
 
     function gameSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
         self.value = !self.value
-        if IsValid(OpenScrollPanel) then
+        if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
             OpenScrollPanel:SetAlpha(255)
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
             settingsTitleLabel:SetAlpha(255)
             settingsTitleLabel:AlphaTo(0, 0.15, 0)
-            timer.Simple(0.2, function()
+            settingsHelpText:SetAlpha(255)
+            settingsHelpText:AlphaTo(0, 0.15, 0)
+            timer.Simple(0.15, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
+                    settingsHelpText:SetText("")
                 end
             end)
-            if OpenScrollPanel == gameSettingsScrollPanel then 
-                OpenScrollPanel = nil
-                print(OpenScrollPanel)
-            end
+            timer.Simple(0.15, function()
+                if IsValid(OpenScrollPanel) and OpenScrollPanel == gameSettingsScrollPanel then
+                    if !OpenScrollPanel:IsVisible() then
+                        OpenScrollPanel = nil
+                    end
+                end
+            end)
             if OpenScrollPanel == nil then return end
             timer.Simple(0.2, function()
-                if IsValid(gameSettingsScrollPanel) and IsValid(settingsTitleLabel) and OpenScrollPanel != gameSettingsScrollPanel then
+                if IsValid(gameSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
                     settingsTitleLabel:SetAlpha(0)
                     settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                    settingsHelpText:SetAlpha(0)
+                    settingsHelpText:AlphaTo(255, 0.15, 0)
                     gameSettingsScrollPanel:Show()
                     gameSettingsScrollPanel:SetAlpha(0)
                     gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-                    settingsTitleLabel:SetText("GAME")
+                    settingsTitleLabel:SetText("VIDEO")
                     OpenScrollPanel = gameSettingsScrollPanel
                 end
             end)
         elseif IsValid(gameSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
             settingsTitleLabel:SetAlpha(0)
             settingsTitleLabel:AlphaTo(255, 0.15, 0)
+            settingsHelpText:SetAlpha(0)
+            settingsHelpText:AlphaTo(255, 0.15, 0)
             gameSettingsScrollPanel:Show()
             gameSettingsScrollPanel:SetAlpha(0)
             gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-            settingsTitleLabel:SetText("GAME")
+            settingsTitleLabel:SetText("VIDEO")
             OpenScrollPanel = gameSettingsScrollPanel
         end
         surface.PlaySound("chicagoRP_settings/select.wav")
@@ -1066,39 +1071,49 @@ net.Receive("chicagoRP_settings", function()
 
     function controlsSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
         self.value = !self.value
-        if IsValid(OpenScrollPanel) then
+        if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
             OpenScrollPanel:SetAlpha(255)
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
             settingsTitleLabel:SetAlpha(255)
             settingsTitleLabel:AlphaTo(0, 0.15, 0)
-            timer.Simple(0.2, function()
+            settingsHelpText:SetAlpha(255)
+            settingsHelpText:AlphaTo(0, 0.15, 0)
+            timer.Simple(0.15, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
+                    settingsHelpText:SetText("")
                 end
             end)
-            if OpenScrollPanel == controlsSettingsScrollPanel then 
-                OpenScrollPanel = nil
-                print(OpenScrollPanel)
-            end
+            timer.Simple(0.15, function()
+                if IsValid(OpenScrollPanel) and OpenScrollPanel == controlsSettingsScrollPanel then
+                    if !OpenScrollPanel:IsVisible() then
+                        OpenScrollPanel = nil
+                    end
+                end
+            end)
             if OpenScrollPanel == nil then return end
             timer.Simple(0.2, function()
-                if IsValid(controlsSettingsScrollPanel) and IsValid(settingsTitleLabel) and OpenScrollPanel != controlsSettingsScrollPanel then
+                if IsValid(controlsSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
                     settingsTitleLabel:SetAlpha(0)
                     settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                    settingsHelpText:SetAlpha(0)
+                    settingsHelpText:AlphaTo(255, 0.15, 0)
                     controlsSettingsScrollPanel:Show()
                     controlsSettingsScrollPanel:SetAlpha(0)
                     controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-                    settingsTitleLabel:SetText("KEY BINDINGS")
+                    settingsTitleLabel:SetText("VIDEO")
                     OpenScrollPanel = controlsSettingsScrollPanel
                 end
             end)
         elseif IsValid(controlsSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
             settingsTitleLabel:SetAlpha(0)
             settingsTitleLabel:AlphaTo(255, 0.15, 0)
+            settingsHelpText:SetAlpha(0)
+            settingsHelpText:AlphaTo(255, 0.15, 0)
             controlsSettingsScrollPanel:Show()
             controlsSettingsScrollPanel:SetAlpha(0)
             controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-            settingsTitleLabel:SetText("KEY BINDINGS")
+            settingsTitleLabel:SetText("VIDEO")
             OpenScrollPanel = controlsSettingsScrollPanel
         end
         surface.PlaySound("chicagoRP_settings/select.wav")
@@ -1108,8 +1123,9 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- keep hover on setting button when cursor is no longer in scroll panel (ask discord about this)
--- rounded outline (ask discord about this, requires stencils likely)
+-- rounded outline (material ID is nil, fuck garry)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask diamond doves about this)
+-- button fade out anims (abuse fade in code for this)
 -- make close material transparent and colorable (ask discord about this)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
