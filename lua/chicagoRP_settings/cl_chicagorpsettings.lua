@@ -99,7 +99,7 @@ local blockedkeys = {
 local blurMat = Material("pp/blurscreen")
 local gradientLeftMat = Material("vgui/gradient-l") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
 local gradientRightMat = Material("vgui/gradient-r") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
-local roundedOutlineMat = surface.GetTextureID("chicagoRP_settings/color_panel_clear")
+local roundedOutlineMat = Material("chicagoRP_settings/color_panel_clear.png")
 local HideHUD = false
 local OpenMotherFrame = nil
 local OpenScrollPanel = nil
@@ -152,9 +152,10 @@ local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thicknes
     DrawOutlinedTexturedRect(panel, gradientRightMat, thickness)
 end
 
-local function TexturedQuadPart(tex, x1, y1, w, h, tx, ty, tw, th) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
     local x2, y2 = x1 + w, y1 + h
-    local tw0, th0 = surface.GetTextureSize(tex)
+    local tw0 = mat:GetInt("$realwidth")
+    local th0 = mat:GetInt("$realheight")
     local u1, v1, u2, v2 = tx / tw0, ty / th0, (tx + tw) / tw0, (ty + th) / th0
 
     local v = {}
@@ -186,12 +187,13 @@ local function TexturedQuadPart(tex, x1, y1, w, h, tx, ty, tw, th) -- ripped fro
         v = v2
     }
 
-    surface.SetTexture(tex)
+    surface.SetMaterial(mat)
     surface.DrawPoly(v)
 end
 
-local function BorderPanel(tex, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
-    local tw, th = surface.GetTextureSize(tex)
+local function BorderPanel(mat, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+    local tw = mat:GetInt("$realwidth")
+    local th = mat:GetInt("$realheight")
     local dx = draw_corner_width
     local dy = draw_corner_height
 
@@ -202,20 +204,19 @@ local function BorderPanel(tex, x, y, w, h, src_corner_width, src_corner_height,
     local x2, y2 = x + w - dx, y + h - dy
     local w2, h2 = w - 2 * dx, h - 2 * dy
 
-    print(tex)
-    print(surface.GetTextureNameByID(56))
+    print(mat)
 
-    TexturedQuadPart(tex, x, y, dx, dy, 0, 0, Dx, Dy) -- corners
-    TexturedQuadPart(tex, x2, y, dx, dy, tw - Dx, 0, Dx, Dy) -- corners
-    TexturedQuadPart(tex, x, y2, dx, dy, 0, th - Dy, Dx, Dy) -- corners
-    TexturedQuadPart(tex, x2, y2, dx, dy, tw - Dy, th - Dy, Dx, Dy) -- corners
+    TexturedQuadPart(mat, x, y, dx, dy, 0, 0, Dx, Dy) -- corners
+    TexturedQuadPart(mat, x2, y, dx, dy, tw - Dx, 0, Dx, Dy) -- corners
+    TexturedQuadPart(mat, x, y2, dx, dy, 0, th - Dy, Dx, Dy) -- corners
+    TexturedQuadPart(mat, x2, y2, dx, dy, tw - Dy, th - Dy, Dx, Dy) -- corners
 
-    TexturedQuadPart(tex, x1, y, w2, dy, Dx, 0, tw - 2 * Dx, Dy) -- borders
-    TexturedQuadPart(tex, x1, y2, w2, dy, Dx, th - Dy, tw - 2 * Dx, Dy) -- borders
-    TexturedQuadPart(tex, x, y1, dx, h2, 0, Dy, Dx, th - 2 * Dy) -- borders
-    TexturedQuadPart(tex, x2, y1, dx, h2, tw - Dx, Dy, Dx, th - 2 * Dy) -- borders
+    TexturedQuadPart(mat, x1, y, w2, dy, Dx, 0, tw - 2 * Dx, Dy) -- borders
+    TexturedQuadPart(mat, x1, y2, w2, dy, Dx, th - Dy, tw - 2 * Dx, Dy) -- borders
+    TexturedQuadPart(mat, x, y1, dx, h2, 0, Dy, Dx, th - 2 * Dy) -- borders
+    TexturedQuadPart(mat, x2, y1, dx, h2, tw - Dx, Dy, Dx, th - 2 * Dy) -- borders
     
-    TexturedQuadPart(tex, x1, y1, w2, h2, Dx, Dy, tw - 2 * Dx, th - 2 * Dy) -- inside
+    TexturedQuadPart(mat, x1, y1, w2, h2, Dx, Dy, tw - 2 * Dx, th - 2 * Dy) -- inside
 end
 
 local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent, frame)
@@ -232,8 +233,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsButton:Paint(w, h)
             print(roundedOutlineMat)
-            print(surface.GetTextureNameByID(roundedOutlineMat))
-            -- BorderPanel(roundedOutlineMat, 0, 0, w, h, 4, 4, 4, 4)
+            BorderPanel(roundedOutlineMat, 1300, 14, 22, 22, 1, 1, 1, 1) -- too wide + too tall
 
             local hovered = self:IsHovered()
             local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
@@ -274,11 +274,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
+                -- surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
                 draw.RoundedBox(4, 1305, 19, 12, 12, primarytext)
-                surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
+                -- surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
@@ -337,6 +337,10 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             gradientcolor2.a = alphaOutline
 
             DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
+
+            if (hovered or childhovered) then
+                helptextparent:SetText(helptext)
+            end
 
             draw.DrawText(printname, "MichromaRegular", 14, 12, primarytext, TEXT_ALIGN_LEFT)
             -- return nil
@@ -800,13 +804,22 @@ net.Receive("chicagoRP_settings", function()
             OpenScrollPanel:AlphaTo(0, 0.15, 0)
             settingsTitleLabel:SetAlpha(255)
             settingsTitleLabel:AlphaTo(0, 0.15, 0)
+            settingsHelpText:SetAlpha(255)
+            settingsHelpText:AlphaTo(0, 0.15, 0)
             surface.PlaySound("chicagoRP_settings/back.wav")
-            timer.Simple(0.2, function()
+            timer.Simple(0.15, function()
                 if IsValid(OpenScrollPanel) then
                     OpenScrollPanel:Hide()
+                    settingsHelpText:SetText("")
                 end
             end)
-            OpenScrollPanel = nil
+            timer.Simple(0.15, function()
+                if IsValid(OpenScrollPanel) then
+                    if !OpenScrollPanel:IsVisible() then
+                        OpenScrollPanel = nil
+                    end
+                end
+            end)
         elseif !IsValid(OpenScrollPanel) and (key == KEY_ESCAPE or key == KEY_Q) then
             self:AlphaTo(50, 0.15, 0)
             surface.PlaySound("chicagoRP_settings/back.wav")
@@ -1000,7 +1013,7 @@ net.Receive("chicagoRP_settings", function()
                     gameSettingsScrollPanel:Show()
                     gameSettingsScrollPanel:SetAlpha(0)
                     gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-                    settingsTitleLabel:SetText("VIDEO")
+                    settingsTitleLabel:SetText("GAME")
                     OpenScrollPanel = gameSettingsScrollPanel
                 end
             end)
@@ -1012,7 +1025,7 @@ net.Receive("chicagoRP_settings", function()
             gameSettingsScrollPanel:Show()
             gameSettingsScrollPanel:SetAlpha(0)
             gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-            settingsTitleLabel:SetText("VIDEO")
+            settingsTitleLabel:SetText("GAME")
             OpenScrollPanel = gameSettingsScrollPanel
         end
         surface.PlaySound("chicagoRP_settings/select.wav")
@@ -1101,7 +1114,7 @@ net.Receive("chicagoRP_settings", function()
                     controlsSettingsScrollPanel:Show()
                     controlsSettingsScrollPanel:SetAlpha(0)
                     controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-                    settingsTitleLabel:SetText("VIDEO")
+                    settingsTitleLabel:SetText("KEY BINDINGS")
                     OpenScrollPanel = controlsSettingsScrollPanel
                 end
             end)
@@ -1113,7 +1126,7 @@ net.Receive("chicagoRP_settings", function()
             controlsSettingsScrollPanel:Show()
             controlsSettingsScrollPanel:SetAlpha(0)
             controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-            settingsTitleLabel:SetText("VIDEO")
+            settingsTitleLabel:SetText("KEY BINDINGS")
             OpenScrollPanel = controlsSettingsScrollPanel
         end
         surface.PlaySound("chicagoRP_settings/select.wav")
