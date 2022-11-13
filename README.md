@@ -2,7 +2,7 @@
 client settings gui for chicagoRP (in-development darkrp server)
 
 # status
-stable enough for other developers to use, but I highly recommend waiting categories to be rehauled
+stable enough for other developers to use, but I highly recommend waiting for categories to be rehauled
 
 # to-do
 [x] - base layout    
