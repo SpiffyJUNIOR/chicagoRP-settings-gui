@@ -77,8 +77,6 @@ surface.CreateFont("MichromaHelpText", {
     shadow = false
 })
 
-local exiticon = Material("chicagoRP_settings/exiticon.png", "smooth")
-
 local blockedkeys = {
     [1] = KEY_ESCAPE,
     [2] = KEY_TAB,
@@ -100,6 +98,7 @@ local blurMat = Material("pp/blurscreen")
 local gradientLeftMat = Material("vgui/gradient-l") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
 local gradientRightMat = Material("vgui/gradient-r") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
 local roundedOutlineMat = Material("chicagoRP_settings/color_panel_clear.png")
+local exiticon = Material("chicagoRP_settings/exiticon.png", "smooth")
 local HideHUD = false
 local OpenMotherFrame = nil
 local OpenScrollPanel = nil
@@ -107,7 +106,7 @@ local OpenControlText = nil
 local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
-local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 255)
+local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 220)
 local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 50) -- Color(247, 31, 251, 200)
 local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 150) -- Color(4, 164, 255, 200)
 local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
@@ -191,7 +190,7 @@ local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- ripped fro
     surface.DrawPoly(v)
 end
 
-local function BorderPanel(mat, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
     local tw = mat:GetInt("$realwidth")
     local th = mat:GetInt("$realheight")
     local dx = draw_corner_width
@@ -232,9 +231,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         end
 
         function settingsButton:Paint(w, h)
-            print(roundedOutlineMat)
-            BorderPanel(roundedOutlineMat, 1300, 14, 22, 22, 1, 1, 1, 1) -- too wide + too tall
-
             local hovered = self:IsHovered()
             local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
 
@@ -274,11 +270,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                -- surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
+                RoundedOutline(roundedOutlineMat, 1300, 14, 22, 22, 1, 1, 1, 1)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
                 draw.RoundedBox(4, 1305, 19, 12, 12, primarytext)
-                -- surface.DrawOutlinedRect(1300, 14, 22, 22, 2)
+                RoundedOutline(roundedOutlineMat, 1300, 14, 22, 22, 1, 1, 1, 1)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
@@ -617,10 +613,9 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    local exitIconButton = vgui.Create("DImageButton", motherFrame)
+    local exitIconButton = vgui.Create("DButton", motherFrame)
     exitIconButton:SetPos(77, 98)
     exitIconButton:SetSize(14, 15)
-    exitIconButton:SetMaterial(exiticon) -- i hate gmod
 
     function exitIconButton:DoClick()
         motherFrame:AlphaTo(50, 0.15, 0)
@@ -633,7 +628,9 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function exitIconButton:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        surface.SetDrawColor(accenttext)
+        surface.SetMaterial(exiticon)
+        surface.DrawTexturedRect(0, 0, w, h)
         -- return nil
         return true
     end
@@ -1136,10 +1133,8 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- rounded outline (material ID is nil, fuck garry)
 -- keep hover on setting button when cursor is no longer in scroll panel (ask diamond doves about this)
 -- button fade out anims (abuse fade in code for this)
--- make close material transparent and colorable (ask discord about this)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
 -- if possible, COLOR PULSE WHEN BUTTON IS CLICKED
