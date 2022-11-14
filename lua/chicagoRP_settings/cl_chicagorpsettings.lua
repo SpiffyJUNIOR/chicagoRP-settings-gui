@@ -106,9 +106,9 @@ local OpenControlText = nil
 local Dynamic = 0
 local primarytext = (Color(CVarPrimaryRed, CVarPrimaryGreen, CVarPrimaryBlue, 255))
 local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondaryBlue, 255))
-local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 220)
-local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 50) -- Color(247, 31, 251, 200)
-local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 150) -- Color(4, 164, 255, 200)
+local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 220) -- colors for exit icon, outline text, and back/game text
+local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 180) -- Color(247, 31, 251, 200)
+local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 180) -- Color(4, 164, 255, 200)
 local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
 hoverslide:SetSoundLevel(0) -- play everywhere
 
@@ -203,8 +203,6 @@ local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_heig
     local x2, y2 = x + w - dx, y + h - dy
     local w2, h2 = w - 2 * dx, h - 2 * dy
 
-    print(mat)
-
     TexturedQuadPart(mat, x, y, dx, dy, 0, 0, Dx, Dy) -- corners
     TexturedQuadPart(mat, x2, y, dx, dy, tw - Dx, 0, Dx, Dy) -- corners
     TexturedQuadPart(mat, x, y2, dx, dy, 0, th - Dy, Dx, Dy) -- corners
@@ -242,7 +240,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             self.__hoverBuf = buf
             buf = math.EaseInOut(buf, 0.2, 0.2)
-            local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 60)
+            local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
 
             surface.SetDrawColor(clr, clr, clr, alpha)
             surface.DrawRect(0, 0, w, h)
@@ -257,12 +255,29 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             self.__hoverOutlineBuf = Outlinebuf
             Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
-            local alphaOutline = Lerp(buf, 0, 150)
+            local alphaOutline = Lerp(buf, 0, 180)
 
             gradientcolor1.a = alphaOutline
             gradientcolor2.a = alphaOutline
 
             DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
+            -----
+            local bufOut, stepOut = self.__hoverBufOut or 0, RealFrameTime() * 1
+
+            if !hovered and bufOut < 1 then -- not working
+                bufOut = math.min(1, stepOut + bufOut)
+                print("fadeout !hovered")
+            elseif hovered and bufOut > 0 then
+                bufOut = math.max(0, stepOut - bufOut)
+                print("fadeout hovered")
+            end
+
+            self.__hoverBufOut = bufOut
+            bufOut = math.EaseInOut(bufOut, 0.2, 0.2)
+            local alphaOut, clrOut = Lerp(bufOut, 80, 80), Lerp(buf, 40, 80)
+
+            surface.SetDrawColor(clrOut, clrOut, clrOut, alphaOut)
+            surface.DrawRect(0, 0, w, h)
 
             if hovered then
                 helptextparent:SetText(helptext)
@@ -312,7 +327,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             self.__hoverBuf = buf
             buf = math.EaseInOut(buf, 0.2, 0.2)
-            local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 60)
+            local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
 
             surface.SetDrawColor(clr, clr, clr, alpha)
             surface.DrawRect(0, 0, w, h)
@@ -1133,8 +1148,8 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- keep hover on setting button when cursor is no longer in scroll panel (ask diamond doves about this)
 -- button fade out anims (abuse fade in code for this)
+-- keep hover on setting button when cursor is no longer in scroll panel (ask diamond doves about this)
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
 -- if possible, COLOR PULSE WHEN BUTTON IS CLICKED
