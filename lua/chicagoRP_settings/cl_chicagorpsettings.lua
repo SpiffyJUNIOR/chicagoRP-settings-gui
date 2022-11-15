@@ -113,7 +113,7 @@ local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.
 hoverslide:SetSoundLevel(0) -- play everywhere
 
 local function BlurBackground(panel)
-    if (!IsValid(panel) or !panel:IsVisible()) then return end
+    if (!IsValid(panel) and !panel:IsVisible()) then return end
     local layers, density, alpha = 1, 1, 80
     local x, y = panel:LocalToScreen(0, 0)
     local FrameRate, Num, Dark = 1 / RealFrameTime(), 5, 150
@@ -145,15 +145,13 @@ local function DrawOutlinedTexturedRect(panel, material, thickness) -- colorcube
 end
 
 local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thickness)
-    if (!IsValid(panel) or !panel:IsVisible()) then return end
     surface.SetDrawColor(firstcolor)
     DrawOutlinedTexturedRect(panel, gradientLeftMat, thickness)
     surface.SetDrawColor(secondcolor)
     DrawOutlinedTexturedRect(panel, gradientRightMat, thickness)
 end
 
-local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
-    if !IsValid(mat) then return end
+local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- taken from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
     local x2, y2 = x1 + w, y1 + h
     local tw0 = mat:GetInt("$realwidth")
     local th0 = mat:GetInt("$realheight")
@@ -192,8 +190,7 @@ local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- ripped fro
     surface.DrawPoly(v)
 end
 
-local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- ripped from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
-    if !IsValid(mat) then return end
+local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- taken from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
     local tw = mat:GetInt("$realwidth")
     local th = mat:GetInt("$realheight")
     local dx = draw_corner_width
@@ -229,41 +226,49 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsButton:OnCursorEntered()
             surface.PlaySound("chicagoRP_settings/hover.wav")
+            self.value = false
+        end
+        function settingsButton:OnCursorExited()
+            self.value = true
         end
 
         function settingsButton:Paint(w, h)
             local hovered = self:IsHovered()
-            local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
+            -- local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
 
-            if hovered and buf < 1 then
-                buf = math.min(1, step + buf)
-            elseif !hovered and buf > 0 then
-                buf = math.max(0, step - buf)
+            -- if hovered and buf < 1 then
+            --     buf = math.min(1, step + buf)
+            -- elseif !hovered and buf > 0 then
+            --     buf = math.max(0, step - buf)
+            -- end
+
+            -- self.__hoverBuf = buf
+            -- buf = math.EaseInOut(buf, 0.2, 0.2)
+            -- local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
+
+            -- surface.SetDrawColor(clr, clr, clr, alpha)
+            -- surface.DrawRect(0, 0, w, h)
+            -- -----
+            -- local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
+
+            -- if hovered and Outlinebuf < 1 then
+            --     Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
+            -- elseif !hovered and Outlinebuf > 0 then
+            --     Outlinebuf = math.max(0, Outlinestep - Outlinebuf)
+            -- end
+
+            -- self.__hoverOutlineBuf = Outlinebuf
+            -- Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
+            -- local alphaOutline = Lerp(buf, 0, 180)
+
+            -- gradientcolor1.a = alphaOutline
+            -- gradientcolor2.a = alphaOutline
+
+            -- DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
+            if self.value == true then
+                print(self)
+                print("should be button^^^")
             end
-
-            self.__hoverBuf = buf
-            buf = math.EaseInOut(buf, 0.2, 0.2)
-            local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
-
-            surface.SetDrawColor(clr, clr, clr, alpha)
-            surface.DrawRect(0, 0, w, h)
-            -----
-            local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
-
-            if hovered and Outlinebuf < 1 then
-                Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-            elseif !hovered and Outlinebuf > 0 then
-                Outlinebuf = math.max(0, Outlinestep - Outlinebuf)
-            end
-
-            self.__hoverOutlineBuf = Outlinebuf
-            Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
-            local alphaOutline = Lerp(buf, 0, 180)
-
-            gradientcolor1.a = alphaOutline
-            gradientcolor2.a = alphaOutline
-
-            DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
             -----
             local bufOut, stepOut = self.__hoverBufOut or 0, RealFrameTime() * 1
 
@@ -277,7 +282,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             self.__hoverBufOut = bufOut
             bufOut = math.EaseInOut(bufOut, 0.2, 0.2)
-            local alphaOut, clrOut = Lerp(bufOut, 80, 80), Lerp(buf, 40, 80)
+            local alphaOut, clrOut = Lerp(bufOut, 80, 80), Lerp(buf, 80, 40)
 
             surface.SetDrawColor(clrOut, clrOut, clrOut, alphaOut)
             surface.DrawRect(0, 0, w, h)
