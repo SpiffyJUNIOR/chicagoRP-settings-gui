@@ -113,7 +113,7 @@ local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.
 hoverslide:SetSoundLevel(0) -- play everywhere
 
 local function BlurBackground(panel)
-    if (!IsValid(panel) and !panel:IsVisible()) then return end
+    if (!IsValid(panel) or !panel:IsVisible()) then return end
     local layers, density, alpha = 1, 1, 80
     local x, y = panel:LocalToScreen(0, 0)
     local FrameRate, Num, Dark = 1 / RealFrameTime(), 5, 150
@@ -134,7 +134,7 @@ local function BlurBackground(panel)
 end
 
 local function DrawOutlinedTexturedRect(panel, material, thickness) -- colorcube uses r and d texture
-    if (!IsValid(panel) and !panel:IsVisible()) then return end
+    if (!IsValid(panel) or !panel:IsVisible()) then return end
     local w, h = panel:GetSize()
 
     surface.SetMaterial(material)
@@ -145,6 +145,7 @@ local function DrawOutlinedTexturedRect(panel, material, thickness) -- colorcube
 end
 
 local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thickness)
+    if (!IsValid(panel) or !panel:IsVisible()) then return end
     surface.SetDrawColor(firstcolor)
     DrawOutlinedTexturedRect(panel, gradientLeftMat, thickness)
     surface.SetDrawColor(secondcolor)
@@ -152,6 +153,7 @@ local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thicknes
 end
 
 local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- taken from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+    if !IsValid(mat) then return end
     local x2, y2 = x1 + w, y1 + h
     local tw0 = mat:GetInt("$realwidth")
     local th0 = mat:GetInt("$realheight")
@@ -191,6 +193,7 @@ local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- taken from
 end
 
 local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_height, draw_corner_width, draw_corner_height) -- taken from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
+    if !IsValid(mat) then return end
     local tw = mat:GetInt("$realwidth")
     local th = mat:GetInt("$realheight")
     local dx = draw_corner_width
