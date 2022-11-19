@@ -21,6 +21,8 @@ CreateClientConVar("chicagoRP_primarygradient_b", 40, true, false, "Changes the 
 CreateClientConVar("chicagoRP_secondarygradient_r", 245, true, false, "Changes the (R) color value for the settings GUI's secondary gradient.", 1, 255)
 CreateClientConVar("chicagoRP_secondarygradient_g", 135, true, false, "Changes the (G) color value for the settings GUI's secondary gradient.", 1, 255)
 CreateClientConVar("chicagoRP_secondarygradient_b", 70, true, false, "Changes the (B) color value for the settings GUI's secondary gradient.", 1, 255)
+CreateClientConVar("chicagoRP_clickpulse", 1, true, false, "Enables or disables color pulse when you click a button.", 0, 1)
+CreateClientConVar("chicagoRP_dsp", 1, true, false, "Enables or disables low-pass DSP when menu is active.", 0, 1)
 
 local CVarPrimaryRed = GetConVar("chicagoRP_primary_r"):GetInt()
 local CVarPrimaryGreen = GetConVar("chicagoRP_primary_g"):GetInt()
@@ -109,10 +111,11 @@ local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondary
 local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 220) -- colors for exit icon, outline text, and back/game text
 local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 180) -- Color(247, 31, 251, 200)
 local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 180) -- Color(4, 164, 255, 200)
-local gradientFadecolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 180) -- used for fade out animation
-local gradientFadecolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 180) -- used for fade out animation
 local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
-hoverslide:SetSoundLevel(0) -- play everywhere
+
+if IsValid(hoverslide) then
+    hoverslide:SetSoundLevel(0) -- play everywhere
+end
 
 local function BlurBackground(panel)
     if (!IsValid(panel) or !panel:IsVisible()) then return end
@@ -152,6 +155,25 @@ local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thicknes
     DrawOutlinedTexturedRect(panel, gradientLeftMat, thickness)
     surface.SetDrawColor(secondcolor)
     DrawOutlinedTexturedRect(panel, gradientRightMat, thickness)
+end
+
+local function gradientrectfixed(panel, firstcolor, secondcolor, thickness) -- fix this
+    if (!IsValid(panel) or !panel:IsVisible()) then return end
+    local w, h = panel:GetSize()
+
+    surface.SetDrawColor(firstcolor)
+    surface.SetMaterial(gradientLeftMat)
+    surface.DrawTexturedRectUV(0, 0, w, thickness, 0, 0, 1, 0) -- top
+    surface.DrawTexturedRectUV(0, h - thickness, w, thickness, 0, 1, 1, 1) -- bottom
+    surface.DrawTexturedRectUV(0, 0, thickness, h, 0, 0, 0, 1) -- left
+    surface.DrawTexturedRectUV(w - thickness, 0, thickness, h, 1, 0, 1, 1) -- right
+
+    surface.SetDrawColor(secondcolor)
+    surface.SetMaterial(gradientRightMat)
+    surface.DrawTexturedRectUV(0, 0, w, thickness, 0, 0, 1, 0) -- top
+    surface.DrawTexturedRectUV(0, h - thickness, w, thickness, 0, 1, 1, 1) -- bottom
+    surface.DrawTexturedRectUV(0, 0, thickness, h, 0, 0, 0, 1) -- left
+    surface.DrawTexturedRectUV(w - thickness, 0, thickness, h, 1, 0, 1, 1) -- right
 end
 
 local function TexturedQuadPart(mat, x1, y1, w, h, tx, ty, tw, th) -- taken from TF2 gamemode by Kilburn, wango911, Agent Agrimar, and LeadKiller
@@ -215,11 +237,13 @@ local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_heig
     TexturedQuadPart(mat, x1, y2, w2, dy, Dx, th - Dy, tw - 2 * Dx, Dy) -- borders
     TexturedQuadPart(mat, x, y1, dx, h2, 0, Dy, Dx, th - 2 * Dy) -- borders
     TexturedQuadPart(mat, x2, y1, dx, h2, tw - Dx, Dy, Dx, th - 2 * Dy) -- borders
-    
+
     TexturedQuadPart(mat, x1, y1, w2, h2, Dx, Dy, tw - 2 * Dx, th - 2 * Dy) -- inside
 end
 
 local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent, frame)
+    local CVarColorPulse = GetConVar("chicagoRP_clickpulse"):GetBool()
+
     if (GetConVar(convar):GetInt() == 0 or GetConVar(convar):GetInt() == 1) and (max == 1) and ConVarExists(convar) then
         local settingsButton = parent:Add("DButton")
         settingsButton:SetText("")
@@ -229,20 +253,16 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsButton:OnCursorEntered()
             surface.PlaySound("chicagoRP_settings/hover.wav")
-            self.value = false
-        end
-        function settingsButton:OnCursorExited()
-            self.value = true
         end
 
         function settingsButton:Paint(w, h)
             local hovered = self:IsHovered()
-            local bufIn, stepIn = self.__hoverBufIn or 0, RealFrameTime() * 1
+            local bufIn, stepIn = self.__hoverBufIn or 0, RealFrameTime() * 4
 
             if hovered and bufIn < 1 then
                 bufIn = math.min(1, stepIn + bufIn)
             elseif !hovered and bufIn > 0 then
-                bufIn = math.max(0, stepIn - bufIn)
+                bufIn = math.max(0, bufIn - stepIn)
             end
 
             self.__hoverBufIn = bufIn
@@ -251,13 +271,13 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             surface.SetDrawColor(clr, clr, clr, alpha)
             surface.DrawRect(0, 0, w, h)
-            -- -----
-            local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, RealFrameTime() * 1
+            -----
+            local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, RealFrameTime() * 4
 
             if hovered and bufOutlineIn < 1 then
                 bufOutlineIn = math.min(1, stepOutlineIn + bufOutlineIn)
             elseif !hovered and bufOutlineIn > 0 then
-                bufOutlineIn = math.max(0, stepOutlineIn - bufOutlineIn)
+                bufOutlineIn = math.max(0, bufOutlineIn - stepOutlineIn)
             end
 
             self.__hoverbufOutlineIn = bufOutlineIn
@@ -267,50 +287,29 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             gradientcolor1.a = alphaOutline
             gradientcolor2.a = alphaOutline
 
-            print(gradientcolor1.a)
-            print(gradientcolor2.a)
-            DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
-            if self.value == true then
-                print(self)
-                print("should be button^^^")
+            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
+            if (self.value != true) then
+                DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
             end
             -----
-            local bufOut, stepOut = self.__hoverBufOut or 1, RealFrameTime() * 1
+            local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-            if !hovered and bufOut < 1 then -- not working
-                bufOut = math.min(1, stepOut + bufOut)
-                print("fadeout !hovered")
-            elseif hovered and bufOut > 0 then
-                bufOut = math.max(0, stepOut - bufOut)
-                print("fadeout hovered")
+            if (self.value == true) and pulseBuf < 1 then
+                pulseBuf = math.min(1, pulseStep + pulseBuf)
+                print(pulseBuf)
+            elseif (self.value != true) and pulseBuf > 0 then
+                pulseBuf = math.max(0, pulseBuf - pulseStep)
+                print(pulseBuf)
             end
 
-            self.__hoverBufOut = bufOut
-            bufOut = math.EaseInOut(bufOut, 0.2, 0.2)
-            local alphaOut, clrOut = Lerp(bufOut, 80, 0), Lerp(bufOut, 80, 0)
+            self.__pulseBuf = pulseBuf
+            pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+            local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 40, 40), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
 
-            surface.SetDrawColor(clrOut, clrOut, clrOut, alphaOut)
+            surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
             surface.DrawRect(0, 0, w, h)
-            -- -----
-            local bufOutlineOut, stepOutlineOut = self.__hoverBufOutlineOut or 1, RealFrameTime() * 1
 
-            if !hovered and bufOutlineOut < 1 then -- not working
-                bufOutlineOut = math.min(1, stepOutlineOut + bufOutlineOut)
-                print("fadeout !hovered")
-            elseif hovered and bufOutlineOut > 0 then
-                bufOutlineOut = math.max(0, stepOutlineOut - bufOutlineOut) -- this is what might be forcing outline on hover instantly be max value
-                print("fadeout hovered")
-            end
-
-            self.__hoverBufOutlineOut = bufOutlineOut
-            bufOutlineOut = math.EaseInOut(bufOutlineOut, 0.2, 0.2)
-            local alphaOutlineOut = Lerp(bufOutlineOut, 180, 0)
-
-            gradientFadecolor1.a = alphaOutlineOut
-            gradientFadecolor2.a = alphaOutlineOut
-
-            DrawOutlinedGradientRect(self, (gradientFadecolor1), (gradientFadecolor2), 3)
-            -----
+            DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
             if hovered then
                 helptextparent:SetText(helptext)
@@ -323,7 +322,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 surface.SetDrawColor(primarytext:Unpack())
                 draw.RoundedBox(4, 1305, 19, 12, 12, primarytext)
                 RoundedOutline(roundedOutlineMat, 1300, 14, 22, 22, 1, 1, 1, 1)
-                print(roundedOutlineMat)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", 790, 12, primarytext, TEXT_ALIGN_RIGHT)
@@ -333,6 +331,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         end
 
         function settingsButton:DoClick()
+            self.value = true
             if (GetConVar(convar):GetInt() == 0) then -- add float check pls
                 RunConsoleCommand(convar, "1")
                 surface.PlaySound("chicagoRP_settings/select.wav")
@@ -340,6 +339,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 RunConsoleCommand(convar, "0")
                 surface.PlaySound("chicagoRP_settings/select.wav")
             end
+            timer.Simple(0.20, function() -- tweak to look better and tweak times
+                if IsValid(self) then
+                    self.value = false
+                end
+            end)
         end
     elseif (GetConVar(convar):GetInt() >= 0 or GetConVar(convar):GetInt() <= 0) and (max > 1) and ConVarExists(convar) then
         local settingsSliderParent = parent:Add("DButton")
@@ -356,7 +360,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             if (hovered or childhovered) and buf < 1 then
                 buf = math.min(1, step + buf)
             elseif (!hovered and !childhovered) and buf > 0 then
-                buf = math.max(0, step - buf)
+                buf = math.max(0, buf - step)
             end
 
             self.__hoverBuf = buf
@@ -371,7 +375,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             if (hovered or childhovered) and Outlinebuf < 1 then
                 Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
             elseif (!hovered and !childhovered) and Outlinebuf > 0 then
-                Outlinebuf = math.max(0, Outlinestep - Outlinebuf)
+                Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
             end
 
             self.__hoverOutlineBuf = Outlinebuf
@@ -381,7 +385,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             gradientcolor1.a = alphaOutline
             gradientcolor2.a = alphaOutline
 
-            DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
+            DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
 
             if (hovered or childhovered) then
                 helptextparent:SetText(helptext)
@@ -457,7 +461,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         if (hovered or haschildren) and buf < 1 then
             buf = math.min(1, step + buf)
         elseif (!hovered and !haschildren) and buf > 0 then
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
         end
 
         self.__hoverBuf = buf
@@ -472,7 +476,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         if (hovered or haschildren) and Outlinebuf < 1 then
             Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
         elseif (!hovered and !haschildren) and Outlinebuf > 0 then
-            Outlinebuf = math.max(0, Outlinestep - Outlinebuf)
+            Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
         end
 
         self.__hoverOutlineBuf = Outlinebuf
@@ -482,7 +486,28 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         gradientcolor1.a = alphaOutline
         gradientcolor2.a = alphaOutline
 
-        DrawOutlinedGradientRect(self, (gradientcolor1), (gradientcolor2), 3)
+        if (self.value != true) then
+            DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
+        end
+        -----
+        local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+
+        if (self.value == true) and pulseBuf < 1 then
+            pulseBuf = math.min(1, pulseStep + pulseBuf)
+            print(pulseBuf)
+        elseif (self.value != true) and pulseBuf > 0 then
+            pulseBuf = math.max(0, pulseBuf - pulseStep)
+            print(pulseBuf)
+        end
+
+        self.__pulseBuf = pulseBuf
+        pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+        local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 40, 40), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
+
+        surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
+        surface.DrawRect(0, 0, w, h)
+
+        DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
         if hovered or haschildren then
             helptextparent:SetText(helptext)
@@ -498,6 +523,13 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
     function controlsButton:DoClick()
         surface.PlaySound("chicagoRP_settings/select.wav")
+        self.value = true
+
+        timer.Simple(0.20, function() -- tweak to look better and tweak times
+            if IsValid(self) and self.value == true then
+                self.value = false
+            end
+        end)
 
         if IsValid(OpenControlText) then
             OpenControlText:Remove()
@@ -558,6 +590,14 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             SetClipboardText(bindtext)
             surface.PlaySound("chicagoRP_settings/select.wav")
             controlHelpText:SetText("Key bound, paste in console then enter.")
+
+            controlsButton.value = true
+            timer.Simple(0.20, function() -- tweak to look better and tweak times
+                if IsValid(controlsButton) and controlsButton.value == true then
+                    controlsButton.value = false
+                end
+            end)
+
             self:Remove()
             timer.Simple(5, function()
                 if IsValid(controlHelpText) then
@@ -595,6 +635,7 @@ net.Receive("chicagoRP_settings", function()
     local ply = LocalPlayer()
     local screenwidth = ScrW()
     local screenheight = ScrH()
+    local CVarDSP = GetConVar("chicagoRP_dsp"):GetBool()
     local motherFrame = vgui.Create("DFrame")
     motherFrame:SetSize(screenwidth, screenheight)
     motherFrame:SetVisible(true)
@@ -605,9 +646,6 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:SetKeyboardInputEnabled(true)
     HideHUD = true
     OpenScrollPanel = nil
-
-    print(primarytext)
-    print(secondarytext)
 
     if IsValid(ArcCW.InvHUD) then
         ArcCW.InvHUD:Hide()
@@ -625,7 +663,9 @@ net.Receive("chicagoRP_settings", function()
     motherFrame:Center()
 
     timer.Simple(0.15, function()
-        ply:SetDSP(30, false)
+        if CVarDSP then
+            ply:SetDSP(30, false)
+        end
     end)
 
     surface.PlaySound("chicagoRP_settings/back.wav")
@@ -635,7 +675,9 @@ net.Receive("chicagoRP_settings", function()
         if IsValid(ArcCW.InvHUD) then
             ArcCW.InvHUD:Show()
         end
-        ply:SetDSP(0, false)
+        if CVarDSP then
+            ply:SetDSP(0, false)
+        end
     end
     ---
 
@@ -746,7 +788,7 @@ net.Receive("chicagoRP_settings", function()
     function videoSettingsScrollPanel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         -- print(self:IsVisible())
-        return nil
+        return true
     end
 
     local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
@@ -860,10 +902,8 @@ net.Receive("chicagoRP_settings", function()
                 end
             end)
             timer.Simple(0.15, function()
-                if IsValid(OpenScrollPanel) then
-                    if !OpenScrollPanel:IsVisible() then
-                        OpenScrollPanel = nil
-                    end
+                if IsValid(OpenScrollPanel) and !OpenScrollPanel:IsVisible() then
+                    OpenScrollPanel = nil
                 end
             end)
         elseif !IsValid(OpenScrollPanel) and (key == KEY_ESCAPE or key == KEY_Q) then
@@ -889,20 +929,20 @@ net.Receive("chicagoRP_settings", function()
     function videoSettingsButton:Paint(w, h)
         local panelActive = videoSettingsScrollPanel:IsVisible()
         local hovered = self:IsHovered()
-        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 5
+        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 1
         local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
 
         if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
             buf = math.min(1, step + buf)
             alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
         elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == videoSettingsScrollPanel) then -- kill yourself
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
             alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
         elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == videoSettingsScrollPanel) then
             buf = math.min(1, step + buf)
             alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
         elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
             alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
         end
 
@@ -922,56 +962,89 @@ net.Receive("chicagoRP_settings", function()
 
         surface.SetDrawColor(clr, clr, clr, alpha)
         surface.DrawRect(0, 0, w, h)
+        -----
+        local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+
+        if (self.value == true) and pulseBuf < 1 then
+            pulseBuf = math.min(1, pulseStep + pulseBuf)
+            print(pulseBuf)
+        elseif (self.value != true) and pulseBuf > 0 then
+            pulseBuf = math.max(0, pulseBuf - pulseStep)
+            print(pulseBuf)
+        end
+
+        self.__pulseBuf = pulseBuf
+        pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+        local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 40, 40), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
+        local outlinePulse = Lerp(pulseBuf, 0, 4)
+
+        surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
+        surface.DrawRect(0, 0, w, h)
+
+        print(self)
+        print(self:GetSize())
+        print(gradientcolor1)
+        print(gradientcolor2)
+        print("OUTLINE PULSE: " .. outlinePulse)
+
+        -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
+
+        gradientrectfixed(self, gradientcolor1, gradientcolor2, outlinePulse)
 
         draw.DrawText("VIDEO", "MichromaRegular", w - 383, h - 42, primarytext, TEXT_ALIGN_LEFT)
     end
 
     function videoSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
-        self.value = !self.value
-        if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
-            OpenScrollPanel:SetAlpha(255)
-            OpenScrollPanel:AlphaTo(0, 0.15, 0)
-            settingsTitleLabel:SetAlpha(255)
-            settingsTitleLabel:AlphaTo(0, 0.15, 0)
-            settingsHelpText:SetAlpha(255)
-            settingsHelpText:AlphaTo(0, 0.15, 0)
-            timer.Simple(0.15, function()
-                if IsValid(OpenScrollPanel) then
-                    OpenScrollPanel:Hide()
-                    settingsHelpText:SetText("")
-                end
-            end)
-            timer.Simple(0.15, function()
-                if IsValid(OpenScrollPanel) and OpenScrollPanel == videoSettingsScrollPanel then
-                    if !OpenScrollPanel:IsVisible() then
-                        OpenScrollPanel = nil
-                    end
-                end
-            end)
-            if OpenScrollPanel == nil then return end
-            timer.Simple(0.2, function()
-                if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
-                    settingsTitleLabel:SetAlpha(0)
-                    settingsTitleLabel:AlphaTo(255, 0.15, 0)
-                    settingsHelpText:SetAlpha(0)
-                    settingsHelpText:AlphaTo(255, 0.15, 0)
-                    videoSettingsScrollPanel:Show()
-                    videoSettingsScrollPanel:SetAlpha(0)
-                    videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-                    settingsTitleLabel:SetText("VIDEO")
-                    OpenScrollPanel = videoSettingsScrollPanel
-                end
-            end)
-        elseif IsValid(videoSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-            settingsTitleLabel:SetAlpha(0)
-            settingsTitleLabel:AlphaTo(255, 0.15, 0)
-            settingsHelpText:SetAlpha(0)
-            settingsHelpText:AlphaTo(255, 0.15, 0)
-            videoSettingsScrollPanel:Show()
-            videoSettingsScrollPanel:SetAlpha(0)
-            videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-            settingsTitleLabel:SetText("VIDEO")
-            OpenScrollPanel = videoSettingsScrollPanel
+        self.value = true
+
+        timer.Simple(0.20, function() -- tweak to look better and tweak times
+            if IsValid(self) and self.value == true then
+                self.value = false
+            end
+        end)
+
+        -- if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
+        --     OpenScrollPanel:SetAlpha(255)
+        --     OpenScrollPanel:AlphaTo(0, 0.15, 0)
+        --     settingsTitleLabel:SetAlpha(255)
+        --     settingsTitleLabel:AlphaTo(0, 0.15, 0)
+        --     settingsHelpText:SetAlpha(255)
+        --     settingsHelpText:AlphaTo(0, 0.15, 0)
+        --     timer.Simple(0.15, function()
+        --         if IsValid(OpenScrollPanel) then
+        --             OpenScrollPanel:Hide()
+        --             settingsHelpText:SetText("")
+        --         end
+        --     end)
+        --     timer.Simple(0.15, function()
+        --         if IsValid(OpenScrollPanel) and OpenScrollPanel == videoSettingsScrollPanel and !OpenScrollPanel:IsVisible() then
+        --             OpenScrollPanel = nil
+        --         end
+        --     end)
+        --     if OpenScrollPanel == nil then return end
+        --     timer.Simple(0.2, function()
+        --         if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
+        --             settingsTitleLabel:SetAlpha(0)
+        --             settingsTitleLabel:AlphaTo(255, 0.15, 0)
+        --             settingsHelpText:SetAlpha(0)
+        --             settingsHelpText:AlphaTo(255, 0.15, 0)
+        --             videoSettingsScrollPanel:Show()
+        --             videoSettingsScrollPanel:SetAlpha(0)
+        --             videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+        --             settingsTitleLabel:SetText("VIDEO")
+        --             OpenScrollPanel = videoSettingsScrollPanel
+        --         end
+        --     end)
+        if IsValid(videoSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
+            -- settingsTitleLabel:SetAlpha(0)
+            -- settingsTitleLabel:AlphaTo(255, 0.15, 0)
+            -- settingsHelpText:SetAlpha(0)
+            -- settingsHelpText:AlphaTo(255, 0.15, 0)
+            -- videoSettingsScrollPanel:Show()
+            -- videoSettingsScrollPanel:SetAlpha(0)
+            -- videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
+            -- settingsTitleLabel:SetText("VIDEO")
+            -- OpenScrollPanel = videoSettingsScrollPanel
         end
         surface.PlaySound("chicagoRP_settings/select.wav")
     end
@@ -998,13 +1071,13 @@ net.Receive("chicagoRP_settings", function()
             buf = math.min(1, step + buf)
             alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
         elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == gameSettingsScrollPanel) then -- kill yourself
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
             alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
         elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == gameSettingsScrollPanel) then
             buf = math.min(1, step + buf)
             alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
         elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
             alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
         end
 
@@ -1043,10 +1116,8 @@ net.Receive("chicagoRP_settings", function()
                 end
             end)
             timer.Simple(0.15, function()
-                if IsValid(OpenScrollPanel) and OpenScrollPanel == gameSettingsScrollPanel then
-                    if !OpenScrollPanel:IsVisible() then
-                        OpenScrollPanel = nil
-                    end
+                if IsValid(OpenScrollPanel) and OpenScrollPanel == gameSettingsScrollPanel and !OpenScrollPanel:IsVisible() then
+                    OpenScrollPanel = nil
                 end
             end)
             if OpenScrollPanel == nil then return end
@@ -1099,13 +1170,13 @@ net.Receive("chicagoRP_settings", function()
             buf = math.min(1, step + buf)
             alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
         elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == controlsSettingsScrollPanel) then -- kill yourself
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
             alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
         elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == controlsSettingsScrollPanel) then
             buf = math.min(1, step + buf)
             alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
         elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
-            buf = math.max(0, step - buf)
+            buf = math.max(0, buf - step)
             alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
         end
 
@@ -1144,10 +1215,8 @@ net.Receive("chicagoRP_settings", function()
                 end
             end)
             timer.Simple(0.15, function()
-                if IsValid(OpenScrollPanel) and OpenScrollPanel == controlsSettingsScrollPanel then
-                    if !OpenScrollPanel:IsVisible() then
-                        OpenScrollPanel = nil
-                    end
+                if IsValid(OpenScrollPanel) and OpenScrollPanel == controlsSettingsScrollPanel and !OpenScrollPanel:IsVisible() then
+                    OpenScrollPanel = nil
                 end
             end)
             if OpenScrollPanel == nil then return end
@@ -1182,8 +1251,7 @@ net.Receive("chicagoRP_settings", function()
 end)
 
 -- still need:
--- button fade out anims (abuse fade in code for this)
--- keep hover on setting button when cursor is no longer in scroll panel (ask diamond doves about this)
+-- fix category gradient pulse
 -- tighten up UI layout
 -- make UI scale correctly with screen resolution (math and maybe performlayout)
 -- optimization

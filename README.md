@@ -8,8 +8,8 @@ stable enough for other developers to use, but I highly recommend waiting for ca
 [x] - base layout    
 [x] - base functionality    
 [x] - control bind code    
-[w] - prettify    
-[w] - animations    
+[x] - prettify    
+[x] - animations    
 [ ] - make layout scalable          
 [ ] - optimize    
 [ ] - write documentation and release    

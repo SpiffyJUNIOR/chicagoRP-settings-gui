@@ -43,8 +43,8 @@ chicagoRPvideoSettingsOptions = { -- simfphys camera, arccw, first person shadow
     },
     [7] = {
         convar = "arccw_cheapscopesv2_ratio",
-        max = 1, -- float
-        min = 0, -- float
+        max = 1.00, -- float
+        min = 0.00, -- float
         printname = "Cheap Scope FOV",
         text = "Controls scope FOV when ADSing with RT PIP disabled. Recommended value is 0.10."
     },
