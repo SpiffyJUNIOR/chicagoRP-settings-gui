@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-for i, f in ipairs(file.Find("chicagoRP_settings/*.lua", "LUA")) do
+for i, f in pairs(file.Find("chicagoRP_settings/*.lua", "LUA")) do
     if string.Left(f, 3) == "sv_" then
         if SERVER then 
             include("chicagoRP_settings/" .. f) 

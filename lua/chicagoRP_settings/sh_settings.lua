@@ -243,3 +243,5 @@ chicagoRPcontrolsSettingsOptions = {
         text = "Drops the currently held weapon."
     }
 }
+
+print("chicagoRP shared settings loaded!")
