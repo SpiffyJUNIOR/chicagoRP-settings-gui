@@ -326,7 +326,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 helptextparent:SetText(helptext)
             end
 
-            draw.DrawText(printname, "MichromaRegular", w - (w - 14), h - (h - 12), primarytext, TEXT_ALIGN_LEFT)
+            draw.DrawText(printname, "MichromaRegular", w - (w - TheCoolerScreenScale(14)), h - (h - TheCoolerScreenScale(12)), primarytext, TEXT_ALIGN_LEFT)
             -- return nil
         end
 
@@ -334,7 +334,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         local parentW, parentH = settingsSlider:GetParent():GetSize()
         settingsSlider:SetText("")
         settingsSlider:SetSize(AdvancedScreenScale(335, parentW), parentH)
-        settingsSlider:SetPos(parentW - (parentW - 1007), 0) -- fucking fix this
+        settingsSlider:SetPos(parentW - self:GetSize(), 0) -- fucking fix this
         settingsSlider:SetMin(min)
         settingsSlider:SetMax(max)
         settingsSlider:SetDecimals(0)
@@ -354,7 +354,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             surface.DrawRect(0, 0, settingsSlider.Slider:GetSlideX() * w, h)
             surface.SetDrawColor(80, 80, 80, 20)
             surface.DrawRect(0, 0, w, h)
-            draw.DrawText(GetConVar(convar):GetInt(), "MichromaRegular", w - (w - 325), h - (h - 13), primarytext, TEXT_ALIGN_RIGHT)
+            draw.DrawText(GetConVar(convar):GetInt(), "MichromaRegular", w - (w - TheCoolerScreenScale(325)), h - (h - TheCoolerScreenScale(13)), primarytext, TEXT_ALIGN_RIGHT)
         end
 
         function settingsSlider.Slider.Knob:Paint(w, h)
@@ -818,7 +818,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local bindLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
-    bindLabel:SetPos(AdvancedScreenScale(1240, controlParentW), AdvancedScreenScale(-25, controlParentW)) -- fucking fix this
+    bindLabel:SetPos(AdvancedScreenScale(1380, controlParentW), AdvancedScreenScale(-25, controlParentW)) -- fucking fix this
     bindLabel:SetSize(TheCoolerScreenScale(100), TheCoolerScreenScale(30))
     bindLabel:SetText("BINDING")
     bindLabel:SetTextColor(secondarytext)
@@ -1249,7 +1249,7 @@ end)
 print("chicagoRP GUI loaded!")
 
 -- still need:
--- fix binding label, fix slider position, fix slider text, make scalable height
+-- fix binding label, fix slider position, fix slider text, make scalable height(?)
 -- tighten up UI layout
 -- optimization
 -- make creating categories not awful
