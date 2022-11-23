@@ -46,11 +46,6 @@ local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondary
 local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 220) -- colors for exit icon, outline text, and back/game text
 local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 180) -- Color(247, 31, 251, 200)
 local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 180) -- Color(4, 164, 255, 200)
-local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0) -- create the new sound, parented to the worldspawn (which always exists)
-
-if IsValid(hoverslide) then
-    hoverslide:SetSoundLevel(0) -- play everywhere
-end
 
 local function BlurBackground(panel)
     if (!IsValid(panel) or !panel:IsVisible()) then return end
@@ -168,12 +163,30 @@ local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_heig
     TexturedQuadPart(mat, x1, y1, w2, h2, Dx, Dy, tw - 2 * Dx, th - 2 * Dy) -- inside
 end
 
-local function TheCoolerScreenScale(size)
+local function HoverSound()
+    local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0)
+    if hoverslide then
+        hoverslide:SetSoundLevel(0)
+        hoverslide:Stop() -- it won't play again otherwise
+        hoverslide:Play()
+    end
+    return hoverslide -- useful if you want to stop the sound yourself
+end
+
+local function HorizontalScreenScale(size)
     return math.Round(size * (ScrW() / 1920.0))
 end
 
-local function AdvancedScreenScale(size, width)
-    return math.Round(size * (width / 1920.0))
+local function VerticalScreenScale(size)
+    return math.Round(size * (ScrH() / 1080.0))
+end
+
+local function AdvancedHorizontalScreenScale(size, divisor)
+    return math.Round(size * (divisor / 1920.0))
+end
+
+local function AdvancedVerticalScreenScale(size, divisor)
+    return math.Round(size * (divisor / 1080.0))
 end
 
 local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent, frame)
@@ -184,7 +197,8 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsButton:SetText("")
         settingsButton:Dock(TOP)
         settingsButton:DockMargin(0, 0, 3, 4)
-        settingsButton:SetSize(TheCoolerScreenScale(1340), TheCoolerScreenScale(50))
+        settingsButton:SetSize(HorizontalScreenScale(1340), VerticalScreenScale(50))
+        print(VerticalScreenScale(50))
 
         function settingsButton:OnCursorEntered()
             surface.PlaySound("chicagoRP_settings/hover.wav")
@@ -239,7 +253,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             self.__pulseBuf = pulseBuf
             pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-            local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 40, 40), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
+            local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 0, 80), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
 
             surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
             surface.DrawRect(0, 0, w, h)
@@ -252,17 +266,18 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                RoundedOutline(roundedOutlineMat, TheCoolerScreenScale(1300), TheCoolerScreenScale(14), 22, 22, 1, 1, 1, 1)
+                RoundedOutline(roundedOutlineMat, HorizontalScreenScale(1300), VerticalScreenScale(14), 22, 22, 1, 1, 1, 1)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                draw.RoundedBox(4, TheCoolerScreenScale(1305), TheCoolerScreenScale(19), 12, 12, primarytext)
-                RoundedOutline(roundedOutlineMat, TheCoolerScreenScale(1300), TheCoolerScreenScale(14), 22, 22, 1, 1, 1, 1)
+                draw.RoundedBox(4, HorizontalScreenScale(1305), VerticalScreenScale(19), 12, 12, primarytext)
+                RoundedOutline(roundedOutlineMat, HorizontalScreenScale(1300), VerticalScreenScale(14), 22, 22, 1, 1, 1, 1)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
-                draw.DrawText(statusString, "MichromaRegular", TheCoolerScreenScale(790), TheCoolerScreenScale(12), primarytext, TEXT_ALIGN_RIGHT)
+                draw.DrawText(statusString, "MichromaRegular", HorizontalScreenScale(790), VerticalScreenScale(12), primarytext, TEXT_ALIGN_RIGHT)
             end
+            print(AdvancedVerticalScreenScale(12, h))
 
-            draw.DrawText(printname, "MichromaRegular", TheCoolerScreenScale(14), TheCoolerScreenScale(12), primarytext, TEXT_ALIGN_LEFT)
+            draw.DrawText(printname, "MichromaRegular", HorizontalScreenScale(14), VerticalScreenScale(12), primarytext, TEXT_ALIGN_LEFT)
         end
 
         function settingsButton:DoClick()
@@ -285,7 +300,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSliderParent:SetText("")
         settingsSliderParent:Dock(TOP)
         settingsSliderParent:DockMargin(0, 0, 3, 4)
-        settingsSliderParent:SetSize(TheCoolerScreenScale(1340), TheCoolerScreenScale(50))
+        settingsSliderParent:SetSize(HorizontalScreenScale(1340), VerticalScreenScale(50))
 
         function settingsSliderParent:Paint(w, h)
             local hovered = self:IsHovered()
@@ -326,15 +341,15 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 helptextparent:SetText(helptext)
             end
 
-            draw.DrawText(printname, "MichromaRegular", w - (w - TheCoolerScreenScale(14)), h - (h - TheCoolerScreenScale(12)), primarytext, TEXT_ALIGN_LEFT)
+            draw.DrawText(printname, "MichromaRegular", HorizontalScreenScale(14), VerticalScreenScale(12), primarytext, TEXT_ALIGN_LEFT)
             -- return nil
         end
 
         local settingsSlider = vgui.Create("DNumSlider", settingsSliderParent)
-        local parentW, parentH = settingsSlider:GetParent():GetSize()
+        local parentW, parentH = settingsSliderParent:GetSize()
         settingsSlider:SetText("")
-        settingsSlider:SetSize(AdvancedScreenScale(335, parentW), parentH)
-        settingsSlider:SetPos(parentW - self:GetSize(), 0) -- fucking fix this
+        settingsSlider:SetSize(HorizontalScreenScale(335), parentH) -- 234
+        settingsSlider:SetPos(parentW - settingsSlider:GetSize(), 0) -- fix this
         settingsSlider:SetMin(min)
         settingsSlider:SetMax(max)
         settingsSlider:SetDecimals(0)
@@ -354,7 +369,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             surface.DrawRect(0, 0, settingsSlider.Slider:GetSlideX() * w, h)
             surface.SetDrawColor(80, 80, 80, 20)
             surface.DrawRect(0, 0, w, h)
-            draw.DrawText(GetConVar(convar):GetInt(), "MichromaRegular", w - (w - TheCoolerScreenScale(325)), h - (h - TheCoolerScreenScale(13)), primarytext, TEXT_ALIGN_RIGHT)
+            draw.DrawText(GetConVar(convar):GetInt(), "MichromaRegular", HorizontalScreenScale(325), VerticalScreenScale(13), primarytext, TEXT_ALIGN_RIGHT)
         end
 
         function settingsSlider.Slider.Knob:Paint(w, h)
@@ -371,8 +386,8 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsSlider:OnValueChanged(value)
             self:SetValue(math.Round(value, 0))
-            hoverslide:Stop()
-            hoverslide:Play()
+            HoverSound()
+            -- print(value)
         end
     end
 end
@@ -382,7 +397,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
     controlsButton:SetText("")
     controlsButton:Dock(TOP)
     controlsButton:DockMargin(0, 0, 3, 4)
-    controlsButton:SetSize(TheCoolerScreenScale(800), TheCoolerScreenScale(44))
+    controlsButton:SetSize(HorizontalScreenScale(800), VerticalScreenScale(44))
 
     function controlsButton:OnCursorEntered()
         surface.PlaySound("chicagoRP_settings/hover.wav")
@@ -438,7 +453,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
         self.__pulseBuf = pulseBuf
         pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-        local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 40, 40), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
+        local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 0, 80), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
 
         surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
         surface.DrawRect(0, 0, w, h)
@@ -451,10 +466,10 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
         if input.LookupBinding(bind, false) and !haschildren then -- how do we hide this for a certain button?
             statusString = string.upper(input.LookupBinding(bind, false))
-            draw.DrawText(statusString, "MichromaRegular", TheCoolerScreenScale(1325), TheCoolerScreenScale(10), primarytext, TEXT_ALIGN_RIGHT)
+            draw.DrawText(statusString, "MichromaRegular", HorizontalScreenScale(1325), VerticalScreenScale(10), primarytext, TEXT_ALIGN_RIGHT)
         end
 
-        draw.DrawText(printname, "MichromaRegular", TheCoolerScreenScale(14), TheCoolerScreenScale(10), primarytext, TEXT_ALIGN_LEFT)
+        draw.DrawText(printname, "MichromaRegular", HorizontalScreenScale(14), VerticalScreenScale(10), primarytext, TEXT_ALIGN_LEFT)
     end
 
     function controlsButton:DoClick()
@@ -472,15 +487,15 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         end
 
         local controlHelpText = vgui.Create("DLabel", frame)
-        controlHelpText:SetPos(TheCoolerScreenScale(1395), TheCoolerScreenScale(880))
-        controlHelpText:SetSize(400, 30)
+        controlHelpText:SetPos(HorizontalScreenScale(1470), VerticalScreenScale(880))
+        controlHelpText:SetSize(HorizontalScreenScale(400), 30)
         controlHelpText:SetFont("MichromaHelpText")
         controlHelpText:SetText("Press a key to bind.")
 
         function controlHelpText:Paint(w, h)
             -- surface.SetDrawColor(200, 0, 0, 10)
             -- surface.DrawRect(0, 0, w, h)
-            draw.DrawText(self:GetText(), "MichromaSmall", w - (w - 385), h - (h - 5), primarytext, TEXT_ALIGN_RIGHT)
+            draw.DrawText(self:GetText(), "MichromaSmall", HorizontalScreenScale(390), VerticalScreenScale(5), primarytext, TEXT_ALIGN_RIGHT)
 
             return true
         end
@@ -496,12 +511,14 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
         local controlsTextEntry = self:Add("DTextEntry")
         controlsTextEntry:Dock(RIGHT)
-        controlsTextEntry:SetSize(AdvancedScreenScale(60, parentW), AdvancedScreenScale(44, parentH))
+        controlsTextEntry:SetSize(AdvancedHorizontalScreenScale(60, parentW), AdvancedHorizontalScreenScale(44, parentH))
         controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
+            -- surface.SetDrawColor(200, 0, 0, 10)
+            -- surface.DrawRect(0, 0, w, h)
             if math.sin((SysTime() * 1) * 6) > 0 then
-                draw.DrawText("__", "MichromaRegular", TheCoolerScreenScale(34), TheCoolerScreenScale(12), primarytext, TEXT_ALIGN_CENTER)
+                draw.DrawText("__", "MichromaRegular", HorizontalScreenScale(16), VerticalScreenScale(12), primarytext, TEXT_ALIGN_CENTER)
             end
         end
 
@@ -625,7 +642,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local exitButton = vgui.Create("DButton", motherFrame)
-    exitButton:SetPos(TheCoolerScreenScale(86), TheCoolerScreenScale(96))
+    exitButton:SetPos(HorizontalScreenScale(86), VerticalScreenScale(96))
     exitButton:SetSize(80, 20)
     exitButton:SetFont("MichromaSmall")
     exitButton:SetText("  GAME")
@@ -648,8 +665,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local exitIconButton = vgui.Create("DButton", motherFrame)
-    exitIconButton:SetPos(TheCoolerScreenScale(77), TheCoolerScreenScale(98))
-    exitIconButton:SetSize(TheCoolerScreenScale(14), TheCoolerScreenScale(15))
+    exitIconButton:SetPos(HorizontalScreenScale(77), VerticalScreenScale(98))
+    exitIconButton:SetSize(HorizontalScreenScale(14), VerticalScreenScale(15))
 
     function exitIconButton:DoClick()
         motherFrame:AlphaTo(50, 0.15, 0)
@@ -671,7 +688,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local settingsLabel = vgui.Create("DLabel", motherFrame)
-    settingsLabel:SetPos(TheCoolerScreenScale(101), TheCoolerScreenScale(119))
+    settingsLabel:SetPos(HorizontalScreenScale(101), VerticalScreenScale(119))
     settingsLabel:SetSize(130, 20)
     settingsLabel:SetFont("MichromaRegular")
     settingsLabel:SetText("SETTINGS")
@@ -684,21 +701,21 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
-    settingsTitleLabel:SetPos(TheCoolerScreenScale(520), TheCoolerScreenScale(130))
-    settingsTitleLabel:SetSize(TheCoolerScreenScale(500), TheCoolerScreenScale(200))
+    settingsTitleLabel:SetPos(HorizontalScreenScale(520), VerticalScreenScale(135))
+    settingsTitleLabel:SetSize(HorizontalScreenScale(500), VerticalScreenScale(200))
     settingsTitleLabel:SetText("")
     settingsTitleLabel:SetTextColor(primarytext)
 
     function settingsTitleLabel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        draw.DrawText(self:GetText(), "MichromaLarge", TheCoolerScreenScale(12), TheCoolerScreenScale(12), accenttext, TEXT_ALIGN_LEFT)
-        draw.DrawText(self:GetText(), "MichromaLarge", TheCoolerScreenScale(14), TheCoolerScreenScale(10), primarytext, TEXT_ALIGN_LEFT)
+        draw.DrawText(self:GetText(), "MichromaLarge", HorizontalScreenScale(12), VerticalScreenScale(12), accenttext, TEXT_ALIGN_LEFT)
+        draw.DrawText(self:GetText(), "MichromaLarge", HorizontalScreenScale(14), VerticalScreenScale(10), primarytext, TEXT_ALIGN_LEFT)
         return true
     end
     ---
 
     local settingsHelpText = vgui.Create("DLabel", motherFrame)
-    settingsHelpText:SetPos(TheCoolerScreenScale(100), TheCoolerScreenScale(935))
+    settingsHelpText:SetPos(HorizontalScreenScale(100), VerticalScreenScale(935))
     settingsHelpText:SetSize(1000, 30) -- scale this and the text somehow
     settingsHelpText:SetFont("MichromaSmall")
     settingsHelpText:SetText("")
@@ -711,8 +728,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local exitHelpText = vgui.Create("DLabel", motherFrame)
-    exitHelpText:SetPos(TheCoolerScreenScale(100), TheCoolerScreenScale(984))
-    exitHelpText:SetSize(TheCoolerScreenScale(160), TheCoolerScreenScale(30))
+    exitHelpText:SetPos(HorizontalScreenScale(100), VerticalScreenScale(984))
+    exitHelpText:SetSize(HorizontalScreenScale(160), VerticalScreenScale(30))
     exitHelpText:SetFont("MichromaHelpText")
     exitHelpText:SetText("[Q]   BACK")
     exitHelpText:SetTextColor(secondarytext)
@@ -724,8 +741,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    videoSettingsScrollPanel:SetPos(TheCoolerScreenScale(525), TheCoolerScreenScale(235))
-    videoSettingsScrollPanel:SetSize(TheCoolerScreenScale(1360), TheCoolerScreenScale(635))
+    videoSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    videoSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
     videoSettingsScrollPanel:Hide()
 
     function videoSettingsScrollPanel:Paint(w, h)
@@ -736,7 +753,7 @@ net.Receive("chicagoRP_settings", function()
 
     local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     videoSettingsScrollBar:SetHideButtons(true)
-    videoSettingsScrollBar:SetPos(TheCoolerScreenScale(525), TheCoolerScreenScale(235))
+    videoSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
     function videoSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
     end
@@ -750,8 +767,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    gameSettingsScrollPanel:SetPos(TheCoolerScreenScale(525), TheCoolerScreenScale(235))
-    gameSettingsScrollPanel:SetSize(TheCoolerScreenScale(1360), TheCoolerScreenScale(635))
+    gameSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    gameSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
     gameSettingsScrollPanel:Hide()
 
     function gameSettingsScrollPanel:Paint(w, h)
@@ -762,7 +779,7 @@ net.Receive("chicagoRP_settings", function()
 
     local gameSettingsScrollBar = gameSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     gameSettingsScrollBar:SetHideButtons(true)
-    gameSettingsScrollBar:SetPos(TheCoolerScreenScale(525), TheCoolerScreenScale(235))
+    gameSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
     function gameSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
     end
@@ -776,8 +793,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local controlsSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    controlsSettingsScrollPanel:SetPos(TheCoolerScreenScale(525), TheCoolerScreenScale(235))
-    controlsSettingsScrollPanel:SetSize(TheCoolerScreenScale(1360), TheCoolerScreenScale(635))
+    controlsSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    controlsSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
     controlsSettingsScrollPanel:Hide()
 
     function controlsSettingsScrollPanel:Paint(w, h)
@@ -788,7 +805,7 @@ net.Receive("chicagoRP_settings", function()
 
     local controlsSettingsScrollBar = controlsSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     controlsSettingsScrollBar:SetHideButtons(true)
-    controlsSettingsScrollBar:SetPos(TheCoolerScreenScale(525), TheCoolerScreenScale(235))
+    controlsSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
     function controlsSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
     end
@@ -804,8 +821,8 @@ net.Receive("chicagoRP_settings", function()
     local controlParentW, controlParentH = controlsSettingsScrollPanel:GetSize()
 
     local actionLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
-    actionLabel:SetPos(AdvancedScreenScale(10, controlParentW), AdvancedScreenScale(-25, controlParentW))
-    actionLabel:SetSize(TheCoolerScreenScale(100), TheCoolerScreenScale(30))
+    actionLabel:SetPos(AdvancedHorizontalScreenScale(10, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW))
+    actionLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
     actionLabel:SetText("ACTION")
     actionLabel:SetTextColor(secondarytext)
     actionLabel:NoClipping(true) -- fuck you derma
@@ -818,15 +835,15 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local bindLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
-    bindLabel:SetPos(AdvancedScreenScale(1380, controlParentW), AdvancedScreenScale(-25, controlParentW)) -- fucking fix this
-    bindLabel:SetSize(TheCoolerScreenScale(100), TheCoolerScreenScale(30))
+    bindLabel:SetPos(AdvancedHorizontalScreenScale(1745, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW)) -- fucking fix this
+    bindLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
     bindLabel:SetText("BINDING")
     bindLabel:SetTextColor(secondarytext)
     bindLabel:NoClipping(true) -- fuck you derma
 
     function bindLabel:Paint(w, h)
         -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-        draw.DrawText(self:GetText(), "MichromaSmall", TheCoolerScreenScale(96), 0, secondarytext, TEXT_ALIGN_RIGHT)
+        draw.DrawText(self:GetText(), "MichromaSmall", HorizontalScreenScale(96), 0, secondarytext, TEXT_ALIGN_RIGHT)
         return true
     end
     ---
@@ -863,8 +880,8 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
-    videoSettingsButton:SetPos(TheCoolerScreenScale(103), TheCoolerScreenScale(230))
-    videoSettingsButton:SetSize(TheCoolerScreenScale(394), TheCoolerScreenScale(56))
+    videoSettingsButton:SetPos(HorizontalScreenScale(103), VerticalScreenScale(230))
+    videoSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
     videoSettingsButton:SetFont("MichromaRegular")
     videoSettingsButton:SetText("")
     videoSettingsButton:SetTextColor(primarytext)
@@ -930,7 +947,7 @@ net.Receive("chicagoRP_settings", function()
 
         -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
-        draw.DrawText("VIDEO", "MichromaRegular", TheCoolerScreenScale(11), TheCoolerScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
+        draw.DrawText("VIDEO", "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
     end
 
     function videoSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
@@ -990,12 +1007,11 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local gameSettingsButton = vgui.Create("DButton", motherFrame)
-    gameSettingsButton:SetPos(TheCoolerScreenScale(103), TheCoolerScreenScale(290))
-    gameSettingsButton:SetSize(TheCoolerScreenScale(394), TheCoolerScreenScale(56))
+    gameSettingsButton:SetPos(HorizontalScreenScale(103), VerticalScreenScale(290))
+    gameSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
     gameSettingsButton:SetFont("MichromaRegular")
     gameSettingsButton:SetText("")
     gameSettingsButton:SetTextColor(primarytext)
-    print(TheCoolerScreenScale(103))
 
     function gameSettingsButton:OnCursorEntered()
         surface.PlaySound("chicagoRP_settings/hover.wav")
@@ -1058,7 +1074,7 @@ net.Receive("chicagoRP_settings", function()
 
         -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
-        draw.DrawText("GAME", "MichromaRegular", TheCoolerScreenScale(11), TheCoolerScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
+        draw.DrawText("GAME", "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
     end
 
     function gameSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
@@ -1118,8 +1134,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local controlsSettingsButton = vgui.Create("DButton", motherFrame)
-    controlsSettingsButton:SetPos(TheCoolerScreenScale(103), TheCoolerScreenScale(350))
-    controlsSettingsButton:SetSize(TheCoolerScreenScale(394), TheCoolerScreenScale(56))
+    controlsSettingsButton:SetPos(HorizontalScreenScale(103), VerticalScreenScale(350))
+    controlsSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
     controlsSettingsButton:SetFont("MichromaRegular")
     controlsSettingsButton:SetText("")
     controlsSettingsButton:SetTextColor(primarytext)
@@ -1185,7 +1201,7 @@ net.Receive("chicagoRP_settings", function()
 
         -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
-        draw.DrawText("CONTROLS", "MichromaRegular", TheCoolerScreenScale(11), TheCoolerScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
+        draw.DrawText("CONTROLS", "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
     end
 
     function controlsSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
@@ -1249,7 +1265,6 @@ end)
 print("chicagoRP GUI loaded!")
 
 -- still need:
--- fix binding label, fix slider position, fix slider text, make scalable height(?)
 -- tighten up UI layout
 -- optimization
 -- make creating categories not awful
