@@ -1,4 +1,6 @@
-chicagoRPvideoSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos
+chicagoRP = {}
+
+chicagoRP.video = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos
     [1] = {
         convar = "cl_new_impact_effects",
         max = 1,
@@ -120,7 +122,7 @@ chicagoRPvideoSettingsOptions = { -- simfphys camera, arccw, first person shadow
     }
 }
 
-chicagoRPgameSettingsOptions = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
+chicagoRP.game = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
     [1] = {
         convar = "arccw_crosshair_clr_a",
         max = 255,
@@ -151,7 +153,7 @@ chicagoRPgameSettingsOptions = { -- simfphys camera, arccw, first person shadow,
     }
 }
 
-chicagoRPcontrolsSettingsOptions = {
+chicagoRP.controls = {
     [1] = {
         bind = "+drop",
         printname = "Drop Weapon",
@@ -244,18 +246,17 @@ chicagoRPcontrolsSettingsOptions = {
     }
 }
 
-chicagoRPCategories = {
-    [1] = {
-        name = "VIDEO",
+chicagoRP.categories = {
+    {
+        name = "video",
         printname = "VIDEO"
-    },
-    [2] = {
-        name = "GAME",
+    }, {
+        name = "game",
         printname = "GAME"
-    },
-    [3] = {
-        name = "CONTROLS",
-        printname = "KEY BINDINGS"
+    }, {
+        binding = "true",
+        name = "controls",
+        printname = "CONTROLS"
     }
 }
 
