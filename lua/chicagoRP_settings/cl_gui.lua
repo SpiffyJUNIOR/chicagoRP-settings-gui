@@ -487,7 +487,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         end
 
         local controlHelpText = vgui.Create("DLabel", frame)
-        controlHelpText:SetPos(HorizontalScreenScale(1470), VerticalScreenScale(880))
+        controlHelpText:SetPos(HorizontalScreenScale(1470), VerticalScreenScale(930))
         controlHelpText:SetSize(HorizontalScreenScale(400), 30)
         controlHelpText:SetFont("MichromaHelpText")
         controlHelpText:SetText("Press a key to bind.")
@@ -642,7 +642,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local exitButton = vgui.Create("DButton", motherFrame)
-    exitButton:SetPos(HorizontalScreenScale(86), VerticalScreenScale(96))
+    exitButton:SetPos(HorizontalScreenScale(46), VerticalScreenScale(46))
     exitButton:SetSize(80, 20)
     exitButton:SetFont("MichromaSmall")
     exitButton:SetText("  GAME")
@@ -665,7 +665,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local exitIconButton = vgui.Create("DButton", motherFrame)
-    exitIconButton:SetPos(HorizontalScreenScale(77), VerticalScreenScale(98))
+    exitIconButton:SetPos(HorizontalScreenScale(37), VerticalScreenScale(48))
     exitIconButton:SetSize(HorizontalScreenScale(14), VerticalScreenScale(15))
 
     function exitIconButton:DoClick()
@@ -688,7 +688,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local settingsLabel = vgui.Create("DLabel", motherFrame)
-    settingsLabel:SetPos(HorizontalScreenScale(101), VerticalScreenScale(119))
+    settingsLabel:SetPos(HorizontalScreenScale(61), VerticalScreenScale(69))
     settingsLabel:SetSize(130, 20)
     settingsLabel:SetFont("MichromaRegular")
     settingsLabel:SetText("SETTINGS")
@@ -701,7 +701,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local settingsTitleLabel = vgui.Create("DLabel", motherFrame)
-    settingsTitleLabel:SetPos(HorizontalScreenScale(520), VerticalScreenScale(135))
+    settingsTitleLabel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(95))
     settingsTitleLabel:SetSize(HorizontalScreenScale(500), VerticalScreenScale(200))
     settingsTitleLabel:SetText("")
     settingsTitleLabel:SetTextColor(primarytext)
@@ -715,8 +715,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local settingsHelpText = vgui.Create("DLabel", motherFrame)
-    settingsHelpText:SetPos(HorizontalScreenScale(100), VerticalScreenScale(935))
-    settingsHelpText:SetSize(1000, 30) -- scale this and the text somehow
+    settingsHelpText:SetPos(HorizontalScreenScale(60), VerticalScreenScale(935))
+    settingsHelpText:SetSize(1000, 30)
     settingsHelpText:SetFont("MichromaSmall")
     settingsHelpText:SetText("")
     settingsHelpText:SetTextColor(primarytext)
@@ -728,7 +728,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local exitHelpText = vgui.Create("DLabel", motherFrame)
-    exitHelpText:SetPos(HorizontalScreenScale(100), VerticalScreenScale(984))
+    exitHelpText:SetPos(HorizontalScreenScale(60), VerticalScreenScale(984))
     exitHelpText:SetSize(HorizontalScreenScale(160), VerticalScreenScale(30))
     exitHelpText:SetFont("MichromaHelpText")
     exitHelpText:SetText("[Q]   BACK")
@@ -741,7 +741,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    videoSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    videoSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
     videoSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
     videoSettingsScrollPanel:Hide()
 
@@ -753,7 +753,7 @@ net.Receive("chicagoRP_settings", function()
 
     local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     videoSettingsScrollBar:SetHideButtons(true)
-    videoSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    videoSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
     function videoSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
     end
@@ -767,7 +767,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    gameSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    gameSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
     gameSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
     gameSettingsScrollPanel:Hide()
 
@@ -779,7 +779,7 @@ net.Receive("chicagoRP_settings", function()
 
     local gameSettingsScrollBar = gameSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     gameSettingsScrollBar:SetHideButtons(true)
-    gameSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    gameSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
     function gameSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
     end
@@ -793,8 +793,8 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local controlsSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    controlsSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
-    controlsSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
+    controlsSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
+    controlsSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(735))
     controlsSettingsScrollPanel:Hide()
 
     function controlsSettingsScrollPanel:Paint(w, h)
@@ -805,7 +805,7 @@ net.Receive("chicagoRP_settings", function()
 
     local controlsSettingsScrollBar = controlsSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     controlsSettingsScrollBar:SetHideButtons(true)
-    controlsSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(235))
+    controlsSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
     function controlsSettingsScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
     end
@@ -878,9 +878,34 @@ net.Receive("chicagoRP_settings", function()
             end)
         end
     end
+
+    local categoryScrollPanel = vgui.Create("DScrollPanel", motherFrame)
+    categoryScrollPanel:SetPos(HorizontalScreenScale(63), VerticalScreenScale(180))
+    categoryScrollPanel:SetSize(HorizontalScreenScale(396), VerticalScreenScale(728))
+
+    function categoryScrollPanel:Paint(w, h)
+        draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+        return nil
+    end
+
+    local categoryScrollBar = categoryScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
+    categoryScrollBar:SetHideButtons(true)
+    print(categoryScrollBar:GetSize())
+    categoryScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
+    function categoryScrollBar:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
+    end
+    function categoryScrollBar.btnGrip:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
+    end
+
+    for _, v in ipairs(chicagoRPCategories) do
+        print(v.name)
+        print(v.printname)
+    end
     ---
     local videoSettingsButton = vgui.Create("DButton", motherFrame)
-    videoSettingsButton:SetPos(HorizontalScreenScale(103), VerticalScreenScale(230))
+    videoSettingsButton:SetPos(HorizontalScreenScale(63), VerticalScreenScale(180))
     videoSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
     videoSettingsButton:SetFont("MichromaRegular")
     videoSettingsButton:SetText("")
@@ -1007,7 +1032,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local gameSettingsButton = vgui.Create("DButton", motherFrame)
-    gameSettingsButton:SetPos(HorizontalScreenScale(103), VerticalScreenScale(290))
+    gameSettingsButton:SetPos(HorizontalScreenScale(63), VerticalScreenScale(240))
     gameSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
     gameSettingsButton:SetFont("MichromaRegular")
     gameSettingsButton:SetText("")
@@ -1134,7 +1159,7 @@ net.Receive("chicagoRP_settings", function()
     ---
 
     local controlsSettingsButton = vgui.Create("DButton", motherFrame)
-    controlsSettingsButton:SetPos(HorizontalScreenScale(103), VerticalScreenScale(350))
+    controlsSettingsButton:SetPos(HorizontalScreenScale(63), VerticalScreenScale(300))
     controlsSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
     controlsSettingsButton:SetFont("MichromaRegular")
     controlsSettingsButton:SetText("")
@@ -1145,42 +1170,6 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function controlsSettingsButton:Paint(w, h)
-        local panelActive = controlsSettingsScrollPanel:IsVisible()
-        local hovered = self:IsHovered()
-        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 3
-        local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
-
-        if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
-            buf = math.min(1, step + buf)
-            alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
-        elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == controlsSettingsScrollPanel) then -- kill yourself
-            buf = math.max(0, buf - step)
-            alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
-        elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == controlsSettingsScrollPanel) then
-            buf = math.min(1, step + buf)
-            alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
-        elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
-            buf = math.max(0, buf - step)
-            alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
-        end
-
-        if hovered and buf >= 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
-            alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
-        elseif !hovered and buf <= 0.02 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == controlsSettingsScrollPanel) then -- kill yourself
-            alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
-        elseif hovered and buf >= 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == controlsSettingsScrollPanel) then
-            alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
-        elseif !hovered and buf <= 0.02 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != controlsSettingsScrollPanel) then
-            alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
-        end
-
-        self.__hoverBuf = buf
-        buf = math.EaseInOut(buf, 0.2, 0.2)
-        alpha, clr = alpha, clr
-
-        surface.SetDrawColor(clr, clr, clr, alpha)
-        surface.DrawRect(0, 0, w, h)
-        -----
         local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
         if (self.value == true) and pulseBuf < 1 then
@@ -1265,6 +1254,5 @@ end)
 print("chicagoRP GUI loaded!")
 
 -- still need:
--- tighten up UI layout
 -- optimization
 -- make creating categories not awful

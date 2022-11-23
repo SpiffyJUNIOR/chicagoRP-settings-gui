@@ -244,4 +244,19 @@ chicagoRPcontrolsSettingsOptions = {
     }
 }
 
+chicagoRPCategories = {
+    [1] = {
+        name = "VIDEO",
+        printname = "VIDEO"
+    },
+    [2] = {
+        name = "GAME",
+        printname = "GAME"
+    },
+    [3] = {
+        name = "CONTROLS",
+        printname = "KEY BINDINGS"
+    }
+}
+
 print("chicagoRP shared settings loaded!")
