@@ -11,8 +11,8 @@ currently being worked on: layout scaling and documentation
 [x] - control bind code    
 [x] - prettify    
 [x] - animations    
-[w] - make layout scalable          
-[ ] - optimize    
+[x] - make layout scalable          
+[w] - optimize    
 [w] - write documentation and release    
 
 # desired layout

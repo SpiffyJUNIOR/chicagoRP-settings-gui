@@ -899,7 +899,7 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for _, v in ipairs(chicagoRP.categories) do
+    for v in ipairs(chicagoRP.categories) do -- _, v
         local categoryButton = categoryScrollPanel:Add("DButton")
         categoryButton:SetText("")
         categoryButton:Dock(TOP)
@@ -940,7 +940,8 @@ net.Receive("chicagoRP_settings", function()
 
         function categoryButton:DoClick()
             print(v.name)
-            local tablename = [v.name] -- he is either trollking or idiot
+            local testname = "game"
+            local tablename = [testname] -- he is either trollking or idiot
             print(tablename)
             print(chicagoRP.tablename)
             print(" ^^^ attempted table name")
