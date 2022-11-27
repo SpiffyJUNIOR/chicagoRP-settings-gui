@@ -919,6 +919,18 @@ net.Receive("chicagoRP_settings", function()
             return true
         end
 
+        ---
+        for _, v in ipairs(chicagoRP[v.name]) do
+            if IsValid(v.bind) and isstring(v.bind) then
+                CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+                actionLabel:Show()
+                bindLabel:Show()
+            elseif IsValid(v.convar) and isstring(v.convar) and ConVarExists(v.convar) then
+                CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+            end
+        end
+
+        ---
         function categoryButton:DoClick()
             print(v.name)
             local testname = chicagoRP[v.name]
@@ -983,15 +995,15 @@ net.Receive("chicagoRP_settings", function()
             end
             surface.PlaySound("chicagoRP_settings/select.wav")
 
-            for _, v in ipairs(chicagoRP[v.name]) do
-                if isstring(v.bind) then
-                    CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
-                    actionLabel:Show()
-                    bindLabel:Show()
-                elseif ConVarExists(v.convar) then
-                    CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
-                end
-            end
+            -- for _, v in ipairs(chicagoRP[v.name]) do
+            --     if isstring(v.bind) then
+            --         CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+            --         actionLabel:Show()
+            --         bindLabel:Show()
+            --     elseif ConVarExists(v.convar) then
+            --         CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+            --     end
+            -- end
         end
     end
     ---
