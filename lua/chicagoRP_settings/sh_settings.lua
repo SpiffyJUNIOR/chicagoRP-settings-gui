@@ -247,15 +247,20 @@ chicagoRP.controls = {
 }
 
 chicagoRP.categories = {
-    {
+    [1] = {
+        binding = "false",
         name = "video",
         printname = "VIDEO"
-    }, {
+    },
+    [2] = {
+        binding = "false",
         name = "game",
         printname = "GAME"
-    }, {
+    },
+    [3] = {
         binding = "true",
         name = "controls",
+        overridename = "KEY BINDINGS",
         printname = "CONTROLS"
     }
 }

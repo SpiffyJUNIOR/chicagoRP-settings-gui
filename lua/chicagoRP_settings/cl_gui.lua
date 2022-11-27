@@ -740,114 +740,6 @@ net.Receive("chicagoRP_settings", function()
     end
     ---
 
-    -- local videoSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    -- videoSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-    -- videoSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
-    -- videoSettingsScrollPanel:Hide()
-
-    -- function videoSettingsScrollPanel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     -- print(self:IsVisible())
-    --     return nil
-    -- end
-
-    -- local videoSettingsScrollBar = videoSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
-    -- videoSettingsScrollBar:SetHideButtons(true)
-    -- videoSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-    -- function videoSettingsScrollBar:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
-    -- end
-    -- function videoSettingsScrollBar.btnGrip:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
-    -- end
-
-    -- for _, v in ipairs(chicagoRPvideoSettingsOptions) do
-    --     CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, videoSettingsScrollPanel, settingsHelpText, motherFrame)
-    -- end
-    -- ---
-
-    -- local gameSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    -- gameSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-    -- gameSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
-    -- gameSettingsScrollPanel:Hide()
-
-    -- function gameSettingsScrollPanel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     -- print(self:IsVisible())
-    --     return nil
-    -- end
-
-    -- local gameSettingsScrollBar = gameSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
-    -- gameSettingsScrollBar:SetHideButtons(true)
-    -- gameSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-    -- function gameSettingsScrollBar:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
-    -- end
-    -- function gameSettingsScrollBar.btnGrip:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
-    -- end
-
-    -- for _, v in ipairs(chicagoRPgameSettingsOptions) do
-    --     CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, gameSettingsScrollPanel, settingsHelpText, motherFrame)
-    -- end
-    -- ---
-
-    -- local controlsSettingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
-    -- controlsSettingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-    -- controlsSettingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(735))
-    -- controlsSettingsScrollPanel:Hide()
-
-    -- function controlsSettingsScrollPanel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     -- print(self:IsVisible())
-    --     return nil
-    -- end
-
-    -- local controlsSettingsScrollBar = controlsSettingsScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
-    -- controlsSettingsScrollBar:SetHideButtons(true)
-    -- controlsSettingsScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-    -- function controlsSettingsScrollBar:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
-    -- end
-    -- function controlsSettingsScrollBar.btnGrip:Paint(w, h)
-    --     draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
-    -- end
-
-    -- for _, v in ipairs(chicagoRPcontrolsSettingsOptions) do
-    --     CreateControlsButton(v.bind, v.printname, v.text, controlsSettingsScrollPanel, settingsHelpText, motherFrame)
-    -- end
-    ---
-
-    -- local controlParentW, controlParentH = controlsSettingsScrollPanel:GetSize()
-
-    -- local actionLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
-    -- actionLabel:SetPos(AdvancedHorizontalScreenScale(10, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW))
-    -- actionLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
-    -- actionLabel:SetText("ACTION")
-    -- actionLabel:SetTextColor(secondarytext)
-    -- actionLabel:NoClipping(true) -- fuck you derma
-
-    -- function actionLabel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     draw.DrawText(self:GetText(), "MichromaSmall", 0, 0, secondarytext, TEXT_ALIGN_LEFT)
-    --     return true
-    -- end
-    -- ---
-
-    -- local bindLabel = vgui.Create("DLabel", controlsSettingsScrollPanel)
-    -- bindLabel:SetPos(AdvancedHorizontalScreenScale(1745, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW)) -- fucking fix this
-    -- bindLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
-    -- bindLabel:SetText("BINDING")
-    -- bindLabel:SetTextColor(secondarytext)
-    -- bindLabel:NoClipping(true) -- fuck you derma
-
-    -- function bindLabel:Paint(w, h)
-    --     -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
-    --     draw.DrawText(self:GetText(), "MichromaSmall", HorizontalScreenScale(96), 0, secondarytext, TEXT_ALIGN_RIGHT)
-    --     return true
-    -- end
-    ---
-
     function motherFrame:OnKeyCodePressed(key)
         if IsValid(OpenScrollPanel) and (key == KEY_ESCAPE or key == KEY_Q) then
             OpenScrollPanel:SetAlpha(255)
@@ -899,23 +791,21 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for v in ipairs(chicagoRP.categories) do -- _, v
+    for _, v in ipairs(chicagoRP.categories) do
         local categoryButton = categoryScrollPanel:Add("DButton")
         categoryButton:SetText("")
         categoryButton:Dock(TOP)
         categoryButton:DockMargin(0, 10, 0, 0)
         categoryButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
 
+        function categoryButton:OnCursorEntered()
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+
         if v.binding == "true" then -- shit but it works
             print("STARLESS")
         end
-
-        function categoryButton:Paint(w, h)
-            draw.DrawText(v.name, "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
-            surface.SetDrawColor(200, 10, 10, 10)
-            surface.DrawRect(0, 0, w, h)
-        end
-
+        ---
         local settingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
         settingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
         settingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
@@ -937,361 +827,174 @@ net.Receive("chicagoRP_settings", function()
         function settingsScrollBar.btnGrip:Paint(w, h)
             draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
         end
+        ---
+        function categoryButton:Paint(w, h)
+            local panelActive = settingsScrollPanel:IsVisible()
+            local hovered = self:IsHovered()
+            local buf, step = self.__hoverBuf or 0, RealFrameTime() * 3
+            local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
+
+            if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != settingsScrollPanel) then
+                buf = math.min(1, step + buf)
+                alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
+            elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == settingsScrollPanel) then -- kill yourself
+                buf = math.max(0, buf - step)
+                alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
+            elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == settingsScrollPanel) then
+                buf = math.min(1, step + buf)
+                alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
+            elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != settingsScrollPanel) then
+                buf = math.max(0, buf - step)
+                alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
+            end
+
+            if hovered and buf >= 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != settingsScrollPanel) then
+                alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
+            elseif !hovered and buf <= 0.02 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == settingsScrollPanel) then -- kill yourself
+                alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14)
+            elseif hovered and buf >= 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == settingsScrollPanel) then
+                alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66)
+            elseif !hovered and buf <= 0.02 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != settingsScrollPanel) then
+                alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
+            end
+
+            self.__hoverBuf = buf
+            buf = math.EaseInOut(buf, 0.2, 0.2)
+            alpha, clr = alpha, clr
+
+            surface.SetDrawColor(clr, clr, clr, alpha)
+            surface.DrawRect(0, 0, w, h)
+            -----
+            local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+
+            if (self.value == true) and pulseBuf < 1 then
+                pulseBuf = math.min(1, pulseStep + pulseBuf)
+                print(pulseBuf)
+            elseif (self.value != true) and pulseBuf > 0 then
+                pulseBuf = math.max(0, pulseBuf - pulseStep)
+                print(pulseBuf)
+            end
+
+            self.__pulseBuf = pulseBuf
+            pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+            local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 180), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
+            -- local outlinePulse = Lerp(pulseBuf, 0, 3)
+
+            surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
+            surface.DrawRect(0, 0, w, h)
+
+            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
+
+            draw.DrawText(v.printname, "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
+        end
+        ---
+        local controlParentW, controlParentH = settingsScrollPanel:GetSize()
+
+        local actionLabel = vgui.Create("DLabel", settingsScrollPanel)
+        actionLabel:SetPos(AdvancedHorizontalScreenScale(10, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW))
+        actionLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
+        actionLabel:SetText("ACTION")
+        actionLabel:SetTextColor(secondarytext)
+        actionLabel:NoClipping(true) -- fuck you derma
+        actionLabel:Hide()
+
+        function actionLabel:Paint(w, h)
+            -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+            draw.DrawText(self:GetText(), "MichromaSmall", 0, 0, secondarytext, TEXT_ALIGN_LEFT)
+            return true
+        end
+        ---
+
+        local bindLabel = vgui.Create("DLabel", settingsScrollPanel)
+        bindLabel:SetPos(AdvancedHorizontalScreenScale(1745, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW)) -- fucking fix this
+        bindLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
+        bindLabel:SetText("BINDING")
+        bindLabel:SetTextColor(secondarytext)
+        bindLabel:NoClipping(true) -- fuck you derma
+        bindLabel:Hide()
+
+        function bindLabel:Paint(w, h)
+            -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+            draw.DrawText(self:GetText(), "MichromaSmall", HorizontalScreenScale(96), 0, secondarytext, TEXT_ALIGN_RIGHT)
+            return true
+        end
 
         function categoryButton:DoClick()
             print(v.name)
-            local testname = "game"
-            local tablename = [testname] -- he is either trollking or idiot
-            print(tablename)
-            print(chicagoRP.tablename)
-            print(" ^^^ attempted table name")
-            -- PrintTable(chicagoRP.tablename)
+            local testname = chicagoRP[v.name]
+            PrintTable(testname)
+
+            self.value = true
+
+            timer.Simple(0.20, function() -- tweak to look better and tweak times
+                if IsValid(self) and self.value == true then
+                    self.value = false
+                end
+            end)
+
+            if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
+                OpenScrollPanel:SetAlpha(255)
+                OpenScrollPanel:AlphaTo(0, 0.15, 0)
+                settingsTitleLabel:SetAlpha(255)
+                settingsTitleLabel:AlphaTo(0, 0.15, 0)
+                settingsHelpText:SetAlpha(255)
+                settingsHelpText:AlphaTo(0, 0.15, 0)
+                timer.Simple(0.15, function()
+                    if IsValid(OpenScrollPanel) then
+                        OpenScrollPanel:Hide()
+                        settingsHelpText:SetText("")
+                    end
+                end)
+                timer.Simple(0.15, function()
+                    if IsValid(OpenScrollPanel) and OpenScrollPanel == settingsScrollPanel and !OpenScrollPanel:IsVisible() then
+                        OpenScrollPanel = nil
+                    end
+                end)
+                if OpenScrollPanel == nil then return end
+                timer.Simple(0.2, function()
+                    if IsValid(settingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
+                        settingsTitleLabel:SetAlpha(0)
+                        settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                        settingsHelpText:SetAlpha(0)
+                        settingsHelpText:AlphaTo(255, 0.15, 0)
+                        settingsScrollPanel:Show()
+                        settingsScrollPanel:SetAlpha(0)
+                        settingsScrollPanel:AlphaTo(255, 0.15, 0)
+                        settingsTitleLabel:SetText(v.printname)
+                        if v.overridename then
+                            settingsTitleLabel:SetText(v.overridename)
+                        end
+                        OpenScrollPanel = settingsScrollPanel
+                    end
+                end)
+            elseif IsValid(settingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
+                settingsTitleLabel:SetAlpha(0)
+                settingsTitleLabel:AlphaTo(255, 0.15, 0)
+                settingsHelpText:SetAlpha(0)
+                settingsHelpText:AlphaTo(255, 0.15, 0)
+                settingsScrollPanel:Show()
+                settingsScrollPanel:SetAlpha(0)
+                settingsScrollPanel:AlphaTo(255, 0.15, 0)
+                settingsTitleLabel:SetText(v.printname)
+                if v.overridename then
+                    settingsTitleLabel:SetText(v.overridename)
+                end
+                OpenScrollPanel = settingsScrollPanel
+            end
+            surface.PlaySound("chicagoRP_settings/select.wav")
+
+            for _, v in ipairs(chicagoRP[v.name]) do
+                if isstring(v.bind) then
+                    CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+                    actionLabel:Show()
+                    bindLabel:Show()
+                elseif ConVarExists(v.convar) then
+                    CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+                end
+            end
         end
     end
     ---
-    -- local videoSettingsButton = vgui.Create("DButton", motherFrame)
-    -- videoSettingsButton:SetPos(HorizontalScreenScale(63), VerticalScreenScale(180))
-    -- videoSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
-    -- videoSettingsButton:SetFont("MichromaRegular")
-    -- videoSettingsButton:SetText("")
-    -- videoSettingsButton:SetTextColor(primarytext)
-
-    -- function videoSettingsButton:OnCursorEntered()
-    --     surface.PlaySound("chicagoRP_settings/hover.wav")
-    -- end
-
-    -- function videoSettingsButton:Paint(w, h)
-    --     local panelActive = videoSettingsScrollPanel:IsVisible()
-    --     local hovered = self:IsHovered()
-    --     local buf, step = self.__hoverBuf or 0, RealFrameTime() * 3
-    --     local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
-
-    --     if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
-    --         buf = math.min(1, step + buf)
-    --         alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
-    --     elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == videoSettingsScrollPanel) then -- kill yourself
-    --         buf = math.max(0, buf - step)
-    --         alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
-    --     elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == videoSettingsScrollPanel) then
-    --         buf = math.min(1, step + buf)
-    --         alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
-    --     elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
-    --         buf = math.max(0, buf - step)
-    --         alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
-    --     end
-
-    --     if hovered and buf >= 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
-    --         alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
-    --     elseif !hovered and buf <= 0.02 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == videoSettingsScrollPanel) then -- kill yourself
-    --         alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
-    --     elseif hovered and buf >= 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == videoSettingsScrollPanel) then
-    --         alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
-    --     elseif !hovered and buf <= 0.02 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != videoSettingsScrollPanel) then
-    --         alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
-    --     end
-
-    --     self.__hoverBuf = buf
-    --     buf = math.EaseInOut(buf, 0.2, 0.2)
-    --     alpha, clr = alpha, clr
-
-    --     surface.SetDrawColor(clr, clr, clr, alpha)
-    --     surface.DrawRect(0, 0, w, h)
-    --     -----
-    --     local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
-
-    --     if (self.value == true) and pulseBuf < 1 then
-    --         pulseBuf = math.min(1, pulseStep + pulseBuf)
-    --         print(pulseBuf)
-    --     elseif (self.value != true) and pulseBuf > 0 then
-    --         pulseBuf = math.max(0, pulseBuf - pulseStep)
-    --         print(pulseBuf)
-    --     end
-
-    --     self.__pulseBuf = pulseBuf
-    --     pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-    --     local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 180), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
-    --     -- local outlinePulse = Lerp(pulseBuf, 0, 3)
-
-    --     surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-    --     surface.DrawRect(0, 0, w, h)
-
-    --     -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
-
-    --     draw.DrawText("VIDEO", "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
-    -- end
-
-    -- function videoSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
-    --     self.value = true
-
-    --     timer.Simple(0.20, function() -- tweak to look better and tweak times
-    --         if IsValid(self) and self.value == true then
-    --             self.value = false
-    --         end
-    --     end)
-
-    --     if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
-    --         OpenScrollPanel:SetAlpha(255)
-    --         OpenScrollPanel:AlphaTo(0, 0.15, 0)
-    --         settingsTitleLabel:SetAlpha(255)
-    --         settingsTitleLabel:AlphaTo(0, 0.15, 0)
-    --         settingsHelpText:SetAlpha(255)
-    --         settingsHelpText:AlphaTo(0, 0.15, 0)
-    --         timer.Simple(0.15, function()
-    --             if IsValid(OpenScrollPanel) then
-    --                 OpenScrollPanel:Hide()
-    --                 settingsHelpText:SetText("")
-    --             end
-    --         end)
-    --         timer.Simple(0.15, function()
-    --             if IsValid(OpenScrollPanel) and OpenScrollPanel == videoSettingsScrollPanel and !OpenScrollPanel:IsVisible() then
-    --                 OpenScrollPanel = nil
-    --             end
-    --         end)
-    --         if OpenScrollPanel == nil then return end
-    --         timer.Simple(0.2, function()
-    --             if IsValid(videoSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
-    --                 settingsTitleLabel:SetAlpha(0)
-    --                 settingsTitleLabel:AlphaTo(255, 0.15, 0)
-    --                 settingsHelpText:SetAlpha(0)
-    --                 settingsHelpText:AlphaTo(255, 0.15, 0)
-    --                 videoSettingsScrollPanel:Show()
-    --                 videoSettingsScrollPanel:SetAlpha(0)
-    --                 videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-    --                 settingsTitleLabel:SetText("VIDEO")
-    --                 OpenScrollPanel = videoSettingsScrollPanel
-    --             end
-    --         end)
-    --     elseif IsValid(videoSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-    --         settingsTitleLabel:SetAlpha(0)
-    --         settingsTitleLabel:AlphaTo(255, 0.15, 0)
-    --         settingsHelpText:SetAlpha(0)
-    --         settingsHelpText:AlphaTo(255, 0.15, 0)
-    --         videoSettingsScrollPanel:Show()
-    --         videoSettingsScrollPanel:SetAlpha(0)
-    --         videoSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-    --         settingsTitleLabel:SetText("VIDEO")
-    --         OpenScrollPanel = videoSettingsScrollPanel
-    --     end
-    --     surface.PlaySound("chicagoRP_settings/select.wav")
-    -- end
-    -- ---
-
-    -- local gameSettingsButton = vgui.Create("DButton", motherFrame)
-    -- gameSettingsButton:SetPos(HorizontalScreenScale(63), VerticalScreenScale(240))
-    -- gameSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
-    -- gameSettingsButton:SetFont("MichromaRegular")
-    -- gameSettingsButton:SetText("")
-    -- gameSettingsButton:SetTextColor(primarytext)
-
-    -- function gameSettingsButton:OnCursorEntered()
-    --     surface.PlaySound("chicagoRP_settings/hover.wav")
-    -- end
-
-    -- function gameSettingsButton:Paint(w, h)
-    --     local panelActive = gameSettingsScrollPanel:IsVisible()
-    --     local hovered = self:IsHovered()
-    --     local buf, step = self.__hoverBuf or 0, RealFrameTime() * 3
-    --     local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
-
-    --     if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
-    --         buf = math.min(1, step + buf)
-    --         alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
-    --     elseif !hovered and buf >= 0 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == gameSettingsScrollPanel) then -- kill yourself
-    --         buf = math.max(0, buf - step)
-    --         alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
-    --     elseif hovered and buf < 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == gameSettingsScrollPanel) then
-    --         buf = math.min(1, step + buf)
-    --         alpha, clr = Lerp(buf, 40, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
-    --     elseif !hovered and buf >= 0 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
-    --         buf = math.max(0, buf - step)
-    --         alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
-    --     end
-
-    --     if hovered and buf >= 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
-    --         alpha, clr = Lerp(buf, 0, 60), Lerp(buf, 0, 66)
-    --     elseif !hovered and buf <= 0.02 and panelActive and OpenScrollPanel != nil and (OpenScrollPanel == gameSettingsScrollPanel) then -- kill yourself
-    --         alpha, clr = Lerp(buf, 40, 40), Lerp(buf, 14, 14) -- Lerp(buf, 34, 60), Lerp(buf, 66, 66)
-    --     elseif hovered and buf >= 1 and panelActive and (OpenScrollPanel != nil or OpenScrollPanel == gameSettingsScrollPanel) then
-    --         alpha, clr = Lerp(buf, 30, 60), Lerp(buf, 66, 66) -- Lerp(buf, 60, 34), Lerp(buf, 66, 66)
-    --     elseif !hovered and buf <= 0.02 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != gameSettingsScrollPanel) then
-    --         alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66)
-    --     end
-
-    --     self.__hoverBuf = buf
-    --     buf = math.EaseInOut(buf, 0.2, 0.2)
-    --     alpha, clr = alpha, clr
-
-    --     surface.SetDrawColor(clr, clr, clr, alpha)
-    --     surface.DrawRect(0, 0, w, h)
-    --     -----
-    --     local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
-
-    --     if (self.value == true) and pulseBuf < 1 then
-    --         pulseBuf = math.min(1, pulseStep + pulseBuf)
-    --         print(pulseBuf)
-    --     elseif (self.value != true) and pulseBuf > 0 then
-    --         pulseBuf = math.max(0, pulseBuf - pulseStep)
-    --         print(pulseBuf)
-    --     end
-
-    --     self.__pulseBuf = pulseBuf
-    --     pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-    --     local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 180), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
-    --     -- local outlinePulse = Lerp(pulseBuf, 0, 3)
-
-    --     surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-    --     surface.DrawRect(0, 0, w, h)
-
-    --     -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
-
-    --     draw.DrawText("GAME", "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
-    -- end
-
-    -- function gameSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
-    --     self.value = true
-
-    --     timer.Simple(0.20, function() -- tweak to look better and tweak times
-    --         if IsValid(self) and self.value == true then
-    --             self.value = false
-    --         end
-    --     end)
-
-    --     if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
-    --         OpenScrollPanel:SetAlpha(255)
-    --         OpenScrollPanel:AlphaTo(0, 0.15, 0)
-    --         settingsTitleLabel:SetAlpha(255)
-    --         settingsTitleLabel:AlphaTo(0, 0.15, 0)
-    --         settingsHelpText:SetAlpha(255)
-    --         settingsHelpText:AlphaTo(0, 0.15, 0)
-    --         timer.Simple(0.15, function()
-    --             if IsValid(OpenScrollPanel) then
-    --                 OpenScrollPanel:Hide()
-    --                 settingsHelpText:SetText("")
-    --             end
-    --         end)
-    --         timer.Simple(0.15, function()
-    --             if IsValid(OpenScrollPanel) and OpenScrollPanel == gameSettingsScrollPanel and !OpenScrollPanel:IsVisible() then
-    --                 OpenScrollPanel = nil
-    --             end
-    --         end)
-    --         if OpenScrollPanel == nil then return end
-    --         timer.Simple(0.2, function()
-    --             if IsValid(gameSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
-    --                 settingsTitleLabel:SetAlpha(0)
-    --                 settingsTitleLabel:AlphaTo(255, 0.15, 0)
-    --                 settingsHelpText:SetAlpha(0)
-    --                 settingsHelpText:AlphaTo(255, 0.15, 0)
-    --                 gameSettingsScrollPanel:Show()
-    --                 gameSettingsScrollPanel:SetAlpha(0)
-    --                 gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-    --                 settingsTitleLabel:SetText("GAME")
-    --                 OpenScrollPanel = gameSettingsScrollPanel
-    --             end
-    --         end)
-    --     elseif IsValid(gameSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-    --         settingsTitleLabel:SetAlpha(0)
-    --         settingsTitleLabel:AlphaTo(255, 0.15, 0)
-    --         settingsHelpText:SetAlpha(0)
-    --         settingsHelpText:AlphaTo(255, 0.15, 0)
-    --         gameSettingsScrollPanel:Show()
-    --         gameSettingsScrollPanel:SetAlpha(0)
-    --         gameSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-    --         settingsTitleLabel:SetText("GAME")
-    --         OpenScrollPanel = gameSettingsScrollPanel
-    --     end
-    --     surface.PlaySound("chicagoRP_settings/select.wav")
-    -- end
-    -- ---
-
-    -- local controlsSettingsButton = vgui.Create("DButton", motherFrame)
-    -- controlsSettingsButton:SetPos(HorizontalScreenScale(63), VerticalScreenScale(300))
-    -- controlsSettingsButton:SetSize(HorizontalScreenScale(394), VerticalScreenScale(56))
-    -- controlsSettingsButton:SetFont("MichromaRegular")
-    -- controlsSettingsButton:SetText("")
-    -- controlsSettingsButton:SetTextColor(primarytext)
-
-    -- function controlsSettingsButton:OnCursorEntered()
-    --     surface.PlaySound("chicagoRP_settings/hover.wav")
-    -- end
-
-    -- function controlsSettingsButton:Paint(w, h)
-    --     local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
-
-    --     if (self.value == true) and pulseBuf < 1 then
-    --         pulseBuf = math.min(1, pulseStep + pulseBuf)
-    --         print(pulseBuf)
-    --     elseif (self.value != true) and pulseBuf > 0 then
-    --         pulseBuf = math.max(0, pulseBuf - pulseStep)
-    --         print(pulseBuf)
-    --     end
-
-    --     self.__pulseBuf = pulseBuf
-    --     pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-    --     local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
-    --     -- local outlinePulse = Lerp(pulseBuf, 0, 3)
-
-    --     surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-    --     surface.DrawRect(0, 0, w, h)
-
-    --     -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
-
-    --     draw.DrawText("CONTROLS", "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
-    -- end
-
-    -- function controlsSettingsButton:DoClick() -- nauseating code but it works and i don't want to touch it
-    --     self.value = true
-
-    --     timer.Simple(0.20, function() -- tweak to look better and tweak times
-    --         if IsValid(self) and self.value == true then
-    --             self.value = false
-    --         end
-    --     end)
-
-    --     if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-    --         OpenScrollPanel:SetAlpha(255)
-    --         OpenScrollPanel:AlphaTo(0, 0.15, 0)
-    --         settingsTitleLabel:SetAlpha(255)
-    --         settingsTitleLabel:AlphaTo(0, 0.15, 0)
-    --         settingsHelpText:SetAlpha(255)
-    --         settingsHelpText:AlphaTo(0, 0.15, 0)
-    --         timer.Simple(0.15, function()
-    --             if IsValid(OpenScrollPanel) then
-    --                 OpenScrollPanel:Hide()
-    --                 settingsHelpText:SetText("")
-    --             end
-    --         end)
-    --         timer.Simple(0.15, function()
-    --             if IsValid(OpenScrollPanel) and OpenScrollPanel == controlsSettingsScrollPanel and !OpenScrollPanel:IsVisible() then
-    --                 OpenScrollPanel = nil
-    --             end
-    --         end)
-    --         if OpenScrollPanel == nil then return end
-    --         timer.Simple(0.2, function()
-    --             if IsValid(controlsSettingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
-    --                 settingsTitleLabel:SetAlpha(0)
-    --                 settingsTitleLabel:AlphaTo(255, 0.15, 0)
-    --                 settingsHelpText:SetAlpha(0)
-    --                 settingsHelpText:AlphaTo(255, 0.15, 0)
-    --                 controlsSettingsScrollPanel:Show()
-    --                 controlsSettingsScrollPanel:SetAlpha(0)
-    --                 controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-    --                 settingsTitleLabel:SetText("KEY BINDINGS")
-    --                 OpenScrollPanel = controlsSettingsScrollPanel
-    --             end
-    --         end)
-    --     elseif IsValid(controlsSettingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-    --         settingsTitleLabel:SetAlpha(0)
-    --         settingsTitleLabel:AlphaTo(255, 0.15, 0)
-    --         settingsHelpText:SetAlpha(0)
-    --         settingsHelpText:AlphaTo(255, 0.15, 0)
-    --         controlsSettingsScrollPanel:Show()
-    --         controlsSettingsScrollPanel:SetAlpha(0)
-    --         controlsSettingsScrollPanel:AlphaTo(255, 0.15, 0)
-    --         settingsTitleLabel:SetText("KEY BINDINGS")
-    --         OpenScrollPanel = controlsSettingsScrollPanel
-    --     end
-    --     surface.PlaySound("chicagoRP_settings/select.wav")
-    -- end
 
     OpenMotherFrame = motherFrame
 end)
