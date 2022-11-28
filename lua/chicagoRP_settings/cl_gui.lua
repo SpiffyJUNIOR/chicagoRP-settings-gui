@@ -237,16 +237,16 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             gradientcolor2.a = alphaOutline
 
             -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-            if (self.value != true) then
+            if (self.pulse != true) then
                 DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
             end
             -----
             local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-            if (self.value == true) and pulseBuf < 1 then
+            if (self.pulse == true) and pulseBuf < 1 then
                 pulseBuf = math.min(1, pulseStep + pulseBuf)
                 print(pulseBuf)
-            elseif (self.value != true) and pulseBuf > 0 then
+            elseif (self.pulse != true) and pulseBuf > 0 then
                 pulseBuf = math.max(0, pulseBuf - pulseStep)
                 print(pulseBuf)
             end
@@ -281,7 +281,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         end
 
         function settingsButton:DoClick()
-            self.value = true
+            self.pulse = true
             if (GetConVar(convar):GetInt() == 0) then -- add float check pls
                 RunConsoleCommand(convar, "1")
                 surface.PlaySound("chicagoRP_settings/select.wav")
@@ -291,7 +291,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             end
             timer.Simple(0.20, function() -- tweak to look better and tweak times
                 if IsValid(self) then
-                    self.value = false
+                    self.pulse = false
                 end
             end)
         end
@@ -437,16 +437,16 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         gradientcolor1.a = alphaOutline
         gradientcolor2.a = alphaOutline
 
-        if (self.value != true) then
+        if (self.pulse != true) then
             DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
         end
         -----
         local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-        if (self.value == true) and pulseBuf < 1 then
+        if (self.pulse == true) and pulseBuf < 1 then
             pulseBuf = math.min(1, pulseStep + pulseBuf)
             print(pulseBuf)
-        elseif (self.value != true) and pulseBuf > 0 then
+        elseif (self.pulse != true) and pulseBuf > 0 then
             pulseBuf = math.max(0, pulseBuf - pulseStep)
             print(pulseBuf)
         end
@@ -474,11 +474,11 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
 
     function controlsButton:DoClick()
         surface.PlaySound("chicagoRP_settings/select.wav")
-        self.value = true
+        self.pulse = true
 
         timer.Simple(0.20, function() -- tweak to look better and tweak times
-            if IsValid(self) and self.value == true then
-                self.value = false
+            if IsValid(self) and self.pulse == true then
+                self.pulse = false
             end
         end)
 
@@ -801,18 +801,15 @@ net.Receive("chicagoRP_settings", function()
         function categoryButton:OnCursorEntered()
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
-
-        if v.binding == "true" then -- shit but it works
-            print("STARLESS")
-        end
         ---
+
         local settingsScrollPanel = vgui.Create("DScrollPanel", motherFrame)
         settingsScrollPanel:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
-        settingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(635))
+        settingsScrollPanel:SetSize(HorizontalScreenScale(1360), VerticalScreenScale(735))
         settingsScrollPanel:Hide()
 
         function settingsScrollPanel:Paint(w, h)
-            draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
+            -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
             return nil
         end
 
@@ -867,12 +864,12 @@ net.Receive("chicagoRP_settings", function()
             -----
             local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-            if (self.value == true) and pulseBuf < 1 then
+            if (self.pulse == true) and pulseBuf < 1 then
                 pulseBuf = math.min(1, pulseStep + pulseBuf)
-                print(pulseBuf)
-            elseif (self.value != true) and pulseBuf > 0 then
+                -- print(pulseBuf)
+            elseif (self.pulse != true) and pulseBuf > 0 then
                 pulseBuf = math.max(0, pulseBuf - pulseStep)
-                print(pulseBuf)
+                -- print(pulseBuf)
             end
 
             self.__pulseBuf = pulseBuf
@@ -919,32 +916,31 @@ net.Receive("chicagoRP_settings", function()
             return true
         end
 
+        local buttonscreated = false
         ---
-        for _, v in ipairs(chicagoRP[v.name]) do
-            if IsValid(v.bind) and isstring(v.bind) then
-                CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
-                actionLabel:Show()
-                bindLabel:Show()
-            elseif IsValid(v.convar) and isstring(v.convar) and ConVarExists(v.convar) then
-                CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
-            end
-        end
 
-        ---
         function categoryButton:DoClick()
-            print(v.name)
-            local testname = chicagoRP[v.name]
-            PrintTable(testname)
-
-            self.value = true
+            self.pulse = true
 
             timer.Simple(0.20, function() -- tweak to look better and tweak times
-                if IsValid(self) and self.value == true then
-                    self.value = false
+                if IsValid(self) and self.pulse == true then
+                    self.pulse = false
                 end
             end)
 
-            if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then -- OpenScrollPanel == gamepanel and IsValid(OpenScrollPanel)
+            for _, v in ipairs(chicagoRP[v.name]) do -- if local !isvalid then do
+                if buttonscreated == false and isstring(v.bind) then
+                    CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+                    actionLabel:Show()
+                    bindLabel:Show()
+                elseif buttonscreated == false and isstring(v.convar) and ConVarExists(v.convar) then
+                    CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+                end
+            end
+
+            buttonscreated = true
+
+            if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
                 OpenScrollPanel:SetAlpha(255)
                 OpenScrollPanel:AlphaTo(0, 0.15, 0)
                 settingsTitleLabel:SetAlpha(255)
@@ -994,16 +990,6 @@ net.Receive("chicagoRP_settings", function()
                 OpenScrollPanel = settingsScrollPanel
             end
             surface.PlaySound("chicagoRP_settings/select.wav")
-
-            -- for _, v in ipairs(chicagoRP[v.name]) do
-            --     if isstring(v.bind) then
-            --         CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
-            --         actionLabel:Show()
-            --         bindLabel:Show()
-            --     elseif ConVarExists(v.convar) then
-            --         CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
-            --     end
-            -- end
         end
     end
     ---

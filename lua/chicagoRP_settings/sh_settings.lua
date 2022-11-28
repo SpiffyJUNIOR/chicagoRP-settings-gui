@@ -1,5 +1,21 @@
 chicagoRP = {}
 
+chicagoRP.categories = {
+    [1] = {
+        name = "video",
+        printname = "VIDEO"
+    },
+    [2] = {
+        name = "game",
+        printname = "GAME"
+    },
+    [3] = {
+        name = "controls",
+        overridename = "KEY BINDINGS",
+        printname = "CONTROLS"
+    }
+}
+
 chicagoRP.video = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos
     [1] = {
         convar = "cl_new_impact_effects",
@@ -243,25 +259,6 @@ chicagoRP.controls = {
         bind = "+drop",
         printname = "Drop Weapon",
         text = "Drops the currently held weapon."
-    }
-}
-
-chicagoRP.categories = {
-    [1] = {
-        binding = "false",
-        name = "video",
-        printname = "VIDEO"
-    },
-    [2] = {
-        binding = "false",
-        name = "game",
-        printname = "GAME"
-    },
-    [3] = {
-        binding = "true",
-        name = "controls",
-        overridename = "KEY BINDINGS",
-        printname = "CONTROLS"
     }
 }
 
