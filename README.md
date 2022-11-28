@@ -2,8 +2,8 @@
 client settings gui for chicagoRP (in-development darkrp server)
 
 # status
-stable and functional, wait for overhaul of category creation
-currently being worked on: layout scaling and documentation
+stable and functional    
+currently being worked on: final optimization and documentation
 
 # to-do
 [x] - base layout    

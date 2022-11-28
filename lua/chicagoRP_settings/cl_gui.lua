@@ -163,6 +163,96 @@ local function RoundedOutline(mat, x, y, w, h, src_corner_width, src_corner_heig
     TexturedQuadPart(mat, x1, y1, w2, h2, Dx, Dy, tw - 2 * Dx, th - 2 * Dy) -- inside
 end
 
+local function ButtonFade(panel, w, h, clrfrom, clrto, alphafrom, alphato, speed, children)
+    if (children == nil) then children = false end
+
+    local hovered = panel:IsHovered()
+    local haschildren = panel:HasChildren()
+    local buf, step = panel.__hoverBuf or 0, RealFrameTime() * speed
+
+    if children == false then -- we can combine this check
+        if hovered and buf < 1 then
+            buf = math.min(1, step + buf)
+        elseif !hovered and buf > 0 then
+            buf = math.max(0, buf - step)
+        end
+    elseif children == true then
+        if (hovered or haschildren) and buf < 1 then
+            buf = math.min(1, step + buf)
+        elseif (!hovered and !haschildren) and buf > 0 then
+            buf = math.max(0, buf - step)
+        end
+    end
+
+    panel.__hoverBuf = buf
+    buf = math.EaseInOut(buf, 0.2, 0.2)
+    local alpha, clr = Lerp(buf, alphafrom, alphato), Lerp(buf, clrfrom, clrto)
+
+    surface.SetDrawColor(clr, clr, clr, alpha)
+    surface.DrawRect(0, 0, w, h)
+end
+
+local function OutlineFade(panel, w, h, alphafrom, alphato, speed, children)
+    if (children == nil) then children = false end
+
+    local hovered = panel:IsHovered()
+    local haschildren = panel:HasChildren()
+    local Outlinebuf, Outlinestep = panel.__hoverOutlineBuf or 0, RealFrameTime() * speed
+
+    if children == false then -- we can combine this check
+        if hovered and Outlinebuf < 1 then
+            Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
+        elseif !hovered and Outlinebuf > 0 then
+            Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
+        end
+    elseif children == true then
+        if (hovered or haschildren) and Outlinebuf < 1 then
+            Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
+        elseif (!hovered and !haschildren) and Outlinebuf > 0 then
+            Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
+        end
+    end
+
+    panel.__hoverOutlineBuf = Outlinebuf
+    Outlinebuf = math.EaseInOut(Outlinebuf, 0.5, 0.5)
+    local alphaOutline = Lerp(Outlinebuf, alphafrom, alphato)
+
+    gradientcolor1.a = alphaOutline
+    gradientcolor2.a = alphaOutline
+end
+
+local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento, clrbluefrom, clrblueto, alphafrom, alphato, pulsevalue, speed, disableoutline) -- the cracker
+    if (disableoutline == nil) then disableoutline = false end
+
+    if (pulsevalue != true) and disableoutline == false then
+        DrawOutlinedGradientRect(panel, gradientcolor1, gradientcolor2, 3)
+    end
+
+    local pulseBuf, pulseStep = panel.__pulseBuf or 0, RealFrameTime() * speed
+
+    if (pulsevalue == true) and pulseBuf < 1 then
+        pulseBuf = math.min(1, pulseStep + pulseBuf)
+        print(pulseBuf)
+    elseif (pulsevalue != true) and pulseBuf > 0 then
+        pulseBuf = math.max(0, pulseBuf - pulseStep)
+        print(pulseBuf)
+    end
+
+    panel.__pulseBuf = pulseBuf
+    pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+    local alphaPulse = Lerp(pulseBuf, alphafrom, alphato)
+    local clrRed, clrGreen, clrBlue = Lerp(pulseBuf, clrredto, clrredfrom), Lerp(pulseBuf, clrgreenfrom, clrgreento), Lerp(pulseBuf, clrbluefrom, clrblueto)
+    local outlinePulse = Lerp(pulseBuf, 0, 4)
+
+    surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
+    surface.DrawRect(0, 0, w, h)
+
+    if disableoutline == false then
+        DrawOutlinedGradientRect(panel, gradientcolor1, gradientcolor2, outlinePulse)
+    end
+end
+
+
 local function HoverSound()
     local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0)
     if hoverslide then
@@ -171,6 +261,20 @@ local function HoverSound()
         hoverslide:Play()
     end
     return hoverslide -- useful if you want to stop the sound yourself
+end
+
+local function PanelFadeIn(panel, length)
+    if !IsValid(panel) then return end
+
+    panel:SetAlpha(0)
+    panel:AlphaTo(255, length, 0)
+end
+
+local function PanelFadeOut(panel, length)
+    if !IsValid(panel) then return end
+
+    panel:SetAlpha(255)
+    panel:AlphaTo(0, length, 0)
 end
 
 local function HorizontalScreenScale(size)
@@ -302,38 +406,48 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsSliderParent:DockMargin(0, 0, 3, 4)
         settingsSliderParent:SetSize(HorizontalScreenScale(1340), VerticalScreenScale(50))
 
+        function settingsSliderParent:OnCursorEntered()
+            surface.PlaySound("chicagoRP_settings/hover.wav")
+        end
+
         function settingsSliderParent:Paint(w, h)
             local hovered = self:IsHovered()
             local childhovered = self:IsChildHovered()
-            local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
+            -- local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
 
-            if (hovered or childhovered) and buf < 1 then
-                buf = math.min(1, step + buf)
-            elseif (!hovered and !childhovered) and buf > 0 then
-                buf = math.max(0, buf - step)
-            end
+            -- if (hovered or childhovered) and buf < 1 then
+            --     buf = math.min(1, step + buf)
+            -- elseif (!hovered and !childhovered) and buf > 0 then
+            --     buf = math.max(0, buf - step)
+            -- end
 
-            self.__hoverBuf = buf
-            buf = math.EaseInOut(buf, 0.2, 0.2)
-            local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
+            -- self.__hoverBuf = buf
+            -- buf = math.EaseInOut(buf, 0.2, 0.2)
+            -- local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
 
-            surface.SetDrawColor(clr, clr, clr, alpha)
-            surface.DrawRect(0, 0, w, h)
+            -- surface.SetDrawColor(clr, clr, clr, alpha)
+            -- surface.DrawRect(0, 0, w, h)
             -----
-            local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
+            -- local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
 
-            if (hovered or childhovered) and Outlinebuf < 1 then
-                Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-            elseif (!hovered and !childhovered) and Outlinebuf > 0 then
-                Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
-            end
+            -- if (hovered or childhovered) and Outlinebuf < 1 then
+            --     Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
+            -- elseif (!hovered and !childhovered) and Outlinebuf > 0 then
+            --     Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
+            -- end
 
-            self.__hoverOutlineBuf = Outlinebuf
-            Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
-            local alphaOutline = Lerp(buf, 0, 150)
+            -- self.__hoverOutlineBuf = Outlinebuf
+            -- Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
+            -- local alphaOutline = Lerp(buf, 0, 150)
 
-            gradientcolor1.a = alphaOutline
-            gradientcolor2.a = alphaOutline
+            -- gradientcolor1.a = alphaOutline
+            -- gradientcolor2.a = alphaOutline
+
+            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
+
+            ButtonFade(self, w, h, 40, 80, 80, 80, 4, true)
+
+            OutlineFade(self, w, h, 0, 150, 4, true) -- work you piece of shit
 
             DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
 
@@ -380,10 +494,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             surface.PlaySound("chicagoRP_settings/hover.wav")
         end
 
-        function settingsSliderParent:OnCursorEntered()
-            surface.PlaySound("chicagoRP_settings/hover.wav")
-        end
-
         function settingsSlider:OnValueChanged(value)
             self:SetValue(math.Round(value, 0))
             HoverSound()
@@ -406,59 +516,17 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
     function controlsButton:Paint(w, h)
         local hovered = self:IsHovered()
         local haschildren = self:HasChildren()
-        local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
         local statusString = "Unbound"
-
-        if (hovered or haschildren) and buf < 1 then
-            buf = math.min(1, step + buf)
-        elseif (!hovered and !haschildren) and buf > 0 then
-            buf = math.max(0, buf - step)
-        end
-
-        self.__hoverBuf = buf
-        buf = math.EaseInOut(buf, 0.2, 0.2)
-        local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 60)
-
-        surface.SetDrawColor(clr, clr, clr, alpha)
-        surface.DrawRect(0, 0, w, h)
         -----
-        local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
 
-        if (hovered or haschildren) and Outlinebuf < 1 then
-            Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-        elseif (!hovered and !haschildren) and Outlinebuf > 0 then
-            Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
-        end
-
-        self.__hoverOutlineBuf = Outlinebuf
-        Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
-        local alphaOutline = Lerp(buf, 0, 150)
-
-        gradientcolor1.a = alphaOutline
-        gradientcolor2.a = alphaOutline
-
-        if (self.pulse != true) then
-            DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-        end
+        ButtonFade(self, w, h, 40, 80, 80, 80, 4, true)
         -----
-        local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-        if (self.pulse == true) and pulseBuf < 1 then
-            pulseBuf = math.min(1, pulseStep + pulseBuf)
-            print(pulseBuf)
-        elseif (self.pulse != true) and pulseBuf > 0 then
-            pulseBuf = math.max(0, pulseBuf - pulseStep)
-            print(pulseBuf)
-        end
+        OutlineFade(self, w, h, 0, 150, 4, true)
+        -----
 
-        self.__pulseBuf = pulseBuf
-        pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-        local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 0, 80), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
-
-        surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-        surface.DrawRect(0, 0, w, h)
-
-        DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
+        Pulse(self, w, h, 0, 150, 0, 20, 0, 30, 0, 80, self.pulse, 5)
+        -----
 
         if hovered or haschildren then
             helptextparent:SetText(helptext)
@@ -504,8 +572,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             print("helptext removed")
         end
 
-        controlHelpText:SetAlpha(0)
-        controlHelpText:AlphaTo(255, 0.2, 0)
+        PanelFadeIn(controlHelpText, 0.2)
 
         local parentW, parentH = self:GetSize()
 
@@ -533,8 +600,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
                     self:Remove()
                     timer.Simple(5, function()
                         if IsValid(controlHelpText) then
-                            controlHelpText:SetAlpha(255)
-                            controlHelpText:AlphaTo(0, 0.5, 0)
+                            PanelFadeOut(controlHelpText, 0.5)
                         end
                     end)
                     bindblocked = true
@@ -556,8 +622,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             self:Remove()
             timer.Simple(5, function()
                 if IsValid(controlHelpText) then
-                    controlHelpText:SetAlpha(255)
-                    controlHelpText:AlphaTo(0, 0.5, 0)
+                    PanelFadeOut(controlHelpText, 0.5)
                 end
             end)
         end
@@ -569,8 +634,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             self:Remove()
             timer.Simple(5, function()
                 if IsValid(controlHelpText) then
-                    controlHelpText:SetAlpha(255)
-                    controlHelpText:AlphaTo(0, 0.5, 0)
+                    PanelFadeOut(controlHelpText, 0.5)
                 end
             end)
         end
@@ -616,8 +680,7 @@ net.Receive("chicagoRP_settings", function()
         end
     end
 
-    motherFrame:SetAlpha(0)
-    motherFrame:AlphaTo(255, 0.15, 0)
+    PanelFadeIn(motherFrame, 0.15)
 
     motherFrame:MakePopup()
     motherFrame:Center()
@@ -742,12 +805,9 @@ net.Receive("chicagoRP_settings", function()
 
     function motherFrame:OnKeyCodePressed(key)
         if IsValid(OpenScrollPanel) and (key == KEY_ESCAPE or key == KEY_Q) then
-            OpenScrollPanel:SetAlpha(255)
-            OpenScrollPanel:AlphaTo(0, 0.15, 0)
-            settingsTitleLabel:SetAlpha(255)
-            settingsTitleLabel:AlphaTo(0, 0.15, 0)
-            settingsHelpText:SetAlpha(255)
-            settingsHelpText:AlphaTo(0, 0.15, 0)
+            PanelFadeOut(OpenScrollPanel, 0.15)
+            PanelFadeOut(settingsTitleLabel, 0.15)
+            PanelFadeOut(settingsHelpText, 0.15)
             surface.PlaySound("chicagoRP_settings/back.wav")
             timer.Simple(0.15, function()
                 if IsValid(OpenScrollPanel) then
@@ -941,12 +1001,9 @@ net.Receive("chicagoRP_settings", function()
             buttonscreated = true
 
             if IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-                OpenScrollPanel:SetAlpha(255)
-                OpenScrollPanel:AlphaTo(0, 0.15, 0)
-                settingsTitleLabel:SetAlpha(255)
-                settingsTitleLabel:AlphaTo(0, 0.15, 0)
-                settingsHelpText:SetAlpha(255)
-                settingsHelpText:AlphaTo(0, 0.15, 0)
+                PanelFadeOut(OpenScrollPanel, 0.15)
+                PanelFadeOut(settingsTitleLabel, 0.15)
+                PanelFadeOut(settingsHelpText, 0.15)
                 timer.Simple(0.15, function()
                     if IsValid(OpenScrollPanel) then
                         OpenScrollPanel:Hide()
@@ -961,13 +1018,10 @@ net.Receive("chicagoRP_settings", function()
                 if OpenScrollPanel == nil then return end
                 timer.Simple(0.2, function()
                     if IsValid(settingsScrollPanel) and IsValid(settingsTitleLabel) and IsValid(OpenScrollPanel) then
-                        settingsTitleLabel:SetAlpha(0)
-                        settingsTitleLabel:AlphaTo(255, 0.15, 0)
-                        settingsHelpText:SetAlpha(0)
-                        settingsHelpText:AlphaTo(255, 0.15, 0)
+                        PanelFadeIn(settingsTitleLabel, 0.15)
+                        PanelFadeIn(settingsHelpText, 0.15)
                         settingsScrollPanel:Show()
-                        settingsScrollPanel:SetAlpha(0)
-                        settingsScrollPanel:AlphaTo(255, 0.15, 0)
+                        PanelFadeIn(settingsScrollPanel, 0.15)
                         settingsTitleLabel:SetText(v.printname)
                         if v.overridename then
                             settingsTitleLabel:SetText(v.overridename)
@@ -976,13 +1030,10 @@ net.Receive("chicagoRP_settings", function()
                     end
                 end)
             elseif IsValid(settingsScrollPanel) and !IsValid(OpenScrollPanel) and IsValid(settingsTitleLabel) then
-                settingsTitleLabel:SetAlpha(0)
-                settingsTitleLabel:AlphaTo(255, 0.15, 0)
-                settingsHelpText:SetAlpha(0)
-                settingsHelpText:AlphaTo(255, 0.15, 0)
+                PanelFadeIn(settingsTitleLabel, 0.15)
+                PanelFadeIn(settingsHelpText, 0.15)
                 settingsScrollPanel:Show()
-                settingsScrollPanel:SetAlpha(0)
-                settingsScrollPanel:AlphaTo(255, 0.15, 0)
+                PanelFadeIn(settingsScrollPanel, 0.15)
                 settingsTitleLabel:SetText(v.printname)
                 if v.overridename then
                     settingsTitleLabel:SetText(v.overridename)
