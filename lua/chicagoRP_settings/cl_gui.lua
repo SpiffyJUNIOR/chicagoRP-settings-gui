@@ -167,8 +167,13 @@ local function ButtonFade(panel, w, h, clrfrom, clrto, alphafrom, alphato, speed
     if (children == nil) then children = false end
 
     local hovered = panel:IsHovered()
-    local haschildren = panel:HasChildren()
+    local haschild = panel:HasChildren()
+    local childhovered = nil
     local buf, step = panel.__hoverBuf or 0, RealFrameTime() * speed
+
+    if haschild and children == true then
+        childhovered = self:GetChild(0):IsHovered()
+    end
 
     if children == false then -- we can combine this check
         if hovered and buf < 1 then
@@ -177,9 +182,9 @@ local function ButtonFade(panel, w, h, clrfrom, clrto, alphafrom, alphato, speed
             buf = math.max(0, buf - step)
         end
     elseif children == true then
-        if (hovered or haschildren) and buf < 1 then
+        if (hovered or childhovered) and buf < 1 then
             buf = math.min(1, step + buf)
-        elseif (!hovered and !haschildren) and buf > 0 then
+        elseif (!hovered and !childhovered) and buf > 0 then
             buf = math.max(0, buf - step)
         end
     end
@@ -196,8 +201,13 @@ local function OutlineFade(panel, w, h, alphafrom, alphato, speed, children)
     if (children == nil) then children = false end
 
     local hovered = panel:IsHovered()
-    local haschildren = panel:HasChildren()
+    local haschild = panel:HasChildren()
+    local childhovered = nil
     local Outlinebuf, Outlinestep = panel.__hoverOutlineBuf or 0, RealFrameTime() * speed
+
+    if haschild and children == true then
+        childhovered = self:GetChild(0):IsHovered()
+    end
 
     if children == false then -- we can combine this check
         if hovered and Outlinebuf < 1 then
@@ -206,9 +216,9 @@ local function OutlineFade(panel, w, h, alphafrom, alphato, speed, children)
             Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
         end
     elseif children == true then
-        if (hovered or haschildren) and Outlinebuf < 1 then
+        if (hovered or childhovered) and Outlinebuf < 1 then
             Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-        elseif (!hovered and !haschildren) and Outlinebuf > 0 then
+        elseif (!hovered and !childhovered) and Outlinebuf > 0 then
             Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
         end
     end
@@ -310,59 +320,67 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsButton:Paint(w, h)
             local hovered = self:IsHovered()
-            local bufIn, stepIn = self.__hoverBufIn or 0, RealFrameTime() * 4
+            -- local bufIn, stepIn = self.__hoverBufIn or 0, RealFrameTime() * 4
 
-            if hovered and bufIn < 1 then
-                bufIn = math.min(1, stepIn + bufIn)
-            elseif !hovered and bufIn > 0 then
-                bufIn = math.max(0, bufIn - stepIn)
-            end
+            -- if hovered and bufIn < 1 then
+            --     bufIn = math.min(1, stepIn + bufIn)
+            -- elseif !hovered and bufIn > 0 then
+            --     bufIn = math.max(0, bufIn - stepIn)
+            -- end
 
-            self.__hoverBufIn = bufIn
-            bufIn = math.EaseInOut(bufIn, 0.2, 0.2)
-            local alpha, clr = Lerp(bufIn, 80, 80), Lerp(bufIn, 40, 80)
+            -- self.__hoverBufIn = bufIn
+            -- bufIn = math.EaseInOut(bufIn, 0.2, 0.2)
+            -- local alpha, clr = Lerp(bufIn, 80, 80), Lerp(bufIn, 40, 80)
 
-            surface.SetDrawColor(clr, clr, clr, alpha)
-            surface.DrawRect(0, 0, w, h)
+            -- surface.SetDrawColor(clr, clr, clr, alpha)
+            -- surface.DrawRect(0, 0, w, h)
+            -- -----
+            -- local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, RealFrameTime() * 4
+
+            -- if hovered and bufOutlineIn < 1 then
+            --     bufOutlineIn = math.min(1, stepOutlineIn + bufOutlineIn)
+            -- elseif !hovered and bufOutlineIn > 0 then
+            --     bufOutlineIn = math.max(0, bufOutlineIn - stepOutlineIn)
+            -- end
+
+            -- self.__hoverbufOutlineIn = bufOutlineIn
+            -- bufOutlineIn = math.EaseInOut(bufOutlineIn, 0.5, 0.5)
+            -- local alphaOutline = Lerp(bufOutlineIn, 0, 180)
+
+            -- gradientcolor1.a = alphaOutline
+            -- gradientcolor2.a = alphaOutline
+
+            -- -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
+            -- if (self.pulse != true) then
+            --     DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
+            -- end
+            -- -----
+            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+
+            -- if (self.pulse == true) and pulseBuf < 1 then
+            --     pulseBuf = math.min(1, pulseStep + pulseBuf)
+            --     print(pulseBuf)
+            -- elseif (self.pulse != true) and pulseBuf > 0 then
+            --     pulseBuf = math.max(0, pulseBuf - pulseStep)
+            --     print(pulseBuf)
+            -- end
+
+            -- self.__pulseBuf = pulseBuf
+            -- pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+            -- local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 0, 80), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
+
+            -- surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
+            -- surface.DrawRect(0, 0, w, h)
+
+            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
+
+            ButtonFade(self, w, h, 40, 80, 80, 80, 4, false)
             -----
-            local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, RealFrameTime() * 4
 
-            if hovered and bufOutlineIn < 1 then
-                bufOutlineIn = math.min(1, stepOutlineIn + bufOutlineIn)
-            elseif !hovered and bufOutlineIn > 0 then
-                bufOutlineIn = math.max(0, bufOutlineIn - stepOutlineIn)
-            end
-
-            self.__hoverbufOutlineIn = bufOutlineIn
-            bufOutlineIn = math.EaseInOut(bufOutlineIn, 0.5, 0.5)
-            local alphaOutline = Lerp(bufOutlineIn, 0, 180)
-
-            gradientcolor1.a = alphaOutline
-            gradientcolor2.a = alphaOutline
-
-            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-            if (self.pulse != true) then
-                DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-            end
+            OutlineFade(self, w, h, 0, 180, 4, false)
             -----
-            local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-            if (self.pulse == true) and pulseBuf < 1 then
-                pulseBuf = math.min(1, pulseStep + pulseBuf)
-                print(pulseBuf)
-            elseif (self.pulse != true) and pulseBuf > 0 then
-                pulseBuf = math.max(0, pulseBuf - pulseStep)
-                print(pulseBuf)
-            end
-
-            self.__pulseBuf = pulseBuf
-            pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-            local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 0, 80), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
-
-            surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-            surface.DrawRect(0, 0, w, h)
-
-            DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
+            Pulse(self, w, h, 0, 150, 0, 20, 0, 30, 0, 80, self.pulse, 5)
 
             if hovered then
                 helptextparent:SetText(helptext)
@@ -379,13 +397,19 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", HorizontalScreenScale(790), VerticalScreenScale(12), primarytext, TEXT_ALIGN_RIGHT)
             end
-            print(AdvancedVerticalScreenScale(12, h))
 
             draw.DrawText(printname, "MichromaRegular", HorizontalScreenScale(14), VerticalScreenScale(12), primarytext, TEXT_ALIGN_LEFT)
         end
 
         function settingsButton:DoClick()
             self.pulse = true
+
+            timer.Simple(0.20, function() -- tweak to look better and tweak times
+                if IsValid(self) then
+                    self.pulse = false
+                end
+            end)
+
             if (GetConVar(convar):GetInt() == 0) then -- add float check pls
                 RunConsoleCommand(convar, "1")
                 surface.PlaySound("chicagoRP_settings/select.wav")
@@ -393,11 +417,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
                 RunConsoleCommand(convar, "0")
                 surface.PlaySound("chicagoRP_settings/select.wav")
             end
-            timer.Simple(0.20, function() -- tweak to look better and tweak times
-                if IsValid(self) then
-                    self.pulse = false
-                end
-            end)
         end
     elseif (GetConVar(convar):GetInt() >= 0 or GetConVar(convar):GetInt() <= 0) and (max > 1) and ConVarExists(convar) then
         local settingsSliderParent = parent:Add("DButton")
@@ -413,20 +432,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         function settingsSliderParent:Paint(w, h)
             local hovered = self:IsHovered()
             local childhovered = self:IsChildHovered()
-            -- local buf, step = self.__hoverBuf or 0, RealFrameTime() * 4
-
-            -- if (hovered or childhovered) and buf < 1 then
-            --     buf = math.min(1, step + buf)
-            -- elseif (!hovered and !childhovered) and buf > 0 then
-            --     buf = math.max(0, buf - step)
-            -- end
-
-            -- self.__hoverBuf = buf
-            -- buf = math.EaseInOut(buf, 0.2, 0.2)
-            -- local alpha, clr = Lerp(buf, 80, 80), Lerp(buf, 40, 80)
-
-            -- surface.SetDrawColor(clr, clr, clr, alpha)
-            -- surface.DrawRect(0, 0, w, h)
             -----
             -- local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
 
@@ -447,7 +452,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
             ButtonFade(self, w, h, 40, 80, 80, 80, 4, true)
 
-            OutlineFade(self, w, h, 0, 150, 4, true) -- work you piece of shit
+            OutlineFade(self, w, h, 0, 150, 4, true) -- work you actual piece of shit
 
             DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
 
@@ -922,23 +927,25 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(clr, clr, clr, alpha)
             surface.DrawRect(0, 0, w, h)
             -----
-            local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
 
-            if (self.pulse == true) and pulseBuf < 1 then
-                pulseBuf = math.min(1, pulseStep + pulseBuf)
-                -- print(pulseBuf)
-            elseif (self.pulse != true) and pulseBuf > 0 then
-                pulseBuf = math.max(0, pulseBuf - pulseStep)
-                -- print(pulseBuf)
-            end
+            -- if (self.pulse == true) and pulseBuf < 1 then
+            --     pulseBuf = math.min(1, pulseStep + pulseBuf)
+            --     -- print(pulseBuf)
+            -- elseif (self.pulse != true) and pulseBuf > 0 then
+            --     pulseBuf = math.max(0, pulseBuf - pulseStep)
+            --     -- print(pulseBuf)
+            -- end
 
-            self.__pulseBuf = pulseBuf
-            pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-            local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 180), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
-            -- local outlinePulse = Lerp(pulseBuf, 0, 3)
+            -- self.__pulseBuf = pulseBuf
+            -- pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
+            -- local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 180), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
+            -- -- local outlinePulse = Lerp(pulseBuf, 0, 3)
 
-            surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-            surface.DrawRect(0, 0, w, h)
+            -- surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
+            -- surface.DrawRect(0, 0, w, h)
+
+            Pulse(self, w, h, 0, 180, 0, 20, 0, 30, 0, 40, self.pulse, 5)
 
             -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
@@ -1052,4 +1059,3 @@ print("chicagoRP GUI loaded!")
 
 -- still need:
 -- optimization
--- make creating categories not awful
