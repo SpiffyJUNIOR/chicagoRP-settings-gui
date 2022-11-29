@@ -36,6 +36,7 @@ local gradientLeftMat = Material("vgui/gradient-l") -- gradient-d, gradient-r, g
 local gradientRightMat = Material("vgui/gradient-r") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
 local roundedOutlineMat = Material("chicagoRP_settings/color_panel_clear.png")
 local exiticon = Material("chicagoRP_settings/exiticon.png", "smooth")
+local TrueFrameTime = RealFrameTime()
 local HideHUD = false
 local OpenMotherFrame = nil
 local OpenScrollPanel = nil
@@ -46,12 +47,20 @@ local secondarytext = (Color(CVarSecondaryRed, CVarSecondaryGreen, CVarSecondary
 local accenttext = Color(CVarAccentRed, CVarAccentGreen, CVarAccentBlue, 220) -- colors for exit icon, outline text, and back/game text
 local gradientcolor1 = Color(CVarPrimaryGradientRed, CVarPrimaryGradientGreen, CVarPrimaryGradientBlue, 180) -- Color(247, 31, 251, 200)
 local gradientcolor2 = Color(CVarSecondaryGradientRed, CVarSecondaryGradientGreen, CVarSecondaryGradientBlue, 180) -- Color(4, 164, 255, 200)
+local pulseredfrom, pulseredto = 0, 150
+local pulsegreenfrom, pulsegreento = 0, 20
+local pulsebluefrom, pulseblueto = 0, 30
+local pulsealphafrom, pulsealphato = 0, 80
+local altpulseredfrom, altpulseredto = 0, 180
+local altpulsegreenfrom, altpulsegreento = 0, 20
+local altpulsebluefrom, altpulseblueto = 0, 30
+local alptulsealphafrom, altpulsealphato = 0, 40
 
 local function BlurBackground(panel)
     if (!IsValid(panel) or !panel:IsVisible()) then return end
     local layers, density, alpha = 1, 1, 100
     local x, y = panel:LocalToScreen(0, 0)
-    local FrameRate, Num, Dark = 1 / RealFrameTime(), 5, 150
+    local FrameRate, Num, Dark = 1 / TrueFrameTime, 5, 150
 
     surface.SetDrawColor(255, 255, 255, alpha)
     surface.SetMaterial(blurMat)
@@ -169,7 +178,7 @@ local function ButtonFade(panel, w, h, clrfrom, clrto, alphafrom, alphato, speed
     local hovered = panel:IsHovered()
     local haschild = panel:HasChildren()
     local childhovered = nil
-    local buf, step = panel.__hoverBuf or 0, RealFrameTime() * speed
+    local buf, step = panel.__hoverBuf or 0, TrueFrameTime * speed
 
     if haschild and children == true then
         childhovered = self:GetChild(0):IsHovered()
@@ -203,7 +212,7 @@ local function OutlineFade(panel, w, h, alphafrom, alphato, speed, children)
     local hovered = panel:IsHovered()
     local haschild = panel:HasChildren()
     local childhovered = nil
-    local Outlinebuf, Outlinestep = panel.__hoverOutlineBuf or 0, RealFrameTime() * speed
+    local Outlinebuf, Outlinestep = panel.__hoverOutlineBuf or 0, TrueFrameTime * speed
 
     if haschild and children == true then
         childhovered = self:GetChild(0):IsHovered()
@@ -238,7 +247,7 @@ local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento
         DrawOutlinedGradientRect(panel, gradientcolor1, gradientcolor2, 3)
     end
 
-    local pulseBuf, pulseStep = panel.__pulseBuf or 0, RealFrameTime() * speed
+    local pulseBuf, pulseStep = panel.__pulseBuf or 0, TrueFrameTime * speed
 
     if (pulsevalue == true) and pulseBuf < 1 then
         pulseBuf = math.min(1, pulseStep + pulseBuf)
@@ -320,7 +329,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsButton:Paint(w, h)
             local hovered = self:IsHovered()
-            -- local bufIn, stepIn = self.__hoverBufIn or 0, RealFrameTime() * 4
+            -- local bufIn, stepIn = self.__hoverBufIn or 0, TrueFrameTime * 4
 
             -- if hovered and bufIn < 1 then
             --     bufIn = math.min(1, stepIn + bufIn)
@@ -335,7 +344,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             -- surface.SetDrawColor(clr, clr, clr, alpha)
             -- surface.DrawRect(0, 0, w, h)
             -- -----
-            -- local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, RealFrameTime() * 4
+            -- local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, TrueFrameTime * 4
 
             -- if hovered and bufOutlineIn < 1 then
             --     bufOutlineIn = math.min(1, stepOutlineIn + bufOutlineIn)
@@ -355,7 +364,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             --     DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
             -- end
             -- -----
-            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, TrueFrameTime * 5
 
             -- if (self.pulse == true) and pulseBuf < 1 then
             --     pulseBuf = math.min(1, pulseStep + pulseBuf)
@@ -380,7 +389,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             OutlineFade(self, w, h, 0, 180, 4, false)
             -----
 
-            Pulse(self, w, h, 0, 150, 0, 20, 0, 30, 0, 80, self.pulse, 5)
+            Pulse(self, w, h, pulseredfrom, pulseredto, pulsegreenfrom, pulsegreento, pulsebluefrom, pulseblueto, pulsealphafrom, pulsealphato, self.pulse, 5)
 
             if hovered then
                 helptextparent:SetText(helptext)
@@ -433,7 +442,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             local hovered = self:IsHovered()
             local childhovered = self:IsChildHovered()
             -----
-            -- local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, RealFrameTime() * 4
+            -- local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, TrueFrameTime * 4
 
             -- if (hovered or childhovered) and Outlinebuf < 1 then
             --     Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
@@ -530,7 +539,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         OutlineFade(self, w, h, 0, 150, 4, true)
         -----
 
-        Pulse(self, w, h, 0, 150, 0, 20, 0, 30, 0, 80, self.pulse, 5)
+        Pulse(self, w, h, pulseredfrom, pulseredto, pulsegreenfrom, pulsegreento, pulsebluefrom, pulseblueto, pulsealphafrom, pulsealphato, self.pulse, 5)
         -----
 
         if hovered or haschildren then
@@ -893,7 +902,7 @@ net.Receive("chicagoRP_settings", function()
         function categoryButton:Paint(w, h)
             local panelActive = settingsScrollPanel:IsVisible()
             local hovered = self:IsHovered()
-            local buf, step = self.__hoverBuf or 0, RealFrameTime() * 3
+            local buf, step = self.__hoverBuf or 0, TrueFrameTime * 3
             local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
 
             if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != settingsScrollPanel) then
@@ -927,7 +936,7 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(clr, clr, clr, alpha)
             surface.DrawRect(0, 0, w, h)
             -----
-            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, RealFrameTime() * 5
+            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, TrueFrameTime * 5
 
             -- if (self.pulse == true) and pulseBuf < 1 then
             --     pulseBuf = math.min(1, pulseStep + pulseBuf)
@@ -945,7 +954,7 @@ net.Receive("chicagoRP_settings", function()
             -- surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
             -- surface.DrawRect(0, 0, w, h)
 
-            Pulse(self, w, h, 0, 180, 0, 20, 0, 30, 0, 40, self.pulse, 5)
+            Pulse(self, w, h, altpulseredfrom, altpulseredto, altpulsegreenfrom, altpulsegreento, altpulsebluefrom, altpulseblueto, altpulsealphafrom, altpulsealphato, self.pulse, 5)
 
             -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
 
