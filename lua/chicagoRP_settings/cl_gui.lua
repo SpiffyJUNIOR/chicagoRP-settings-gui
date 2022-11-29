@@ -36,7 +36,6 @@ local gradientLeftMat = Material("vgui/gradient-l") -- gradient-d, gradient-r, g
 local gradientRightMat = Material("vgui/gradient-r") -- gradient-d, gradient-r, gradient-u, gradient-l, gradient_down, gradient_up
 local roundedOutlineMat = Material("chicagoRP_settings/color_panel_clear.png")
 local exiticon = Material("chicagoRP_settings/exiticon.png", "smooth")
-local TrueFrameTime = RealFrameTime()
 local HideHUD = false
 local OpenMotherFrame = nil
 local OpenScrollPanel = nil
@@ -54,13 +53,13 @@ local pulsealphafrom, pulsealphato = 0, 80
 local altpulseredfrom, altpulseredto = 0, 180
 local altpulsegreenfrom, altpulsegreento = 0, 20
 local altpulsebluefrom, altpulseblueto = 0, 30
-local alptulsealphafrom, altpulsealphato = 0, 40
+local altpulsealphafrom, altpulsealphato = 0, 40
 
 local function BlurBackground(panel)
     if (!IsValid(panel) or !panel:IsVisible()) then return end
     local layers, density, alpha = 1, 1, 100
     local x, y = panel:LocalToScreen(0, 0)
-    local FrameRate, Num, Dark = 1 / TrueFrameTime, 5, 150
+    local FrameRate, Num, Dark = 1 / RealFrameTime(), 5, 150
 
     surface.SetDrawColor(255, 255, 255, alpha)
     surface.SetMaterial(blurMat)
@@ -178,24 +177,16 @@ local function ButtonFade(panel, w, h, clrfrom, clrto, alphafrom, alphato, speed
     local hovered = panel:IsHovered()
     local haschild = panel:HasChildren()
     local childhovered = nil
-    local buf, step = panel.__hoverBuf or 0, TrueFrameTime * speed
+    local buf, step = panel.__hoverBuf or 0, RealFrameTime() * speed
 
     if haschild and children == true then
-        childhovered = self:GetChild(0):IsHovered()
+        childhovered = panel:GetChild(0):IsHovered()
     end
 
-    if children == false then -- we can combine this check
-        if hovered and buf < 1 then
-            buf = math.min(1, step + buf)
-        elseif !hovered and buf > 0 then
-            buf = math.max(0, buf - step)
-        end
-    elseif children == true then
-        if (hovered or childhovered) and buf < 1 then
-            buf = math.min(1, step + buf)
-        elseif (!hovered and !childhovered) and buf > 0 then
-            buf = math.max(0, buf - step)
-        end
+    if (hovered or (hovered or childhovered)) and buf < 1 then
+        buf = math.min(1, step + buf)
+    elseif (!hovered and !childhovered) and buf > 0 then
+        buf = math.max(0, buf - step)
     end
 
     panel.__hoverBuf = buf
@@ -212,24 +203,16 @@ local function OutlineFade(panel, w, h, alphafrom, alphato, speed, children)
     local hovered = panel:IsHovered()
     local haschild = panel:HasChildren()
     local childhovered = nil
-    local Outlinebuf, Outlinestep = panel.__hoverOutlineBuf or 0, TrueFrameTime * speed
+    local Outlinebuf, Outlinestep = panel.__hoverOutlineBuf or 0, RealFrameTime() * speed
 
     if haschild and children == true then
-        childhovered = self:GetChild(0):IsHovered()
+        childhovered = panel:GetChild(0):IsHovered()
     end
 
-    if children == false then -- we can combine this check
-        if hovered and Outlinebuf < 1 then
-            Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-        elseif !hovered and Outlinebuf > 0 then
-            Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
-        end
-    elseif children == true then
-        if (hovered or childhovered) and Outlinebuf < 1 then
-            Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-        elseif (!hovered and !childhovered) and Outlinebuf > 0 then
-            Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
-        end
+    if (hovered or (hovered or childhovered)) and Outlinebuf < 1 then
+        Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
+    elseif (!hovered and !childhovered) and Outlinebuf > 0 then
+        Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
     end
 
     panel.__hoverOutlineBuf = Outlinebuf
@@ -240,14 +223,14 @@ local function OutlineFade(panel, w, h, alphafrom, alphato, speed, children)
     gradientcolor2.a = alphaOutline
 end
 
-local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento, clrbluefrom, clrblueto, alphafrom, alphato, pulsevalue, speed, disableoutline) -- the cracker
+local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento, clrbluefrom, clrblueto, alphafrom, alphato, pulsevalue, speed, disableoutline)
     if (disableoutline == nil) then disableoutline = false end
 
     if (pulsevalue != true) and disableoutline == false then
         DrawOutlinedGradientRect(panel, gradientcolor1, gradientcolor2, 3)
     end
 
-    local pulseBuf, pulseStep = panel.__pulseBuf or 0, TrueFrameTime * speed
+    local pulseBuf, pulseStep = panel.__pulseBuf or 0, RealFrameTime() * speed
 
     if (pulsevalue == true) and pulseBuf < 1 then
         pulseBuf = math.min(1, pulseStep + pulseBuf)
@@ -271,15 +254,14 @@ local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento
     end
 end
 
-
 local function HoverSound()
     local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0)
     if hoverslide then
         hoverslide:SetSoundLevel(0)
-        hoverslide:Stop() -- it won't play again otherwise
+        hoverslide:Stop()
         hoverslide:Play()
     end
-    return hoverslide -- useful if you want to stop the sound yourself
+    return hoverslide
 end
 
 local function PanelFadeIn(panel, length)
@@ -313,7 +295,7 @@ local function AdvancedVerticalScreenScale(size, divisor)
 end
 
 local function CreateSettingsButton(printname, convar, min, max, helptext, parent, helptextparent, frame)
-    local CVarColorPulse = GetConVar("chicagoRP_clickpulse"):GetBool()
+    local CVarPulse = GetConVar("chicagoRP_clickpulse"):GetBool()
 
     if (GetConVar(convar):GetInt() == 0 or GetConVar(convar):GetInt() == 1) and (max == 1) and ConVarExists(convar) then
         local settingsButton = parent:Add("DButton")
@@ -329,72 +311,23 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsButton:Paint(w, h)
             local hovered = self:IsHovered()
-            -- local bufIn, stepIn = self.__hoverBufIn or 0, TrueFrameTime * 4
-
-            -- if hovered and bufIn < 1 then
-            --     bufIn = math.min(1, stepIn + bufIn)
-            -- elseif !hovered and bufIn > 0 then
-            --     bufIn = math.max(0, bufIn - stepIn)
-            -- end
-
-            -- self.__hoverBufIn = bufIn
-            -- bufIn = math.EaseInOut(bufIn, 0.2, 0.2)
-            -- local alpha, clr = Lerp(bufIn, 80, 80), Lerp(bufIn, 40, 80)
-
-            -- surface.SetDrawColor(clr, clr, clr, alpha)
-            -- surface.DrawRect(0, 0, w, h)
-            -- -----
-            -- local bufOutlineIn, stepOutlineIn = self.__hoverbufOutlineIn or 0, TrueFrameTime * 4
-
-            -- if hovered and bufOutlineIn < 1 then
-            --     bufOutlineIn = math.min(1, stepOutlineIn + bufOutlineIn)
-            -- elseif !hovered and bufOutlineIn > 0 then
-            --     bufOutlineIn = math.max(0, bufOutlineIn - stepOutlineIn)
-            -- end
-
-            -- self.__hoverbufOutlineIn = bufOutlineIn
-            -- bufOutlineIn = math.EaseInOut(bufOutlineIn, 0.5, 0.5)
-            -- local alphaOutline = Lerp(bufOutlineIn, 0, 180)
-
-            -- gradientcolor1.a = alphaOutline
-            -- gradientcolor2.a = alphaOutline
-
-            -- -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-            -- if (self.pulse != true) then
-            --     DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-            -- end
-            -- -----
-            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, TrueFrameTime * 5
-
-            -- if (self.pulse == true) and pulseBuf < 1 then
-            --     pulseBuf = math.min(1, pulseStep + pulseBuf)
-            --     print(pulseBuf)
-            -- elseif (self.pulse != true) and pulseBuf > 0 then
-            --     pulseBuf = math.max(0, pulseBuf - pulseStep)
-            --     print(pulseBuf)
-            -- end
-
-            -- self.__pulseBuf = pulseBuf
-            -- pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-            -- local alphaPulse, clrRed, clrGreen, clrBlue, outlinePulse = Lerp(pulseBuf, 0, 80), Lerp(pulseBuf, 0, 150), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30), Lerp(pulseBuf, 0, 4)
-
-            -- surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-            -- surface.DrawRect(0, 0, w, h)
-
-            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
-
+            -----
             ButtonFade(self, w, h, 40, 80, 80, 80, 4, false)
-            -----
 
+            -----
             OutlineFade(self, w, h, 0, 180, 4, false)
+
             -----
+            if CVarPulse then
+                Pulse(self, w, h, pulseredfrom, pulseredto, pulsegreenfrom, pulsegreento, pulsebluefrom, pulseblueto, pulsealphafrom, pulsealphato, self.pulse, 5)
+            end
 
-            Pulse(self, w, h, pulseredfrom, pulseredto, pulsegreenfrom, pulsegreento, pulsebluefrom, pulseblueto, pulsealphafrom, pulsealphato, self.pulse, 5)
-
+            -----
             if hovered then
                 helptextparent:SetText(helptext)
             end
 
+            -----
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
                 RoundedOutline(roundedOutlineMat, HorizontalScreenScale(1300), VerticalScreenScale(14), 22, 22, 1, 1, 1, 1)
@@ -413,16 +346,16 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         function settingsButton:DoClick()
             self.pulse = true
 
-            timer.Simple(0.20, function() -- tweak to look better and tweak times
+            timer.Simple(0.20, function()
                 if IsValid(self) then
                     self.pulse = false
                 end
             end)
 
-            if (GetConVar(convar):GetInt() == 0) then -- add float check pls
+            if (GetConVar(convar):GetInt() == 0) then
                 RunConsoleCommand(convar, "1")
                 surface.PlaySound("chicagoRP_settings/select.wav")
-            elseif (GetConVar(convar):GetInt() == 1) then -- add float check pls
+            elseif (GetConVar(convar):GetInt() == 1) then
                 RunConsoleCommand(convar, "0")
                 surface.PlaySound("chicagoRP_settings/select.wav")
             end
@@ -442,26 +375,9 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             local hovered = self:IsHovered()
             local childhovered = self:IsChildHovered()
             -----
-            -- local Outlinebuf, Outlinestep = self.__hoverOutlineBuf or 0, TrueFrameTime * 4
-
-            -- if (hovered or childhovered) and Outlinebuf < 1 then
-            --     Outlinebuf = math.min(1, Outlinestep + Outlinebuf)
-            -- elseif (!hovered and !childhovered) and Outlinebuf > 0 then
-            --     Outlinebuf = math.max(0, Outlinebuf - Outlinestep)
-            -- end
-
-            -- self.__hoverOutlineBuf = Outlinebuf
-            -- Outlinebuf = math.EaseInOut(buf, 0.5, 0.5)
-            -- local alphaOutline = Lerp(buf, 0, 150)
-
-            -- gradientcolor1.a = alphaOutline
-            -- gradientcolor2.a = alphaOutline
-
-            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
-
             ButtonFade(self, w, h, 40, 80, 80, 80, 4, true)
 
-            OutlineFade(self, w, h, 0, 150, 4, true) -- work you actual piece of shit
+            OutlineFade(self, w, h, 0, 150, 4, true)
 
             DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
 
@@ -476,8 +392,8 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         local settingsSlider = vgui.Create("DNumSlider", settingsSliderParent)
         local parentW, parentH = settingsSliderParent:GetSize()
         settingsSlider:SetText("")
-        settingsSlider:SetSize(HorizontalScreenScale(335), parentH) -- 234
-        settingsSlider:SetPos(parentW - settingsSlider:GetSize(), 0) -- fix this
+        settingsSlider:SetSize(HorizontalScreenScale(335), parentH)
+        settingsSlider:SetPos(parentW - settingsSlider:GetSize(), 0)
         settingsSlider:SetMin(min)
         settingsSlider:SetMax(max)
         settingsSlider:SetDecimals(0)
@@ -532,21 +448,22 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         local haschildren = self:HasChildren()
         local statusString = "Unbound"
         -----
-
         ButtonFade(self, w, h, 40, 80, 80, 80, 4, true)
         -----
-
         OutlineFade(self, w, h, 0, 150, 4, true)
-        -----
 
-        Pulse(self, w, h, pulseredfrom, pulseredto, pulsegreenfrom, pulsegreento, pulsebluefrom, pulseblueto, pulsealphafrom, pulsealphato, self.pulse, 5)
+        DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, 3)
+        -----
+        if CVarPulse then
+            Pulse(self, w, h, pulseredfrom, pulseredto, pulsegreenfrom, pulsegreento, pulsebluefrom, pulseblueto, pulsealphafrom, pulsealphato, self.pulse, 5)
+        end
         -----
 
         if hovered or haschildren then
             helptextparent:SetText(helptext)
         end
 
-        if input.LookupBinding(bind, false) and !haschildren then -- how do we hide this for a certain button?
+        if input.LookupBinding(bind, false) and !haschildren then
             statusString = string.upper(input.LookupBinding(bind, false))
             draw.DrawText(statusString, "MichromaRegular", HorizontalScreenScale(1325), VerticalScreenScale(10), primarytext, TEXT_ALIGN_RIGHT)
         end
@@ -558,7 +475,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         surface.PlaySound("chicagoRP_settings/select.wav")
         self.pulse = true
 
-        timer.Simple(0.20, function() -- tweak to look better and tweak times
+        timer.Simple(0.20, function()
             if IsValid(self) and self.pulse == true then
                 self.pulse = false
             end
@@ -575,8 +492,6 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlHelpText:SetText("Press a key to bind.")
 
         function controlHelpText:Paint(w, h)
-            -- surface.SetDrawColor(200, 0, 0, 10)
-            -- surface.DrawRect(0, 0, w, h)
             draw.DrawText(self:GetText(), "MichromaSmall", HorizontalScreenScale(390), VerticalScreenScale(5), primarytext, TEXT_ALIGN_RIGHT)
 
             return true
@@ -596,8 +511,6 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         controlsTextEntry:RequestFocus() -- please
 
         function controlsTextEntry:Paint(w, h)
-            -- surface.SetDrawColor(200, 0, 0, 10)
-            -- surface.DrawRect(0, 0, w, h)
             if math.sin((SysTime() * 1) * 6) > 0 then
                 draw.DrawText("__", "MichromaRegular", HorizontalScreenScale(16), VerticalScreenScale(12), primarytext, TEXT_ALIGN_CENTER)
             end
@@ -627,7 +540,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             controlHelpText:SetText("Key bound, paste in console then enter.")
 
             controlsButton.value = true
-            timer.Simple(0.20, function() -- tweak to look better and tweak times
+            timer.Simple(0.20, function()
                 if IsValid(controlsButton) and controlsButton.value == true then
                     controlsButton.value = false
                 end
@@ -669,6 +582,7 @@ net.Receive("chicagoRP_settings", function()
     local screenwidth = ScrW()
     local screenheight = ScrH()
     local CVarBlur = GetConVar("chicagoRP_blur"):GetBool()
+    local CVarPulse = GetConVar("chicagoRP_clickpulse"):GetBool()
     local CVarDSP = GetConVar("chicagoRP_dsp"):GetBool()
     local motherFrame = vgui.Create("DFrame")
     motherFrame:SetSize(screenwidth, screenheight)
@@ -736,7 +650,6 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function exitButton:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
     ---
@@ -759,7 +672,7 @@ net.Receive("chicagoRP_settings", function()
         surface.SetDrawColor(accenttext)
         surface.SetMaterial(exiticon)
         surface.DrawTexturedRect(0, 0, w, h)
-        -- return nil
+
         return true
     end
     ---
@@ -772,7 +685,6 @@ net.Receive("chicagoRP_settings", function()
     settingsLabel:SetTextColor(primarytext)
 
     function settingsLabel:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
     ---
@@ -784,22 +696,21 @@ net.Receive("chicagoRP_settings", function()
     settingsTitleLabel:SetTextColor(primarytext)
 
     function settingsTitleLabel:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         draw.DrawText(self:GetText(), "MichromaLarge", HorizontalScreenScale(12), VerticalScreenScale(12), accenttext, TEXT_ALIGN_LEFT)
         draw.DrawText(self:GetText(), "MichromaLarge", HorizontalScreenScale(14), VerticalScreenScale(10), primarytext, TEXT_ALIGN_LEFT)
+
         return true
     end
     ---
 
     local settingsHelpText = vgui.Create("DLabel", motherFrame)
-    settingsHelpText:SetPos(HorizontalScreenScale(60), VerticalScreenScale(935))
+    settingsHelpText:SetPos(HorizontalScreenScale(60), VerticalScreenScale(945))
     settingsHelpText:SetSize(1000, 30)
     settingsHelpText:SetFont("MichromaSmall")
     settingsHelpText:SetText("")
     settingsHelpText:SetTextColor(primarytext)
 
     function settingsHelpText:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
     ---
@@ -812,7 +723,6 @@ net.Receive("chicagoRP_settings", function()
     exitHelpText:SetTextColor(secondarytext)
 
     function exitHelpText:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
     ---
@@ -850,7 +760,6 @@ net.Receive("chicagoRP_settings", function()
     categoryScrollPanel:SetSize(HorizontalScreenScale(396), VerticalScreenScale(728))
 
     function categoryScrollPanel:Paint(w, h)
-        -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
         return nil
     end
 
@@ -883,7 +792,6 @@ net.Receive("chicagoRP_settings", function()
         settingsScrollPanel:Hide()
 
         function settingsScrollPanel:Paint(w, h)
-            -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
             return nil
         end
 
@@ -902,7 +810,7 @@ net.Receive("chicagoRP_settings", function()
         function categoryButton:Paint(w, h)
             local panelActive = settingsScrollPanel:IsVisible()
             local hovered = self:IsHovered()
-            local buf, step = self.__hoverBuf or 0, TrueFrameTime * 3
+            local buf, step = self.__hoverBuf or 0, RealFrameTime() * 5
             local alpha, clr = Lerp(buf, 0, 34), Lerp(buf, 0, 66) -- end of anim
 
             if hovered and buf < 1 and (!panelActive or panelActive) and (OpenScrollPanel == nil or OpenScrollPanel != settingsScrollPanel) then
@@ -936,59 +844,41 @@ net.Receive("chicagoRP_settings", function()
             surface.SetDrawColor(clr, clr, clr, alpha)
             surface.DrawRect(0, 0, w, h)
             -----
-            -- local pulseBuf, pulseStep = self.__pulseBuf or 0, TrueFrameTime * 5
-
-            -- if (self.pulse == true) and pulseBuf < 1 then
-            --     pulseBuf = math.min(1, pulseStep + pulseBuf)
-            --     -- print(pulseBuf)
-            -- elseif (self.pulse != true) and pulseBuf > 0 then
-            --     pulseBuf = math.max(0, pulseBuf - pulseStep)
-            --     -- print(pulseBuf)
-            -- end
-
-            -- self.__pulseBuf = pulseBuf
-            -- pulseBuf = math.EaseInOut(pulseBuf, 0.2, 0.2)
-            -- local alphaPulse, clrRed, clrGreen, clrBlue = Lerp(pulseBuf, 0, 40), Lerp(pulseBuf, 0, 180), Lerp(pulseBuf, 0, 20), Lerp(pulseBuf, 0, 30)
-            -- -- local outlinePulse = Lerp(pulseBuf, 0, 3)
-
-            -- surface.SetDrawColor(clrRed, clrGreen, clrBlue, alphaPulse)
-            -- surface.DrawRect(0, 0, w, h)
-
-            Pulse(self, w, h, altpulseredfrom, altpulseredto, altpulsegreenfrom, altpulsegreento, altpulsebluefrom, altpulseblueto, altpulsealphafrom, altpulsealphato, self.pulse, 5)
-
-            -- DrawOutlinedGradientRect(self, gradientcolor1, gradientcolor2, outlinePulse)
+            if CVarPulse then -- gradient pulse does not work
+                Pulse(self, w, h, altpulseredfrom, altpulseredto, altpulsegreenfrom, altpulsegreento, altpulsebluefrom, altpulseblueto, altpulsealphafrom, altpulsealphato, self.pulse, 3, true)
+            end
 
             draw.DrawText(v.printname, "MichromaRegular", HorizontalScreenScale(11), VerticalScreenScale(14), primarytext, TEXT_ALIGN_LEFT)
         end
         ---
-        local controlParentW, controlParentH = settingsScrollPanel:GetSize()
+        local labelParentW,_ = settingsScrollPanel:GetSize()
 
         local actionLabel = vgui.Create("DLabel", settingsScrollPanel)
-        actionLabel:SetPos(AdvancedHorizontalScreenScale(10, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW))
+        actionLabel:SetPos(AdvancedHorizontalScreenScale(10, labelParentW), AdvancedHorizontalScreenScale(-34, labelParentW))
         actionLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
         actionLabel:SetText("ACTION")
         actionLabel:SetTextColor(secondarytext)
-        actionLabel:NoClipping(true) -- fuck you derma
+        actionLabel:NoClipping(true)
         actionLabel:Hide()
 
         function actionLabel:Paint(w, h)
-            -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
             draw.DrawText(self:GetText(), "MichromaSmall", 0, 0, secondarytext, TEXT_ALIGN_LEFT)
+
             return true
         end
         ---
 
         local bindLabel = vgui.Create("DLabel", settingsScrollPanel)
-        bindLabel:SetPos(AdvancedHorizontalScreenScale(1745, controlParentW), AdvancedHorizontalScreenScale(-34, controlParentW)) -- fucking fix this
+        bindLabel:SetPos(AdvancedHorizontalScreenScale(1745, labelParentW), AdvancedHorizontalScreenScale(-34, labelParentW)) -- fucking fix this
         bindLabel:SetSize(HorizontalScreenScale(100), VerticalScreenScale(30))
         bindLabel:SetText("BINDING")
         bindLabel:SetTextColor(secondarytext)
-        bindLabel:NoClipping(true) -- fuck you derma
+        bindLabel:NoClipping(true)
         bindLabel:Hide()
 
         function bindLabel:Paint(w, h)
-            -- draw.RoundedBox(8, 0, 0, w, h, Color(200, 0, 0, 10))
             draw.DrawText(self:GetText(), "MichromaSmall", HorizontalScreenScale(96), 0, secondarytext, TEXT_ALIGN_RIGHT)
+
             return true
         end
 
@@ -998,19 +888,19 @@ net.Receive("chicagoRP_settings", function()
         function categoryButton:DoClick()
             self.pulse = true
 
-            timer.Simple(0.20, function() -- tweak to look better and tweak times
+            timer.Simple(0.20, function()
                 if IsValid(self) and self.pulse == true then
                     self.pulse = false
                 end
             end)
 
-            for _, v in ipairs(chicagoRP[v.name]) do -- if local !isvalid then do
-                if buttonscreated == false and isstring(v.bind) then
-                    CreateControlsButton(v.bind, v.printname, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+            for _, v2 in ipairs(chicagoRP[v.name]) do
+                if buttonscreated == false and isstring(v2.bind) then
+                    CreateControlsButton(v2.bind, v2.printname, v2.text, settingsScrollPanel, settingsHelpText, motherFrame)
                     actionLabel:Show()
                     bindLabel:Show()
-                elseif buttonscreated == false and isstring(v.convar) and ConVarExists(v.convar) then
-                    CreateSettingsButton(v.printname, v.convar, v.min, v.max, v.text, settingsScrollPanel, settingsHelpText, motherFrame)
+                elseif buttonscreated == false and isstring(v2.convar) and ConVarExists(v2.convar) then
+                    CreateSettingsButton(v2.printname,v2.convar, v2.min, v2.max, v2.text, settingsScrollPanel, settingsHelpText, motherFrame)
                 end
             end
 
