@@ -91,14 +91,14 @@ local function DrawOutlinedGradientRect(panel, firstcolor, secondcolor, thicknes
     if (!IsValid(panel) or !panel:IsVisible()) then return end
     local w, h = panel:GetSize()
 
-    surface.SetDrawColor(firstcolor)
+    surface.SetDrawColor(firstcolor:Unpack())
     surface.SetMaterial(gradientLeftMat)
     surface.DrawTexturedRectUV(0, 0, w, thickness, 0, 0, 1, 0) -- top
     surface.DrawTexturedRectUV(0, h - thickness, w, thickness, 0, 1, 1, 1) -- bottom
     surface.DrawTexturedRectUV(0, 0, thickness, h, 0, 0, 0, 1) -- left
     surface.DrawTexturedRectUV(w - thickness, 0, thickness, h, 1, 0, 1, 1) -- right
 
-    surface.SetDrawColor(secondcolor)
+    surface.SetDrawColor(secondcolor:Unpack())
     surface.SetMaterial(gradientRightMat)
     surface.DrawTexturedRectUV(0, 0, w, thickness, 0, 0, 1, 0) -- top
     surface.DrawTexturedRectUV(0, h - thickness, w, thickness, 0, 1, 1, 1) -- bottom
@@ -669,7 +669,7 @@ net.Receive("chicagoRP_settings", function()
     end
 
     function exitIconButton:Paint(w, h)
-        surface.SetDrawColor(accenttext)
+        surface.SetDrawColor(accenttext:Unpack())
         surface.SetMaterial(exiticon)
         surface.DrawTexturedRect(0, 0, w, h)
 
