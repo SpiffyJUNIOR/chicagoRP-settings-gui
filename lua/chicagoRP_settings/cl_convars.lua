@@ -16,5 +16,3 @@ CreateClientConVar("chicagoRP_secondarygradient_b", 70, true, false, "Changes th
 CreateClientConVar("chicagoRP_blur", 1, true, false, "Enables or disables UI blur when menu is active.", 0, 1)
 CreateClientConVar("chicagoRP_clickpulse", 1, true, false, "Enables or disables color pulse when you click a button.", 0, 1)
 CreateClientConVar("chicagoRP_dsp", 1, true, false, "Enables or disables low-pass DSP when menu is active.", 0, 1)
-
-print("chicagoRP client Convars loaded!")

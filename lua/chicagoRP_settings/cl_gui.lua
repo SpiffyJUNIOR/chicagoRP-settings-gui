@@ -252,7 +252,7 @@ local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento
     end
 end
 
-local function HoverSound()
+local function SlideSound()
     local hoverslide = CreateSound(game.GetWorld(), "chicagoRP_settings/hover_slide.wav", 0)
     if hoverslide then
         hoverslide:SetSoundLevel(0)
@@ -423,7 +423,7 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
 
         function settingsSlider:OnValueChanged(value)
             self:SetValue(math.Round(value, 0))
-            HoverSound()
+            SlideSound()
         end
     end
 end
@@ -764,7 +764,7 @@ net.Receive("chicagoRP_settings", function()
         draw.RoundedBox(0, 0, 0, w, h, Color(76, 76, 74, 150))
     end
 
-    for _, v in ipairs(chicagoRP.categories) do
+    for _, v in ipairs(chicagoRPsettings.categories) do
         local categoryButton = categoryScrollPanel:Add("DButton")
         categoryButton:SetText("")
         categoryButton:Dock(TOP)
@@ -884,7 +884,7 @@ net.Receive("chicagoRP_settings", function()
                 end
             end)
 
-            for _, v2 in ipairs(chicagoRP[v.name]) do
+            for _, v2 in ipairs(chicagoRPsettings[v.name]) do
                 if buttonscreated == false and isstring(v2.bind) then
                     CreateControlsButton(v2.bind, v2.printname, v2.text, settingsScrollPanel, settingsHelpText, motherFrame)
                     actionLabel:Show()
@@ -946,5 +946,3 @@ end)
 
 -- still need:
 -- optimization
-
-print("cl_gui loaded")

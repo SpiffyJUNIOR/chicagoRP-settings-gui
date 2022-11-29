@@ -1,6 +1,6 @@
-chicagoRP = {}
+chicagoRPsettings = {}
 
-chicagoRP.categories = {
+chicagoRPsettings.categories = {
     [1] = {
         name = "video",
         printname = "VIDEO"
@@ -16,7 +16,7 @@ chicagoRP.categories = {
     }
 }
 
-chicagoRP.video = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos
+chicagoRPsettings.video = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos
     [1] = {
         convar = "cl_new_impact_effects",
         max = 1,
@@ -138,7 +138,7 @@ chicagoRP.video = { -- simfphys camera, arccw, first person shadow, shmovement, 
     }
 }
 
-chicagoRP.game = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
+chicagoRPsettings.game = { -- simfphys camera, arccw, first person shadow, shmovement, vfire, simfphys, stormfox, atmos, 
     [1] = {
         convar = "arccw_crosshair_clr_a",
         max = 255,
@@ -169,7 +169,7 @@ chicagoRP.game = { -- simfphys camera, arccw, first person shadow, shmovement, v
     }
 }
 
-chicagoRP.controls = {
+chicagoRPsettings.controls = {
     [1] = {
         bind = "+drop",
         printname = "Drop Weapon",
@@ -261,5 +261,3 @@ chicagoRP.controls = {
         text = "Drops the currently held weapon."
     }
 }
-
-print("sh_settings loaded")

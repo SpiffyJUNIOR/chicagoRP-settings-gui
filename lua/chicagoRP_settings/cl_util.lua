@@ -42,5 +42,3 @@ surface.CreateFont("MichromaHelpText", {
     antialias = true,
     shadow = false
 })
-
-print("cl_util loaded")

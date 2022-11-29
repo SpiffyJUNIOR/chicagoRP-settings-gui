@@ -17,5 +17,3 @@ concommand.Add("chicagoRP_settings", function(ply)
     net.Start("chicagoRP_settings")
     net.Send(ply)
 end)
-
-print("cl_util loaded")
