@@ -4,7 +4,7 @@ hook.Add("PlayerSay", "chicagoRPsettings_PLAYERSAY", function(ply, txt)
     if !IsValid(ply) then return end
     local lowerTxt = string.lower(txt)
 
-    if (lowerTxt == "*settings*") then
+    if lowerTxt == "*settings*" then
         net.Start("chicagoRP_settings")
         net.Send(ply)
 
@@ -18,4 +18,4 @@ concommand.Add("chicagoRP_settings", function(ply)
     net.Send(ply)
 end)
 
-print("chicagoRP server Util loaded!")
+print("cl_util loaded")

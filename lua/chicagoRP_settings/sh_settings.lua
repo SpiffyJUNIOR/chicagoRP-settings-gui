@@ -262,4 +262,4 @@ chicagoRP.controls = {
     }
 }
 
-print("chicagoRP shared settings loaded!")
+print("sh_settings loaded")

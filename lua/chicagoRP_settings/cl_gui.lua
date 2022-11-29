@@ -234,10 +234,8 @@ local function Pulse(panel, w, h, clrredto, clrredfrom, clrgreenfrom, clrgreento
 
     if (pulsevalue == true) and pulseBuf < 1 then
         pulseBuf = math.min(1, pulseStep + pulseBuf)
-        print(pulseBuf)
     elseif (pulsevalue != true) and pulseBuf > 0 then
         pulseBuf = math.max(0, pulseBuf - pulseStep)
-        print(pulseBuf)
     end
 
     panel.__pulseBuf = pulseBuf
@@ -303,7 +301,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         settingsButton:Dock(TOP)
         settingsButton:DockMargin(0, 0, 3, 4)
         settingsButton:SetSize(HorizontalScreenScale(1340), VerticalScreenScale(50))
-        print(VerticalScreenScale(50))
 
         function settingsButton:OnCursorEntered()
             surface.PlaySound("chicagoRP_settings/hover.wav")
@@ -427,7 +424,6 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
         function settingsSlider:OnValueChanged(value)
             self:SetValue(math.Round(value, 0))
             HoverSound()
-            -- print(value)
         end
     end
 end
@@ -497,10 +493,6 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             return true
         end
 
-        function controlHelpText:OnRemove() -- debug function
-            print("helptext removed")
-        end
-
         PanelFadeIn(controlHelpText, 0.2)
 
         local parentW, parentH = self:GetSize()
@@ -557,7 +549,6 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
         function controlsTextEntry:OnLoseFocus()
             surface.PlaySound("chicagoRP_settings/back.wav")
             controlHelpText:SetText("Bind cancelled.")
-            print("bind cancelled")
             self:Remove()
             timer.Simple(5, function()
                 if IsValid(controlHelpText) then
@@ -765,7 +756,6 @@ net.Receive("chicagoRP_settings", function()
 
     local categoryScrollBar = categoryScrollPanel:GetVBar() -- mr biden please legalize nuclear bombs
     categoryScrollBar:SetHideButtons(true)
-    print(categoryScrollBar:GetSize())
     categoryScrollBar:SetPos(HorizontalScreenScale(525), VerticalScreenScale(185))
     function categoryScrollBar:Paint(w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(42, 40, 35, 66))
@@ -954,7 +944,7 @@ net.Receive("chicagoRP_settings", function()
     OpenMotherFrame = motherFrame
 end)
 
-print("chicagoRP GUI loaded!")
-
 -- still need:
 -- optimization
+
+print("cl_gui loaded")

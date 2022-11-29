@@ -1,5 +1,5 @@
 list.Set("DesktopWindows", "chicagoRP Settings", {
-    title = "chicagoRP Settings",
+    title = "Client Settings",
     icon = "icon64/chicagoRP_settings.png",
     init = function(icon, window)
         LocalPlayer():ConCommand("chicagoRP_settings")
@@ -43,4 +43,4 @@ surface.CreateFont("MichromaHelpText", {
     shadow = false
 })
 
-print("chicagoRP client Util loaded!")
+print("cl_util loaded")
