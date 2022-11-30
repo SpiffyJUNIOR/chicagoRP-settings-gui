@@ -1,6 +1,6 @@
 list.Set("DesktopWindows", "chicagoRP Settings", {
     title = "Client Settings",
-    icon = "icon64/chicagoRP_settings.png",
+    icon = "icon64/chicagorp_settings.png",
     init = function(icon, window)
         LocalPlayer():ConCommand("chicagoRP_settings")
     end
