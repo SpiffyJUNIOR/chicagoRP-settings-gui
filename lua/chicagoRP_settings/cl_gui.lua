@@ -95,11 +95,11 @@ local function CreateSettingsButton(printname, convar, min, max, helptext, paren
             -----
             if (GetConVar(convar):GetInt() == 0) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                chicagoRP.DrawOutlinedRoundedBox(3, chicagoRP.HorizontalScreenScale(1300), chicagoRP.VerticalScreenScale(14), 22, 22, primarytext, 1)
+                chicagoRP.DrawOutlinedRoundedBox(3, chicagoRP.HorizontalScreenScale(1300), chicagoRP.VerticalScreenScale(14), chicagoRP.VerticalScreenScale(22), chicagoRP.VerticalScreenScale(22), primarytext, 1)
             elseif (GetConVar(convar):GetInt() == 1) and (max == 1) then
                 surface.SetDrawColor(primarytext:Unpack())
-                draw.RoundedBox(4, chicagoRP.HorizontalScreenScale(1305), chicagoRP.VerticalScreenScale(19), 12, 12, primarytext)
-                chicagoRP.DrawOutlinedRoundedBox(3, chicagoRP.HorizontalScreenScale(1300), chicagoRP.VerticalScreenScale(14), 22, 22, primarytext, 1)
+                draw.RoundedBox(4, chicagoRP.HorizontalScreenScale(1305), chicagoRP.VerticalScreenScale(19), chicagoRP.VerticalScreenScale(12), chicagoRP.VerticalScreenScale(12), primarytext)
+                chicagoRP.DrawOutlinedRoundedBox(3, chicagoRP.HorizontalScreenScale(1300), chicagoRP.VerticalScreenScale(14), chicagoRP.VerticalScreenScale(22), chicagoRP.VerticalScreenScale(22), primarytext, 1)
             elseif (GetConVar(convar):GetInt() >= 0) and (max > 1) then
                 local statusString = GetConVar(convar):GetInt()
                 draw.DrawText(statusString, "MichromaRegular", chicagoRP.HorizontalScreenScale(790), chicagoRP.VerticalScreenScale(12), primarytext, TEXT_ALIGN_RIGHT)
