@@ -280,7 +280,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
             local bindblocked = false
             local keyname = tostring(input.GetKeyName(keyCode) .. " ")
             local bindtext = tostring("bind " .. input.GetKeyName(keyCode) .. " " .. bind)
-            for k, v in ipairs(blockedbindkeys) do
+            for _, v in ipairs(blockedbindkeys) do
                 if keyCode == v then
                     surface.PlaySound("chicagorp_settings/back.wav")
                     controlHelpText:SetText("Binding default key blocked.")
