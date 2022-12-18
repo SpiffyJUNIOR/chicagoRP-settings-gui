@@ -329,7 +329,7 @@ local function CreateControlsButton(bind, printname, helptext, parent, helptextp
     end
 end
 
-hook.Add("HUDPaint", "chicagoRP_HideHUD", function()
+hook.Add("HUDShouldDraw", "chicagoRP_HideHUD", function()
     if HideHUD then
         return false
     end
