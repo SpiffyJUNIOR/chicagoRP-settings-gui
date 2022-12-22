@@ -354,7 +354,7 @@ net.Receive("chicagoRP_settings", function()
     HideHUD = true
     OpenScrollPanel = nil
 
-    if IsValid(ArcCW.InvHUD) then
+    if ArcCW and IsValid(ArcCW.InvHUD) then
         ArcCW.InvHUD:Hide()
     end
 
